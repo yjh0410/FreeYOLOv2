@@ -64,13 +64,13 @@ python train.py --cuda -d coco -v yolo_free_nano -bs 16 -accu 4 --max_epoch 300 
 
 Main results on COCO-val:
 
-| Model      |  Scale  | FPS<sup><br>2080ti |  FLOPs   |  Params  |    AP    |    AP50    |  Weight  |
-|------------|---------|--------------------|----------|----------|----------|------------|----------|
-| FreeYOLO-N |  640    |                  |    G  |   M   |      |        |  |
-| FreeYOLO-S |  640    |                  |    G |   M   |      |        |  |
-| FreeYOLO-M |  640    |                  |    G |   M   |      |        |  |
-| FreeYOLO-L |  640    |                  |   G |   M  |      |        |  |
-| FreeYOLO-H |  640    |                  |   G |   M  |      |        |  |
+| Model        |  Scale  | FPS<sup><br>2080ti |  FLOPs   |  Params  |    AP    |    AP50    |  Weight  |
+|--------------|---------|--------------------|----------|----------|----------|------------|----------|
+| FreeYOLOv2-N |  640    |                  |   5.2 G  |  1.6 M   |      |        |  |
+| FreeYOLOv2-S |  640    |                  |    G |   M   |      |        |  |
+| FreeYOLOv2-M |  640    |                  |    G |   M   |      |        |  |
+| FreeYOLOv2-L |  640    |                  |   G |   M  |      |        |  |
+| FreeYOLOv2-H |  640    |                  |   G |   M  |      |        |  |
 
 
 ### WiderFace
@@ -111,13 +111,13 @@ python train.py --cuda -d widerface --root path/to/WiderFace -v yolo_free_nano -
 
 Main results on WiderFace-val:
 
-| Model      |  Scale  |    AP    |    AP50    |  Weight  |
-|------------|---------|----------|------------|----------|
-| FreeYOLO-N |  640    |      |        |  |
-| FreeYOLO-S |  640    |      |        |  |
-| FreeYOLO-M |  640    |      |        |  |
-| FreeYOLO-L |  640    |      |        |  |
-| FreeYOLO-H |  640    |      |        |  |
+| Model        |  Scale  |    AP    |    AP50    |  Weight  |
+|--------------|---------|----------|------------|----------|
+| FreeYOLOv2-N |  640    |      |        |  |
+| FreeYOLOv2-S |  640    |      |        |  |
+| FreeYOLOv2-M |  640    |      |        |  |
+| FreeYOLOv2-L |  640    |      |        |  |
+| FreeYOLOv2-H |  640    |      |        |  |
 
 
 ### CrowdHuman
@@ -167,13 +167,13 @@ python train.py --cuda -d crowdhuman -v yolo_free_nano -bs 16 -accu 4 -lr 0.001 
 
 Main results on CrowdHuman-val:
 
-| Model      |  Scale  |    AP    |    AP50    |  Weight  |
-|------------|---------|----------|------------|----------|
-| FreeYOLO-N |  640    |      |        |  |
-| FreeYOLO-S |  640    |      |        |  |
-| FreeYOLO-M |  640    |      |        |  |
-| FreeYOLO-L |  640    |      |        |  |
-| FreeYOLO-H |  640    |      |        |  |
+| Model        |  Scale  |    AP    |    AP50    |  Weight  |
+|--------------|---------|----------|------------|----------|
+| FreeYOLOv2-N |  640    |      |        |  |
+| FreeYOLOv2-S |  640    |      |        |  |
+| FreeYOLOv2-M |  640    |      |        |  |
+| FreeYOLOv2-L |  640    |      |        |  |
+| FreeYOLOv2-H |  640    |      |        |  |
 
 
 ## Train

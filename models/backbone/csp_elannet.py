@@ -147,7 +147,8 @@ class CSP_ELANNet(nn.Module):
 
         # --------- Network Parameters ----------
         self.layer_1 = nn.Sequential(
-            Conv(3, int(64*width), k=3, p=1, s=2, act_type=act_type, norm_type=norm_type, depthwise=depthwise),
+            Conv(3, int(64*width), k=3, p=1, s=2,
+                 act_type=act_type, norm_type=norm_type, depthwise=depthwise),
             Conv(int(64*width), int(64*width), k=3, p=1,
                  act_type=act_type, norm_type=norm_type, depthwise=depthwise)           # P1/2
         )
@@ -160,17 +161,17 @@ class CSP_ELANNet(nn.Module):
         self.layer_3 = nn.Sequential(   
             DownSample(in_dim=int(128*width), act_type=act_type, norm_type=norm_type, depthwise=depthwise),             
             CSP_ELANBlock(in_dim=int(128*width), out_dim=int(256*width), depth=int(6*depth), shortcut=True,
-                          act_type=act_type, norm_type=norm_type, depthwise=depthwise)  # P2/4
+                          act_type=act_type, norm_type=norm_type, depthwise=depthwise)  # P3/8
         )
         self.layer_4 = nn.Sequential(   
             DownSample(in_dim=int(256*width), act_type=act_type, norm_type=norm_type, depthwise=depthwise),             
             CSP_ELANBlock(in_dim=int(256*width), out_dim=int(512*width), depth=int(9*depth), shortcut=True,
-                          act_type=act_type, norm_type=norm_type, depthwise=depthwise)  # P2/4
+                          act_type=act_type, norm_type=norm_type, depthwise=depthwise)  # P4/16
         )
         self.layer_5 = nn.Sequential(   
             DownSample(in_dim=int(512*width), act_type=act_type, norm_type=norm_type, depthwise=depthwise),             
             CSP_ELANBlock(in_dim=int(512*width), out_dim=int(1024*width), depth=int(3*depth), shortcut=True,
-                          act_type=act_type, norm_type=norm_type, depthwise=depthwise)  # P2/4
+                          act_type=act_type, norm_type=norm_type, depthwise=depthwise)  # P5/32
         )
 
 
