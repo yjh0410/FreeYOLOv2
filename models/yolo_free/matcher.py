@@ -6,9 +6,9 @@ from .matcher_utils import select_candidates_in_gts, select_highest_overlaps, io
 
 class TaskAlignedAssigner(nn.Module):
     def __init__(self,
-                 topk=13,
+                 topk=10,
                  num_classes=80,
-                 alpha=1.0,
+                 alpha=0.5,
                  beta=6.0, 
                  eps=1e-9):
         super(TaskAlignedAssigner, self).__init__()
