@@ -9,27 +9,17 @@ from ..basic.elanblock import ELANBlock, DownSample
 class ELAN_PaFPN(nn.Module):
     def __init__(self, 
                  in_dims=[512, 1024, 512],
-                 out_dim=256,
-                 fpn_size='large',
+                 width=1.0,
+                 depth=1.0,
                  act_type='silu',
                  norm_type='BN',
                  depthwise=False):
         super(ELAN_PaFPN, self).__init__()
         self.in_dims = in_dims
-        self.out_dim = out_dim
+        self.out_dim = int(256 * width)
+        self.width = width
+        self.depth = depth
         c3, c4, c5 = in_dims
-        if fpn_size == 'nano':
-            width = 0.25
-            depth=0.34
-        elif fpn_size == 'tiny':
-            width = 0.5
-            depth=0.34
-        elif fpn_size == 'large':
-            width = 1.0
-            depth=0.67
-        elif fpn_size == 'huge':
-            width = 1.25
-            depth=1.0
 
         # top dwon
         ## P5 -> P4

@@ -11,7 +11,7 @@ def build_backbone(cfg, trainable=False):
     if cfg['backbone'] in ['elannet_large', 'elannet_huge', \
                            'elannet_tiny', 'elannet_nano']:
         model, feat_dim = build_elannet(
-            model_name=cfg['backbone'],
+            cfg=cfg,
             pretrained=pretrained
         )
 

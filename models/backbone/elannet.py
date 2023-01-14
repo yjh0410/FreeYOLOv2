@@ -186,22 +186,15 @@ class ELANNet(nn.Module):
 
 
 # build ELAN-Net
-def build_elannet(model_name='elannet_large', pretrained=False): 
+def build_elannet(cfg, pretrained=False): 
     # model
-    if model_name == 'elannet_huge':
-        backbone = ELANNet(width=1.25, depth=1.0, act_type='silu', norm_type='BN')
-    elif model_name == 'elannet_large':
-        backbone = ELANNet(width=1.0, depth=0.67, act_type='silu', norm_type='BN')
-    elif model_name == 'elannet_tiny':
-        backbone = ELANNet(width=0.5, depth=0.34, act_type='lrelu', norm_type='BN')
-    elif model_name == 'elannet_nano':
-        backbone = ELANNet(width=0.25, depth=0.34, act_type='lrelu', norm_type='BN')
+    backbone = ELANNet(width=cfg['width'], depth=cfg['depth'], act_type=cfg['bk_act'], norm_type=cfg['bk_norm'])
     feat_dims = backbone.feat_dims
 
     # load weight
     if pretrained:
         print('Loading pretrained weight ...')
-        url = model_urls[model_name]
+        url = model_urls[cfg['backbone']]
         if url is not None:
             checkpoint = torch.hub.load_state_dict_from_url(
                 url=url, map_location="cpu", check_hash=True)
@@ -222,7 +215,7 @@ def build_elannet(model_name='elannet_large', pretrained=False):
 
             backbone.load_state_dict(checkpoint_state_dict)
         else:
-            print('No backbone pretrained: {}'.format(model_name))
+            print('No backbone pretrained: {}'.format(cfg['backbone']))
 
     return backbone, feat_dims
 
@@ -230,7 +223,13 @@ def build_elannet(model_name='elannet_large', pretrained=False):
 if __name__ == '__main__':
     import time
     from thop import profile
-    model, feats = build_elannet(model_name='elannet_nano', pretrained=False)
+    cfg = {
+        'bk_act': 'silu',
+        'bk_norm': 'BN',
+        'width': 1.25,
+        'depth': 1.0,
+    }
+    model, feats = build_elannet(cfg, pretrained=False)
     x = torch.randn(1, 3, 224, 224)
     t0 = time.time()
     outputs = model(x)

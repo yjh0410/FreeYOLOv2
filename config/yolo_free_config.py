@@ -25,6 +25,10 @@ yolo_free_config = {
         # model
         'backbone': 'elannet_nano',
         'pretrained': True,
+        'bk_act': 'lrelu',
+        'bk_norm': 'BN',
+        'width': 0.25,
+        'depth': 0.34,
         'stride': [8, 16, 32],  # P3, P4, P5
         # neck
         'neck': 'sppf_block_csp',
@@ -93,6 +97,10 @@ yolo_free_config = {
         # model
         'backbone': 'elannet_tiny',
         'pretrained': True,
+        'bk_act': 'lrelu',
+        'bk_norm': 'BN',
+        'width': 0.50,
+        'depth': 0.34,
         'stride': [8, 16, 32],  # P3, P4, P5
         # neck
         'neck': 'sppf_block_csp',
@@ -161,6 +169,10 @@ yolo_free_config = {
         # model
         'backbone': 'elannet_large',
         'pretrained': True,
+        'bk_act': 'silu',
+        'bk_norm': 'BN',
+        'width': 1.0,
+        'depth': 0.67,
         'stride': [8, 16, 32],  # P3, P4, P5
         # neck
         'neck': 'sppf_block_csp',
@@ -229,6 +241,10 @@ yolo_free_config = {
         # model
         'backbone': 'elannet_huge',
         'pretrained': True,
+        'bk_act': 'silu',
+        'bk_norm': 'BN',
+        'width': 1.25,
+        'depth': 1.0,
         'stride': [8, 16, 32],  # P3, P4, P5
         # neck
         'neck': 'sppf_block_csp',
