@@ -4,7 +4,7 @@ import torch.nn as nn
 
 model_urls = {
     "elannet_nano": None,
-    "elannet_tiny": None,
+    "elannet_small": None,
     "elannet_medium": None,
     "elannet_large": None,
     "elannet_huge": None,

@@ -72,7 +72,7 @@ yolo_free_config = {
         'warmup_factor': 0.00066667,
         },
 
-    'yolo_free_tiny': {
+    'yolo_free_small': {
         # input
         'train_size': 800,
         'test_size': 640,
@@ -93,7 +93,7 @@ yolo_free_config = {
                           'hsv_v': 0.4
                           },
         # model
-        'backbone': 'elannet_tiny',
+        'backbone': 'elannet_small',
         'pretrained': True,
         'bk_act': 'silu',
         'bk_norm': 'BN',
