@@ -126,12 +126,15 @@ class Criterion(object):
             strides = strides,
             )
         
-        # normalize loss
+        loss_cls = loss_cls.sum()
+        loss_iou = loss_iou.sum()
+        loss_dfl = loss_dfl.sum()
         gt_score_targets_sum = gt_score_targets.sum()
+        # normalize loss
         if gt_score_targets_sum > 0:
-            loss_cls = loss_cls.sum() / gt_score_targets_sum
-            loss_iou = loss_iou.sum() / gt_score_targets_sum
-            loss_dfl = loss_dfl.sum() / gt_score_targets_sum
+            loss_cls /= gt_score_targets_sum
+            loss_iou /= gt_score_targets_sum
+            loss_dfl /= gt_score_targets_sum
 
         # total loss
         losses = loss_cls * self.loss_cls_weight + \
