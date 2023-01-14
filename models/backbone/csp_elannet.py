@@ -60,25 +60,6 @@ class Conv(nn.Module):
         return self.convs(x)
 
 
-# Bottleneck
-class Bottleneck(nn.Module):
-    def __init__(self,
-                 in_dim,
-                 act_type='silu',
-                 norm_type='BN',
-                 shortcut=False,
-                 depthwise=False):
-        super().__init__()
-        self.cv1 = Conv(in_dim, in_dim, k=3, p=1, act_type=act_type, norm_type=norm_type)
-        self.cv2 = Conv(in_dim, in_dim, k=3, p=1, act_type=act_type, norm_type=norm_type, depthwise=depthwise)
-        self.shortcut = shortcut
-
-    def forward(self, x):
-        h = self.cv2(self.cv1(x))
-
-        return x + h if self.shortcut else h
-
-
 # ELANBlock - same to 'C2f' proposed by YOLOv8
 class CSP_ELANBlock(nn.Module): 
     def __init__(self,
@@ -87,19 +68,16 @@ class CSP_ELANBlock(nn.Module):
                  depth=1,
                  act_type='silu',
                  norm_type='BN',
-                 shortcut=False,
                  depthwise=False):
         super(CSP_ELANBlock, self).__init__()
         inter_dim = in_dim // 2
         self.cv1 = Conv(in_dim, 2*inter_dim, k=1, act_type=act_type, norm_type=norm_type)
         self.cv2 = nn.Sequential(*[
-            Bottleneck(inter_dim, act_type=act_type, norm_type=norm_type,
-                       shortcut=shortcut, depthwise=depthwise)
+            Conv(inter_dim, inter_dim, k=3, p=1, act_type=act_type, norm_type=norm_type, depthwise=depthwise)
             for _ in range(depth)
             ])
         self.cv3 = nn.Sequential(*[
-            Bottleneck(inter_dim, act_type=act_type, norm_type=norm_type,
-                       shortcut=shortcut, depthwise=depthwise)
+            Conv(inter_dim, inter_dim, k=3, p=1, act_type=act_type, norm_type=norm_type, depthwise=depthwise)
             for _ in range(depth)
             ])
         self.cv4 = Conv(inter_dim*4, out_dim, k=1, act_type=act_type, norm_type=norm_type)
@@ -155,22 +133,22 @@ class CSP_ELANNet(nn.Module):
         self.layer_2 = nn.Sequential(   
             Conv(int(64*width), int(64*width), k=3, p=1, s=2,
                  act_type=act_type, norm_type=norm_type, depthwise=depthwise),
-            CSP_ELANBlock(in_dim=int(64*width), out_dim=int(128*width), depth=int(3*depth), shortcut=True,
+            CSP_ELANBlock(in_dim=int(64*width), out_dim=int(128*width), depth=int(3*depth),
                           act_type=act_type, norm_type=norm_type, depthwise=depthwise)  # P2/4
         )
         self.layer_3 = nn.Sequential(   
             DownSample(in_dim=int(128*width), act_type=act_type, norm_type=norm_type, depthwise=depthwise),             
-            CSP_ELANBlock(in_dim=int(128*width), out_dim=int(256*width), depth=int(6*depth), shortcut=True,
+            CSP_ELANBlock(in_dim=int(128*width), out_dim=int(256*width), depth=int(6*depth),
                           act_type=act_type, norm_type=norm_type, depthwise=depthwise)  # P3/8
         )
         self.layer_4 = nn.Sequential(   
             DownSample(in_dim=int(256*width), act_type=act_type, norm_type=norm_type, depthwise=depthwise),             
-            CSP_ELANBlock(in_dim=int(256*width), out_dim=int(512*width), depth=int(9*depth), shortcut=True,
+            CSP_ELANBlock(in_dim=int(256*width), out_dim=int(512*width), depth=int(9*depth),
                           act_type=act_type, norm_type=norm_type, depthwise=depthwise)  # P4/16
         )
         self.layer_5 = nn.Sequential(   
             DownSample(in_dim=int(512*width), act_type=act_type, norm_type=norm_type, depthwise=depthwise),             
-            CSP_ELANBlock(in_dim=int(512*width), out_dim=int(1024*width), depth=int(3*depth), shortcut=True,
+            CSP_ELANBlock(in_dim=int(512*width), out_dim=int(1024*width), depth=int(3*depth),
                           act_type=act_type, norm_type=norm_type, depthwise=depthwise)  # P5/32
         )
 
