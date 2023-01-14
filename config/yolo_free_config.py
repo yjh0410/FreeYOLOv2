@@ -27,6 +27,7 @@ yolo_free_config = {
         'pretrained': True,
         'bk_act': 'lrelu',
         'bk_norm': 'BN',
+        'bk_dpw': False,
         'width': 0.25,
         'depth': 0.34,
         'stride': [8, 16, 32],  # P3, P4, P5
@@ -39,14 +40,11 @@ yolo_free_config = {
         'neck_depthwise': False,
         # fpn
         'fpn': 'elan_pafpn',
-        'fpn_size': 'nano',
-        'fpn_dim': [128, 256, 128],
         'fpn_act': 'lrelu',
         'fpn_norm': 'BN',
         'fpn_depthwise': False,
         # head
         'head': 'decoupled_head',
-        'head_dim': 64,
         'head_act': 'lrelu',
         'head_norm': 'BN',
         'num_cls_head': 2,
@@ -99,6 +97,7 @@ yolo_free_config = {
         'pretrained': True,
         'bk_act': 'lrelu',
         'bk_norm': 'BN',
+        'bk_dpw': False,
         'width': 0.50,
         'depth': 0.34,
         'stride': [8, 16, 32],  # P3, P4, P5
@@ -111,14 +110,11 @@ yolo_free_config = {
         'neck_depthwise': False,
         # fpn
         'fpn': 'elan_pafpn',
-        'fpn_size': 'tiny', # 'nano', 'tiny', 'large', 'huge
-        'fpn_dim': [256, 512, 256],
         'fpn_act': 'lrelu',
         'fpn_norm': 'BN',
         'fpn_depthwise': False,
         # head
         'head': 'decoupled_head',
-        'head_dim': 128,
         'head_act': 'lrelu',
         'head_norm': 'BN',
         'num_cls_head': 2,
@@ -171,6 +167,7 @@ yolo_free_config = {
         'pretrained': True,
         'bk_act': 'silu',
         'bk_norm': 'BN',
+        'bk_dpw': False,
         'width': 1.0,
         'depth': 0.67,
         'stride': [8, 16, 32],  # P3, P4, P5
@@ -183,14 +180,11 @@ yolo_free_config = {
         'neck_depthwise': False,
         # fpn
         'fpn': 'elan_pafpn',
-        'fpn_size': 'large', # 'tiny', 'large', 'huge
-        'fpn_dim': [512, 1024, 512],
         'fpn_act': 'silu',
         'fpn_norm': 'BN',
         'fpn_depthwise': False,
         # head
         'head': 'decoupled_head',
-        'head_dim': 256,
         'head_act': 'silu',
         'head_norm': 'BN',
         'num_cls_head': 2,
@@ -243,6 +237,7 @@ yolo_free_config = {
         'pretrained': True,
         'bk_act': 'silu',
         'bk_norm': 'BN',
+        'bk_dpw': False,
         'width': 1.25,
         'depth': 1.0,
         'stride': [8, 16, 32],  # P3, P4, P5
@@ -255,14 +250,11 @@ yolo_free_config = {
         'neck_depthwise': False,
         # fpn
         'fpn': 'elan_pafpn',
-        'fpn_size': 'huge',
-        'fpn_dim': [640, 1280, 640],
         'fpn_act': 'silu',
         'fpn_norm': 'BN',
         'fpn_depthwise': False,
         # head
         'head': 'decoupled_head',
-        'head_dim': 320,
         'head_act': 'silu',
         'head_norm': 'BN',
         'num_cls_head': 2,

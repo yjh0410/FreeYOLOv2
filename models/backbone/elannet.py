@@ -145,7 +145,7 @@ class ELANNet(nn.Module):
         
         # large backbone
         self.layer_1 = nn.Sequential(
-            Conv(3, int(64*width), k=3, p=1, s=2, act_type=act_type, norm_type=norm_type, depthwise=depthwise),
+            Conv(3, int(64*width), k=3, p=1, s=2, act_type=act_type, norm_type=norm_type),
             Conv(int(64*width), int(64*width), k=3, p=1, act_type=act_type, norm_type=norm_type, depthwise=depthwise) # P1/2
         )
         self.layer_2 = nn.Sequential(   
@@ -188,7 +188,7 @@ class ELANNet(nn.Module):
 # build ELAN-Net
 def build_elannet(cfg, pretrained=False): 
     # model
-    backbone = ELANNet(width=cfg['width'], depth=cfg['depth'], act_type=cfg['bk_act'], norm_type=cfg['bk_norm'])
+    backbone = ELANNet(width=cfg['width'], depth=cfg['depth'], act_type=cfg['bk_act'], norm_type=cfg['bk_norm'], depthwise=cfg['bk_dpw'])
     feat_dims = backbone.feat_dims
 
     # load weight
@@ -226,8 +226,9 @@ if __name__ == '__main__':
     cfg = {
         'bk_act': 'silu',
         'bk_norm': 'BN',
-        'width': 1.25,
-        'depth': 1.0,
+        'bk_dpw': False,
+        'width': 0.25,
+        'depth': 0.34,
     }
     model, feats = build_elannet(cfg, pretrained=False)
     x = torch.randn(1, 3, 224, 224)
