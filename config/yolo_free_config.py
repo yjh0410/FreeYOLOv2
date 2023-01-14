@@ -187,7 +187,7 @@ yolo_free_config = {
         'num_cls_head': 2,
         'num_reg_head': 2,
         'head_depthwise': False,
-        'reg_max': 0,
+        'reg_max': 16,
         # matcher
         'matcher': {'topk': 10,
                     'alpha': 0.5,
@@ -230,7 +230,7 @@ yolo_free_config = {
                           'hsv_v': 0.4
                           },
         # model
-        'backbone': 'csp_elannet',
+        'backbone': 'elannet',
         'width': 1.0,
         'depth': 1.0,
         'bk_act': 'silu',
