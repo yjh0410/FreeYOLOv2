@@ -277,7 +277,7 @@ yolo_free_config = {
         'momentum': 0.9,
         'weight_decay': 5e-4,
         # warmup strategy
-        'warmup': 'linear',
+        'warmup': 'exp',
         'warmup_factor': 0.00066667,
         'wp_epoch': 1,
         },
