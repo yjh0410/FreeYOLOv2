@@ -5,6 +5,7 @@ import torch.nn as nn
 model_urls = {
     "elannet_nano": None,
     "elannet_tiny": None,
+    "elannet_medium": None,
     "elannet_large": None,
     "elannet_huge": None,
 }
@@ -227,8 +228,8 @@ if __name__ == '__main__':
         'bk_act': 'silu',
         'bk_norm': 'BN',
         'bk_dpw': False,
-        'width': 0.25,
-        'depth': 0.34,
+        'width': 0.75,
+        'depth': 0.67,
     }
     model, feats = build_elannet(cfg, pretrained=False)
     x = torch.randn(1, 3, 224, 224)
