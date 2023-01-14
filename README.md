@@ -66,7 +66,7 @@ Main results on COCO-val:
 
 | Model            |  Scale  | FPS<sup><br>2080ti |  FLOPs   |  Params  |    AP    |    AP50    |  Weight  |
 |------------------|---------|--------------------|----------|----------|----------|------------|----------|
-| FreeYOLOv2-Nano  |  640    |                  |   5.2 G  |  1.6 M   |      |        |  |
+| FreeYOLOv2-Nano  |  640    |                  |   7.7 G  |  2.3 M   |      |        |  |
 | FreeYOLOv2-Tiny  |  640    |                  |    G |   M   |      |        |  |
 | FreeYOLOv2-Large |  640    |                  |    G |   M   |      |        |  |
 | FreeYOLOv2-Huge  |  640    |                  |   G |   M  |      |        |  |
