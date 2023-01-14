@@ -230,7 +230,7 @@ yolo_free_config = {
                           'hsv_v': 0.4
                           },
         # model
-        'backbone': 'elannet',
+        'backbone': 'csp_elannet',
         'width': 1.0,
         'depth': 1.0,
         'bk_act': 'silu',
@@ -262,7 +262,7 @@ yolo_free_config = {
                     'alpha': 0.5,
                     'beta': 6.0},
         # loss weight
-        'cls_loss': 'bce', # vfl (optional)
+        'cls_loss': 'vfl', # vfl (optional)
         'loss_cls_weight': 0.5,
         'loss_iou_weight': 7.5,
         'loss_dfl_weight': 1.5,
