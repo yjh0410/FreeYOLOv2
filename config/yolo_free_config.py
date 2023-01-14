@@ -69,7 +69,6 @@ yolo_free_config = {
         # warmup strategy
         'warmup': 'linear',
         'warmup_factor': 0.00066667,
-        'wp_epoch': 1,
         },
 
     'yolo_free_small': {
@@ -139,7 +138,6 @@ yolo_free_config = {
         # warmup strategy
         'warmup': 'linear',
         'warmup_factor': 0.00066667,
-        'wp_epoch': 1,
         },
 
     'yolo_free_medium': {
@@ -209,7 +207,6 @@ yolo_free_config = {
         # warmup strategy
         'warmup': 'linear',
         'warmup_factor': 0.00066667,
-        'wp_epoch': 1,
         },
 
     'yolo_free_large': {
@@ -277,9 +274,8 @@ yolo_free_config = {
         'momentum': 0.9,
         'weight_decay': 5e-4,
         # warmup strategy
-        'warmup': 'exp',
+        'warmup': 'linear',
         'warmup_factor': 0.00066667,
-        'wp_epoch': 1,
         },
 
     'yolo_free_huge': {
@@ -349,7 +345,6 @@ yolo_free_config = {
         # warmup strategy
         'warmup': 'linear',
         'warmup_factor': 0.00066667,
-        'wp_epoch': 1,
         },
 
 }

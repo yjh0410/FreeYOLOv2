@@ -28,6 +28,12 @@ class WarmUpScheduler(object):
         self.base_lr = base_lr
         self.wp_iter = wp_iter
         self.warmup_factor = warmup_factor
+        print('==============================')
+        print('WarmUpScheduler: {}'.format(name))
+        print('--base_lr: {}'.format(base_lr))
+        print('--wp_iter: {}'.format(wp_iter))
+        if self.name == 'linear':
+            print('--warmup_factor: {}'.format(warmup_factor))
 
 
     def set_lr(self, optimizer, lr):
