@@ -75,9 +75,12 @@ def train_with_warmup(epoch,
         loss_dict_reduced = distributed_utils.reduce_dict(loss_dict)
 
         # check loss
-        if torch.isnan(losses):
-            print('loss is NAN !!')
-            continue
+        try:
+            if torch.isnan(losses):
+                print('loss is NAN !!')
+                continue
+        except:
+            print(loss_dict)
 
         if args.distributed:
             # gradient averaged between devices in DDP mode
