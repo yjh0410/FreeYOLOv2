@@ -64,13 +64,12 @@ python train.py --cuda -d coco -v yolo_free_nano -bs 16 -accu 4 --max_epoch 300 
 
 Main results on COCO-val:
 
-| Model        |  Scale  | FPS<sup><br>2080ti |  FLOPs   |  Params  |    AP    |    AP50    |  Weight  |
-|--------------|---------|--------------------|----------|----------|----------|------------|----------|
-| FreeYOLOv2-N |  640    |                  |   5.2 G  |  1.6 M   |      |        |  |
-| FreeYOLOv2-S |  640    |                  |    G |   M   |      |        |  |
-| FreeYOLOv2-M |  640    |                  |    G |   M   |      |        |  |
-| FreeYOLOv2-L |  640    |                  |   G |   M  |      |        |  |
-| FreeYOLOv2-H |  640    |                  |   G |   M  |      |        |  |
+| Model            |  Scale  | FPS<sup><br>2080ti |  FLOPs   |  Params  |    AP    |    AP50    |  Weight  |
+|------------------|---------|--------------------|----------|----------|----------|------------|----------|
+| FreeYOLOv2-Nano  |  640    |                  |   5.2 G  |  1.6 M   |      |        |  |
+| FreeYOLOv2-Tiny  |  640    |                  |    G |   M   |      |        |  |
+| FreeYOLOv2-Large |  640    |                  |    G |   M   |      |        |  |
+| FreeYOLOv2-Huge  |  640    |                  |   G |   M  |      |        |  |
 
 
 ### WiderFace
