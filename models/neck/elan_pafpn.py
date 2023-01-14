@@ -64,9 +64,12 @@ class ELAN_PaFPN(nn.Module):
                                      act_type=act_type)
 
         # head conv
-        self.head_conv_1 = Conv(int(128 * width), int(256 * width), k=3, p=1, act_type=act_type, norm_type=norm_type)
-        self.head_conv_2 = Conv(int(256 * width), int(512 * width), k=3, p=1, act_type=act_type, norm_type=norm_type)
-        self.head_conv_3 = Conv(int(512 * width), int(1024 * width), k=3, p=1, act_type=act_type, norm_type=norm_type)
+        self.head_conv_1 = ELANBlock(in_dim=int(128 * width), out_dim=int(256 * width), depth=0.34,
+                                     act_type=act_type, norm_type=norm_type, depthwise=depthwise)
+        self.head_conv_2 = ELANBlock(in_dim=int(256 * width), out_dim=int(512 * width), depth=0.34,
+                                     act_type=act_type, norm_type=norm_type, depthwise=depthwise)
+        self.head_conv_3 = ELANBlock(in_dim=int(512 * width), out_dim=int(1024 * width), depth=0.34,
+                                     act_type=act_type, norm_type=norm_type, depthwise=depthwise)
 
         # output proj layers
         self.out_layers = nn.ModuleList([
