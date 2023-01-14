@@ -38,28 +38,27 @@ class FreeYOLO(nn.Module):
         self.proj_conv = nn.Conv2d(self.reg_max + 1, 1, kernel_size=1, bias=False)
 
         ## backbone
-        self.backbone, feats_dim = build_backbone(cfg=cfg)
+        self.backbone, feats_dim = build_backbone(cfg=cfg, trainable=trainable)
 
         ## neck
-        self.neck = build_neck(cfg=cfg, in_dim=feats_dim[-1], out_dim=feats_dim[-1])
+        self.neck = build_neck(cfg=cfg, in_dim=feats_dim[-1], out_dim=cfg['fpn_dim'][-1])
         
         ## fpn
-        self.fpn = build_fpn(cfg=cfg)
-        self.head_dim = self.fpn.scaled_out_dim
+        self.fpn = build_fpn(cfg=cfg, in_dims=cfg['fpn_dim'], out_dim=cfg['head_dim'])
 
         ## non-shared heads
         self.non_shared_heads = nn.ModuleList(
-            [build_head(cfg, in_dim=self.head_dim) 
+            [build_head(cfg, in_dim=cfg['head_dim']) 
             for _ in range(len(cfg['stride']))
             ])
 
         ## pred
         self.cls_preds = nn.ModuleList(
-                            [nn.Conv2d(self.head_dim, self.num_classes, kernel_size=1) 
+                            [nn.Conv2d(cfg['head_dim'], self.num_classes, kernel_size=1) 
                               for _ in range(len(cfg['stride']))
                               ]) 
         self.reg_preds = nn.ModuleList(
-                            [nn.Conv2d(self.head_dim, 4*(cfg['reg_max'] + 1), kernel_size=1) 
+                            [nn.Conv2d(cfg['head_dim'], 4*(cfg['reg_max'] + 1), kernel_size=1) 
                               for _ in range(len(cfg['stride']))
                               ])                 
 

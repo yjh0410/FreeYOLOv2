@@ -1,12 +1,19 @@
-from .csp_elannet import build_csp_elannet
+from .elannet import build_elannet
 
 
-def build_backbone(cfg):
+def build_backbone(cfg, trainable=False):
     print('==============================')
     print('Backbone: {}'.format(cfg['backbone'].upper()))
 
-    if cfg['backbone'] == 'csp_elannet':
-        model, feat_dim = build_csp_elannet(cfg)
+    # imagenet pretrained
+    pretrained = cfg['pretrained'] and trainable
+
+    if cfg['backbone'] in ['elannet_large', 'elannet_huge', \
+                           'elannet_tiny', 'elannet_nano']:
+        model, feat_dim = build_elannet(
+            model_name=cfg['backbone'],
+            pretrained=pretrained
+        )
 
     else:
         print('Unknown Backbone ...')

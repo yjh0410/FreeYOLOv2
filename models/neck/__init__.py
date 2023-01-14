@@ -1,18 +1,19 @@
 from .spp import SPPFBlockCSP
-from .csp_elan_pafpn import CSP_ELAN_PaFPN
+from .elan_pafpn import ELAN_PaFPN
 
 
-def build_fpn(cfg):
+def build_fpn(cfg, in_dims, out_dim=None):
     model = cfg['fpn']
     print('==============================')
     print('FPN: {}'.format(model))
     # build neck
-    if model == 'csp_elan_pafpn':
-        fpn_net = CSP_ELAN_PaFPN(width=cfg['width'],
-                                 depth=cfg['depth'],
-                                 depthwise=cfg['fpn_depthwise'],
-                                 act_type=cfg['fpn_act'],
-                                 norm_type=cfg['fpn_norm'])
+    if model == 'elan_pafpn':
+        fpn_net = ELAN_PaFPN(in_dims=in_dims,
+                             out_dim=out_dim,
+                             fpn_size=cfg['fpn_size'],
+                             depthwise=cfg['fpn_depthwise'],
+                             norm_type=cfg['fpn_norm'],
+                             act_type=cfg['fpn_act'])
 
     return fpn_net
 
