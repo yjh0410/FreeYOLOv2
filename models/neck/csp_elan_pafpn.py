@@ -42,7 +42,7 @@ class CSP_ELAN_PaFPN(nn.Module):
         super(CSP_ELAN_PaFPN, self).__init__()
         # --------- Basic Parameters ----------
         ## base dims
-        self.in_dims = [512, 1024, 1024]
+        self.in_dims = [256, 512, 1024]
         self.out_dim = 256
         ## scaled dims
         self.scaled_in_dims = [int(width * dim) for dim in self.in_dims]
