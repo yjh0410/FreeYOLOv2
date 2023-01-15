@@ -21,6 +21,35 @@ class SPPF(nn.Module):
         return self.cv2(torch.cat((x, y1, y2, self.m(y2)), 1))
 
 
+# SPPF block
+class SPPFBlock(nn.Module):
+    """
+        Spatial Pyramid Pooling Block
+    """
+    def __init__(self,
+                 in_dim,
+                 out_dim,
+                 pooling_size=5,
+                 act_type='silu',
+                 norm_type='BN',
+                 ):
+        super(SPPFBlock, self).__init__()
+        self.out_dim = out_dim
+        inter_dim = in_dim // 2
+        self.m = nn.Sequential(
+            Conv(in_dim, inter_dim, k=1, act_type=act_type, norm_type=norm_type),
+            Conv(inter_dim, in_dim, k=3, p=1, act_type=act_type, norm_type=norm_type),
+            SPPF(in_dim, inter_dim, expand_ratio=0.5,
+                 pooling_size=pooling_size, act_type=act_type, norm_type=norm_type),
+            Conv(inter_dim, in_dim, k=3, p=1, act_type=act_type, norm_type=norm_type),
+            Conv(in_dim, out_dim, k=1, act_type=act_type, norm_type=norm_type)
+        )
+
+        
+    def forward(self, x):
+        return self.m(x)
+
+
 # SPPF block with CSP module
 class SPPFBlockCSP(nn.Module):
     """

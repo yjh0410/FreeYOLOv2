@@ -1,5 +1,7 @@
 from .spp import SPPFBlockCSP
 from .elan_pafpn import ELAN_PaFPN
+from .csp_pafpn import CSP_PaFPN
+from .fpn import FPN
 
 
 def build_fpn(cfg, in_dims):
@@ -15,6 +17,20 @@ def build_fpn(cfg, in_dims):
                              norm_type=cfg['fpn_norm'],
                              depthwise=cfg['fpn_depthwise']
                              )
+    elif model == 'csp_pafpn':
+        fpn_net = CSP_PaFPN(in_dims=in_dims,
+                             out_dim=cfg['head_dim'],
+                             act_type=cfg['fpn_act'],
+                             norm_type=cfg['fpn_norm'],
+                             depthwise=cfg['fpn_depthwise']
+                             )
+    elif model == 'baisc_fpn':
+        fpn_net = FPN(in_dims=in_dims,
+                        out_dim=cfg['head_dim'],
+                        act_type=cfg['fpn_act'],
+                        norm_type=cfg['fpn_norm'],
+                        spp_block=cfg['spp_block']
+                        )
 
     return fpn_net
 
