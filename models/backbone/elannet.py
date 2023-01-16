@@ -194,9 +194,9 @@ def build_elannet(cfg, pretrained=False):
 
     # load weight
     if pretrained:
-        print('Loading pretrained weight ...')
         url = model_urls[cfg['backbone']]
         if url is not None:
+            print('Loading pretrained weight ...')
             checkpoint = torch.hub.load_state_dict_from_url(
                 url=url, map_location="cpu", check_hash=True)
             # checkpoint state dict
@@ -225,13 +225,14 @@ if __name__ == '__main__':
     import time
     from thop import profile
     cfg = {
+        'backbone': 'elannet_large',
         'bk_act': 'silu',
         'bk_norm': 'BN',
         'bk_dpw': False,
-        'width': 0.75,
-        'depth': 0.67,
+        'width': 1.0,
+        'depth': 1.0,
     }
-    model, feats = build_elannet(cfg, pretrained=False)
+    model, feats = build_elannet(cfg, pretrained=True)
     x = torch.randn(1, 3, 224, 224)
     t0 = time.time()
     outputs = model(x)
