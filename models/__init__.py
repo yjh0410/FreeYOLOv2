@@ -13,12 +13,7 @@ def build_model(args,
                 device, 
                 num_classes=80, 
                 trainable=False):
-    print('==============================')
-    print('Build {} ...'.format(args.version.upper()))
-    
-    print('==============================')
-    print('Model Configuration: \n', cfg)
-    
+    # detector    
     if args.version in ['yolo_free_nano',  'yolo_free_tiny',
                         'yolo_free_small', 'yolo_free_medium',
                         'yolo_free_large', 'yolo_free_huge']:
