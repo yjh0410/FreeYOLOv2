@@ -61,6 +61,7 @@ class Conv(nn.Module):
         return self.convs(x)
 
 
+# BottleNeck
 class Bottleneck(nn.Module):
     def __init__(self,
                  in_dim,
@@ -82,6 +83,7 @@ class Bottleneck(nn.Module):
         return x + h if self.shortcut else h
 
 
+# ResBlock
 class ResBlock(nn.Module):
     def __init__(self,
                  in_dim,
@@ -90,6 +92,7 @@ class ResBlock(nn.Module):
                  act_type='silu',
                  norm_type='BN'):
         super(ResBlock, self).__init__()
+        assert in_dim == out_dim
         self.m = nn.Sequential(*[
             Bottleneck(in_dim, out_dim, expand_ratio=0.5, shortcut=True,
                        norm_type=norm_type, act_type=act_type)
@@ -100,6 +103,7 @@ class ResBlock(nn.Module):
         return self.m(x)
 
 
+# CSPBlock
 class CSPBlock(nn.Module):
     def __init__(self,
                  in_dim,

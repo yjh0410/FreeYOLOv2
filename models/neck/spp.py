@@ -57,7 +57,7 @@ class SPPFBlockCSP(nn.Module):
     """
     def __init__(self,
                  in_dim,
-                 width=1.0,
+                 out_dim,
                  expand_ratio=0.5,
                  pooling_size=5,
                  act_type='lrelu',
@@ -66,7 +66,7 @@ class SPPFBlockCSP(nn.Module):
                  ):
         super(SPPFBlockCSP, self).__init__()
         inter_dim = int(in_dim * expand_ratio)
-        self.out_dim = int(512 * width)
+        self.out_dim = out_dim
         self.cv1 = Conv(in_dim, inter_dim, k=1, act_type=act_type, norm_type=norm_type)
         self.cv2 = Conv(in_dim, inter_dim, k=1, act_type=act_type, norm_type=norm_type)
         self.m = nn.Sequential(

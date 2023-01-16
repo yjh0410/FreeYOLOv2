@@ -21,15 +21,15 @@ class UpSample(nn.Module):
                              align_corners=self.align_corner
                                                )
 
-# FPN
-class FPN(nn.Module):
+# BasicFPN
+class BasicFPN(nn.Module):
     def __init__(self,
                  in_dims=[256, 512, 1024],
-                 out_dim=256,
+                 out_dim=None,
                  act_type='silu',
                  norm_type='BN',
                  spp_block=False):
-        super(FPN, self).__init__()
+        super(BasicFPN, self).__init__()
         self.in_dims = in_dims
         self.out_dim = out_dim
         c3, c4, c5 = in_dims
@@ -52,11 +52,14 @@ class FPN(nn.Module):
         self.head_conv_4 = Conv(c3//2, c3, k=3, p=1, act_type=act_type, norm_type=norm_type)
 
         # output proj layers
-        self.out_layers = nn.ModuleList([
-            Conv(in_dim, self.out_dim, k=1,
-                    norm_type=norm_type, act_type=act_type)
-                    for in_dim in in_dims
-                    ])
+        if self.out_dim is not None:
+            self.out_layers = nn.ModuleList([
+                Conv(in_dim, self.out_dim, k=1,
+                        norm_type=norm_type, act_type=act_type)
+                        for in_dim in in_dims
+                        ])
+        else:
+            self.out_dim = [c3, c4, c5]
 
 
     def forward(self, features):
@@ -79,8 +82,11 @@ class FPN(nn.Module):
         out_feats = [p3, p4, p5]
 
         # output proj layers
-        out_feats_proj = []
-        for feat, layer in zip(out_feats, self.out_layers):
-            out_feats_proj.append(layer(feat))
+        if self.out_dim is not None:
+            out_feats_proj = []
+            for feat, layer in zip(out_feats, self.out_layers):
+                out_feats_proj.append(layer(feat))
 
-        return out_feats_proj
+            return out_feats_proj
+
+        return out_feats
