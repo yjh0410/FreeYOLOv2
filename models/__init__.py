@@ -3,6 +3,8 @@
 
 import torch
 from .yolo_free.build import build_yolo_free
+from .yolov3.build import build_yolov3
+from .yolov4.build import build_yolov4
 
 
 # build object detector
@@ -23,6 +25,13 @@ def build_model(args,
         model, criterion = build_yolo_free(
             args, cfg, device, num_classes, trainable)
 
+    elif args.version == 'yolov3':
+        model, criterion = build_yolov3(
+            args, cfg, device, num_classes, trainable)
+
+    elif args.version == 'yolov4':
+        model, criterion = build_yolov4(
+            args, cfg, device, num_classes, trainable)
 
     if trainable:
         # Load pretrained weight

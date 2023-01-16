@@ -3,23 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from ..basic.conv import Conv, ConvBlocks
-from .spp import SPPFBlock
 
-class UpSample(nn.Module):
-    def __init__(self, size=None, scale_factor=None, mode='nearest', align_corner=None):
-        super(UpSample, self).__init__()
-        self.size = size
-        self.scale_factor = scale_factor
-        self.mode = mode
-        self.align_corner = align_corner
-
-    def forward(self, x):
-        return F.interpolate(input=x, 
-                             size=self.size, 
-                             scale_factor=self.scale_factor, 
-                             mode=self.mode, 
-                             align_corners=self.align_corner
-                                               )
 
 # BasicFPN
 class BasicFPN(nn.Module):
@@ -27,18 +11,14 @@ class BasicFPN(nn.Module):
                  in_dims=[256, 512, 1024],
                  out_dim=None,
                  act_type='silu',
-                 norm_type='BN',
-                 spp_block=False):
+                 norm_type='BN'):
         super(BasicFPN, self).__init__()
         self.in_dims = in_dims
         self.out_dim = out_dim
         c3, c4, c5 = in_dims
 
         # P5 -> P4
-        if spp_block:
-            self.head_convblock_0 = SPPFBlock(c5, c5//2, pooling_size=5, act_type=act_type, norm_type=norm_type)
-        else:
-            self.head_convblock_0 = ConvBlocks(c5, c5//2, act_type=act_type, norm_type=norm_type)
+        self.head_convblock_0 = ConvBlocks(c5, c5//2, act_type=act_type, norm_type=norm_type)
         self.head_conv_0 = Conv(c5//2, c4//2, k=1, act_type=act_type, norm_type=norm_type)
         self.head_conv_1 = Conv(c5//2, c5, k=3, p=1, act_type=act_type, norm_type=norm_type)
 
