@@ -225,12 +225,12 @@ if __name__ == '__main__':
     import time
     from thop import profile
     cfg = {
-        'backbone': 'elannet_large',
+        'backbone': 'elannet_huge',
         'bk_act': 'silu',
         'bk_norm': 'BN',
         'bk_dpw': False,
-        'width': 1.0,
-        'depth': 1.0,
+        'width': 1.25,
+        'depth': 1.34,
     }
     model, feats = build_elannet(cfg, pretrained=True)
     x = torch.randn(1, 3, 224, 224)
