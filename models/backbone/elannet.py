@@ -4,7 +4,8 @@ import torch.nn as nn
 
 model_urls = {
     "elannet_nano": None,
-    "elannet_small": None,
+    "elannet_tiny": "https://github.com/yjh0410/image_classification_pytorch/releases/download/weight/elannet_tiny.pth",
+    "elannet_small": "https://github.com/yjh0410/image_classification_pytorch/releases/download/weight/elannet_small.pth",
     "elannet_medium": None,
     "elannet_large": None,
     "elannet_huge": None,
@@ -225,12 +226,12 @@ if __name__ == '__main__':
     import time
     from thop import profile
     cfg = {
-        'backbone': 'elannet_huge',
-        'bk_act': 'silu',
+        'backbone': 'elannet_tiny',
+        'bk_act': 'lrelu',
         'bk_norm': 'BN',
         'bk_dpw': False,
-        'width': 1.25,
-        'depth': 1.34,
+        'width': 0.25,
+        'depth': 0.34,
     }
     model, feats = build_elannet(cfg, pretrained=True)
     x = torch.randn(1, 3, 224, 224)
