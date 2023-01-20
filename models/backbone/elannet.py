@@ -7,7 +7,7 @@ model_urls = {
     "elannet_tiny": "https://github.com/yjh0410/image_classification_pytorch/releases/download/weight/elannet_tiny.pth",
     "elannet_small": "https://github.com/yjh0410/image_classification_pytorch/releases/download/weight/elannet_small.pth",
     "elannet_medium": None,
-    "elannet_large": None,
+    "elannet_large": "https://github.com/yjh0410/image_classification_pytorch/releases/download/weight/elannet_large.pth",
     "elannet_huge": None,
 }
 
