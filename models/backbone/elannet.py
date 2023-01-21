@@ -3,10 +3,10 @@ import torch.nn as nn
 
 
 model_urls = {
-    "elannet_nano": None,
+    "elannet_nano": "https://github.com/yjh0410/image_classification_pytorch/releases/download/weight/elannet_nano.pth",
     "elannet_tiny": "https://github.com/yjh0410/image_classification_pytorch/releases/download/weight/elannet_tiny.pth",
     "elannet_small": "https://github.com/yjh0410/image_classification_pytorch/releases/download/weight/elannet_small.pth",
-    "elannet_medium": None,
+    "elannet_medium": "https://github.com/yjh0410/image_classification_pytorch/releases/download/weight/elannet_medium.pth",
     "elannet_large": "https://github.com/yjh0410/image_classification_pytorch/releases/download/weight/elannet_large.pth",
     "elannet_huge": None,
 }
