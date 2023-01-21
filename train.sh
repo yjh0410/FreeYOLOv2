@@ -4,8 +4,8 @@ python train.py \
         -d coco \
         --root /mnt/share/ssd2/dataset/ \
         -v yolo_free_nano \
-        -bs 16 \
-        -accu 4 \
+        -bs 64 \
+        -accu 1 \
         -lr 0.01 \
         -mlr 0.01 \
         --max_epoch 300 \
