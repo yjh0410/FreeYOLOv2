@@ -67,7 +67,7 @@ Main results on COCO-val:
 | Model        |  Scale  | FPS<sup><br>3090-FP32 |  FLOPs   |  Params  |    AP    |    AP50    |  Weight  |
 |--------------|---------|-----------------------|----------|----------|----------|------------|----------|
 | FreeYOLOv2-N |  416    |                     |   1.3 G  |  0.9 M   |      |        |  |
-| FreeYOLOv2-T |  640    |           66          |   7.7 G  |  2.3 M   |      |        |  |
+| FreeYOLOv2-T |  640    |                     |   7.7 G  |  2.3 M   |      |        |  |
 | FreeYOLOv2-S |  640    |                     |    G |   M   |      |        |  |
 | FreeYOLOv2-M |  640    |                     |    G |   M   |      |        |  |
 | FreeYOLOv2-L |  640    |                     |    G |   M   |      |        |  |
