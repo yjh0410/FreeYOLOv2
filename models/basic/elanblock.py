@@ -21,7 +21,7 @@ class ELANBlock(nn.Module):
         # branch-2
         self.cv2 = Conv(in_dim, inter_dim, k=1, act_type=act_type, norm_type=norm_type)
         # branch-3
-        for idx in range(int(3*depth)):
+        for idx in range(round(3*depth)):
             if idx == 0:
                 cv3 = [Conv(inter_dim, inter_dim2, k=3, p=1, act_type=act_type, norm_type=norm_type, depthwise=depthwise)]
             else:
@@ -30,7 +30,7 @@ class ELANBlock(nn.Module):
         # branch-4
         self.cv4 = nn.Sequential(*[
             Conv(inter_dim2, inter_dim2, k=3, p=1, act_type=act_type, norm_type=norm_type, depthwise=depthwise)
-            for _ in range(int(3*depth))
+            for _ in range(round(3*depth))
         ])
         # output
         self.out = Conv(inter_dim*2 + inter_dim2*2, out_dim, k=1, act_type=act_type, norm_type=norm_type)
