@@ -6,24 +6,35 @@ from ..basic.conv import Conv
 
 # ELANBlock
 class ELANBlock(nn.Module):
-    """
-    ELAN BLock of YOLOv7's backbone
-    """
     def __init__(self, in_dim, out_dim, expand_ratio=0.5, depth=1.0, act_type='silu', norm_type='BN', depthwise=False):
         super(ELANBlock, self).__init__()
-        inter_dim = int(in_dim * 0.25)
+        if isinstance(expand_ratio, float):
+            inter_dim = int(in_dim * expand_ratio)
+            inter_dim2 = inter_dim
+        elif isinstance(expand_ratio, list):
+            assert len(expand_ratio) == 2
+            e1, e2 = expand_ratio
+            inter_dim = int(in_dim * e1)
+            inter_dim2 = int(inter_dim * e2)
+        # branch-1
         self.cv1 = Conv(in_dim, inter_dim, k=1, act_type=act_type, norm_type=norm_type)
+        # branch-2
         self.cv2 = Conv(in_dim, inter_dim, k=1, act_type=act_type, norm_type=norm_type)
-        self.cv3 = nn.Sequential(*[
-            Conv(inter_dim, inter_dim, k=3, p=1, act_type=act_type, norm_type=norm_type, depthwise=depthwise)
-            for _ in range(int(3*depth))
-        ])
+        # branch-3
+        for idx in range(int(3*depth)):
+            if idx == 0:
+                cv3 = [Conv(inter_dim, inter_dim2, k=3, p=1, act_type=act_type, norm_type=norm_type, depthwise=depthwise)]
+            else:
+                cv3.append(Conv(inter_dim2, inter_dim2, k=3, p=1, act_type=act_type, norm_type=norm_type, depthwise=depthwise))
+        self.cv3 = nn.Sequential(*cv3)
+        # branch-4
         self.cv4 = nn.Sequential(*[
-            Conv(inter_dim, inter_dim, k=3, p=1, act_type=act_type, norm_type=norm_type, depthwise=depthwise)
+            Conv(inter_dim2, inter_dim2, k=3, p=1, act_type=act_type, norm_type=norm_type, depthwise=depthwise)
             for _ in range(int(3*depth))
         ])
+        # output
+        self.out = Conv(inter_dim*2 + inter_dim2*2, out_dim, k=1, act_type=act_type, norm_type=norm_type)
 
-        self.out = Conv(inter_dim*4, out_dim, k=1)
 
     def forward(self, x):
         """

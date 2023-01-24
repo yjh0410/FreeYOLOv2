@@ -28,6 +28,7 @@ class ELAN_PaFPN(nn.Module):
         self.cv2 = Conv(c4, int(256 * width), k=1, norm_type=norm_type, act_type=act_type)
         self.head_elan_1 = ELANBlock(in_dim=int(256 * width) + int(256 * width),
                                      out_dim=int(256 * width),
+                                     expand_ratio=[0.5, 0.5],
                                      depth=depth,
                                      depthwise=depthwise,
                                      norm_type=norm_type,
@@ -38,6 +39,7 @@ class ELAN_PaFPN(nn.Module):
         self.cv4 = Conv(c3, int(128 * width), k=1, norm_type=norm_type, act_type=act_type)
         self.head_elan_2 = ELANBlock(in_dim=int(128 * width) + int(128 * width),
                                      out_dim=int(128 * width),  # 128
+                                     expand_ratio=[0.5, 0.5],
                                      depth=depth,
                                      depthwise=depthwise,
                                      norm_type=norm_type,
@@ -49,6 +51,7 @@ class ELAN_PaFPN(nn.Module):
                               act_type=act_type, norm_type=norm_type, depthwise=depthwise)
         self.head_elan_3 = ELANBlock(in_dim=int(256 * width) + int(256 * width),
                                      out_dim=int(256 * width),  # 256
+                                     expand_ratio=[0.5, 0.5],
                                      depth=depth,
                                      depthwise=depthwise,
                                      norm_type=norm_type,
@@ -59,6 +62,7 @@ class ELAN_PaFPN(nn.Module):
                               act_type=act_type, norm_type=norm_type, depthwise=depthwise)
         self.head_elan_4 = ELANBlock(in_dim=int(512 * width) + c5,
                                      out_dim=int(512 * width),  # 512
+                                     expand_ratio=[0.5, 0.5],
                                      depth=depth,
                                      depthwise=depthwise,
                                      norm_type=norm_type,
