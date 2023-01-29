@@ -4,8 +4,8 @@ import os
 
 
 model_urls = {
-    "darknet53": None,
-    "cspdarknet53": None,
+    "darknet53": "https://github.com/yjh0410/image_classification_pytorch/releases/download/weight/darknet53_silu.pth",
+    "cspdarknet53": "https://github.com/yjh0410/image_classification_pytorch/releases/download/weight/cspdarknet53_silu.pth",
 }
 
 

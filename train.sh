@@ -9,7 +9,7 @@ python train.py \
         -lr 0.01 \
         -mlr 0.01 \
         --max_epoch 300 \
-        --wp_epoch 3 \
+        --wp_epoch 1 \
         --eval_epoch 10 \
         --ema \
         --fp16 \
