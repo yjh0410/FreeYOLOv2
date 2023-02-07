@@ -60,7 +60,7 @@ yolo_free_config = {
         'loss_iou_weight': 7.5,
         'loss_dfl_weight': 1.5,
         # training configuration
-        'no_aug_epoch': 10,
+        'no_aug_epoch': 15,
         'base_lr': 0.01 / 64.,
         # optimizer
         'optimizer': 'sgd',
@@ -83,8 +83,8 @@ yolo_free_config = {
         'mixup_prob': 0.05,
         'format': 'RGB',
         'trans_config': {'degrees': 0.0,
-                          'translate': 0.2,
-                          'scale': 0.9,
+                          'translate': 0.1,
+                          'scale': 0.5,
                           'shear': 0.0,
                           'perspective': 0.0,
                           'hsv_h': 0.015,
@@ -130,7 +130,7 @@ yolo_free_config = {
         'loss_iou_weight': 7.5,
         'loss_dfl_weight': 1.5,
         # training configuration
-        'no_aug_epoch': 10,
+        'no_aug_epoch': 15,
         'base_lr': 0.01 / 64.,
         # optimizer
         'optimizer': 'sgd',
@@ -200,7 +200,7 @@ yolo_free_config = {
         'loss_iou_weight': 7.5,
         'loss_dfl_weight': 1.5,
         # training configuration
-        'no_aug_epoch': 10,
+        'no_aug_epoch': 15,
         'base_lr': 0.01 / 64.,
         # optimizer
         'optimizer': 'sgd',
@@ -270,7 +270,7 @@ yolo_free_config = {
         'loss_iou_weight': 7.5,
         'loss_dfl_weight': 1.5,
         # training configuration
-        'no_aug_epoch': 10,
+        'no_aug_epoch': 15,
         'base_lr': 0.01 / 64.,
         # optimizer
         'optimizer': 'sgd',
@@ -340,7 +340,7 @@ yolo_free_config = {
         'loss_iou_weight': 7.5,
         'loss_dfl_weight': 1.5,
         # training configuration
-        'no_aug_epoch': 10,
+        'no_aug_epoch': 15,
         'base_lr': 0.01 / 64.,
         # optimizer
         'optimizer': 'sgd',
@@ -410,7 +410,7 @@ yolo_free_config = {
         'loss_iou_weight': 7.5,
         'loss_dfl_weight': 1.5,
         # training configuration
-        'no_aug_epoch': 10,
+        'no_aug_epoch': 15,
         'base_lr': 0.01 / 64.,
         # optimizer
         'optimizer': 'sgd',
