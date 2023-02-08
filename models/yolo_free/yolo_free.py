@@ -50,18 +50,18 @@ class FreeYOLO(nn.Module):
 
         ## non-shared heads
         self.non_shared_heads = nn.ModuleList(
-            [build_head(cfg, in_dim=self.head_dim) 
-            for _ in range(len(cfg['stride']))
+            [build_head(cfg, in_dim=head_dim) 
+            for head_dim in self.head_dim
             ])
 
         ## pred
         self.cls_preds = nn.ModuleList(
-                            [nn.Conv2d(self.head_dim, self.num_classes, kernel_size=1) 
-                              for _ in range(len(cfg['stride']))
+                            [nn.Conv2d(head_dim, self.num_classes, kernel_size=1) 
+                                for head_dim in self.head_dim
                               ]) 
         self.reg_preds = nn.ModuleList(
-                            [nn.Conv2d(self.head_dim, 4*(cfg['reg_max'] + 1), kernel_size=1) 
-                              for _ in range(len(cfg['stride']))
+                            [nn.Conv2d(head_dim, 4*(cfg['reg_max'] + 1), kernel_size=1) 
+                                for head_dim in self.head_dim
                               ])                 
 
         # --------- Network Initialization ----------
