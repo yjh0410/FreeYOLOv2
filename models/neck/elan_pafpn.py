@@ -17,7 +17,6 @@ class ELAN_PaFPN(nn.Module):
                  depthwise=False):
         super(ELAN_PaFPN, self).__init__()
         self.in_dims = in_dims
-        self.out_dim = out_dim
         self.width = width
         self.depth = depth
         c3, c4, c5 = in_dims
@@ -76,14 +75,17 @@ class ELAN_PaFPN(nn.Module):
         self.head_conv_3 = Conv(int(512 * width), int(1024 * width), k=3, p=1,
                                      act_type=act_type, norm_type=norm_type, depthwise=depthwise)
 
-        if self.out_dim is not None:
+        if out_dim is not None:
             # output proj layers
             self.out_layers = nn.ModuleList([
-                Conv(in_dim, self.out_dim, k=1,
+                Conv(in_dim, out_dim, k=1,
                         norm_type=norm_type, act_type=act_type)
                         for in_dim in [int(256 * width), int(512 * width), int(1024 * width)]
                         ])
+            self.out_dim = [out_dim] * 3
+
         else:
+            self.out_layers = None
             self.out_dim = [int(256 * width), int(512 * width), int(1024 * width)]
 
 
@@ -118,7 +120,7 @@ class ELAN_PaFPN(nn.Module):
 
         out_feats = [c20, c21, c22] # [P3, P4, P5]
         
-        if self.out_dim is not None:
+        if self.out_layers is not None:
             # output proj layers
             out_feats_proj = []
             for feat, layer in zip(out_feats, self.out_layers):
