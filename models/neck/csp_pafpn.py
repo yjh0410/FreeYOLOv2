@@ -15,7 +15,6 @@ class CSP_PaFPN(nn.Module):
                  norm_type='BN'):
         super(CSP_PaFPN, self).__init__()
         self.in_dims = in_dims
-        self.out_dim = out_dim
         c3, c4, c5 = in_dims
 
         self.head_conv_0 = Conv(c5, c5//2, k=1, norm_type=norm_type, act_type=act_type)  # 10
@@ -37,12 +36,17 @@ class CSP_PaFPN(nn.Module):
         self.head_csp_3 = CSPBlock(c4 + c5//2, c5, expand_ratio=0.5, nblocks=3, shortcut=False,
                                    depthwise=depthwise, norm_type=norm_type, act_type=act_type)
 
-        # output proj layers
-        self.out_layers = nn.ModuleList([
-            Conv(in_dim, self.out_dim, k=1,
-                    norm_type=norm_type, act_type=act_type)
-                    for in_dim in in_dims
-                    ])
+        if out_dim is not None:
+            # output proj layers
+            self.out_layers = nn.ModuleList([
+                Conv(in_dim, out_dim, k=1, norm_type=norm_type, act_type=act_type)
+                        for in_dim in [c3, c4, c5]])
+            self.out_dim = [out_dim] * 3
+
+        else:
+            self.out_layers = None
+            self.out_dim = [c3, c4, c5]
+
 
     def forward(self, features):
         c3, c4, c5 = features
@@ -67,9 +71,12 @@ class CSP_PaFPN(nn.Module):
 
         out_feats = [c13, c16, c19] # [P3, P4, P5]
 
-        # output proj layers
-        out_feats_proj = []
-        for feat, layer in zip(out_feats, self.out_layers):
-            out_feats_proj.append(layer(feat))
+        if self.out_layers is not None:
+            # output proj layers
+            out_feats_proj = []
+            for feat, layer in zip(out_feats, self.out_layers):
+                out_feats_proj.append(layer(feat))
 
-        return out_feats_proj
+            return out_feats_proj
+            
+        return out_feats

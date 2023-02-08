@@ -14,7 +14,6 @@ class BasicFPN(nn.Module):
                  norm_type='BN'):
         super(BasicFPN, self).__init__()
         self.in_dims = in_dims
-        self.out_dim = out_dim
         c3, c4, c5 = in_dims
 
         # P5 -> P4
@@ -31,14 +30,15 @@ class BasicFPN(nn.Module):
         self.head_convblock_2 = ConvBlocks(c3 + c3//2, c3//2, act_type=act_type, norm_type=norm_type)
         self.head_conv_4 = Conv(c3//2, c3, k=3, p=1, act_type=act_type, norm_type=norm_type)
 
-        # output proj layers
-        if self.out_dim is not None:
+        if out_dim is not None:
+            # output proj layers
             self.out_layers = nn.ModuleList([
-                Conv(in_dim, self.out_dim, k=1,
-                        norm_type=norm_type, act_type=act_type)
-                        for in_dim in in_dims
-                        ])
+                Conv(in_dim, out_dim, k=1, norm_type=norm_type, act_type=act_type)
+                        for in_dim in [c3, c4, c5]])
+            self.out_dim = [out_dim] * 3
+
         else:
+            self.out_layers = None
             self.out_dim = [c3, c4, c5]
 
 
@@ -61,12 +61,12 @@ class BasicFPN(nn.Module):
 
         out_feats = [p3, p4, p5]
 
-        # output proj layers
-        if self.out_dim is not None:
+        if self.out_layers is not None:
+            # output proj layers
             out_feats_proj = []
             for feat, layer in zip(out_feats, self.out_layers):
                 out_feats_proj.append(layer(feat))
 
             return out_feats_proj
-
+            
         return out_feats

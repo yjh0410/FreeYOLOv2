@@ -45,23 +45,22 @@ class YOLOv4(nn.Module):
 
         ## non-shared heads
         self.non_shared_heads = nn.ModuleList(
-            [build_head(cfg, in_dim=cfg['head_dim']) 
-            for _ in range(len(cfg['stride']))
+            [build_head(cfg, in_dim=head_dim) 
+            for head_dim in self.head_dim
             ])
 
         ## pred
-        head_dim = cfg['head_dim']
         self.obj_preds = nn.ModuleList(
                             [nn.Conv2d(head_dim, 1, kernel_size=1) 
-                              for _ in range(len(cfg['stride']))
+                                for head_dim in self.head_dim
                               ])
         self.cls_preds = nn.ModuleList(
                             [nn.Conv2d(head_dim, self.num_classes, kernel_size=1) 
-                              for _ in range(len(cfg['stride']))
+                                for head_dim in self.head_dim
                               ]) 
         self.reg_preds = nn.ModuleList(
                             [nn.Conv2d(head_dim, 4, kernel_size=1) 
-                              for _ in range(len(cfg['stride']))
+                                for head_dim in self.head_dim
                               ])                 
 
         # --------- Network Initialization ----------
