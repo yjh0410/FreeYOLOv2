@@ -177,10 +177,11 @@ def train():
     total_bs = single_gpu_bs * accumulate * world_size
 
     # learning rate
-    base_lr = args.base_lr * (total_bs / 64)
+    base_lr = args.base_lr
     min_lr = base_lr * args.min_lr_ratio
 
     # optimizer
+    cfg['weight_decay'] *= (total_bs / 64)
     optimizer, start_epoch = build_optimizer(cfg, model_without_ddp, base_lr, args.resume)
     
     # warmup scheduler

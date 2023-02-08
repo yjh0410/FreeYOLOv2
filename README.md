@@ -64,14 +64,14 @@ python train.py --cuda -d coco -v yolo_free_nano -bs 16 -accu 4 --max_epoch 300 
 
 Main results on COCO-val:
 
-| Model        |  Scale  | AP<sup>val<br>0.5:0.95 | AP<sup>test<br>0.5:0.95 |FPS<sup>3090<br>FP32-bs1 |  GFLOPs |  Params  |  Weight  |
-|--------------|---------|------------------------|-------------------------|-------------------------|---------|----------|----------|
-| FreeYOLOv2-N |  416    |                    |                     |                       |     |    |  |
-| FreeYOLOv2-T |  640    |                    |                     |                       |     |    |  |
-| FreeYOLOv2-S |  640    |                    |                     |                       |     |    |  |
-| FreeYOLOv2-M |  640    |                    |                     |                       |  79.0   |  24.6 M  |  |
-| FreeYOLOv2-L |  640    |         49.3           |          49.8           |          56             |  156.2  |  48.2 M  | [ckpt](https://github.com/yjh0410/FreeYOLOv2/releases/download/yolo_free_v2_weights/yolo_free_v2_large_coco.pth) |
-| FreeYOLOv2-H |  640    |                    |                     |                       |    |    |  |
+| Model        |  Scale  | AP<sup>val<br>0.5:0.95 | AP<sup>test<br>0.5:0.95 |FPS<sup>3090<br>FP32-bs1 |  FLOPs<br><sup>(G) |  Params<br><sup>(M)  |  Weight  |
+|--------------|---------|------------------------|-------------------------|-------------------------|--------------------|----------------------|----------|
+| FreeYOLOv2-N |  416    |                        |                         |                         |                    |                    |  |
+| FreeYOLOv2-T |  640    |                        |                         |                         |                    |                    |  |
+| FreeYOLOv2-S |  640    |                        |                         |                         |                    |                    |  |
+| FreeYOLOv2-M |  640    |                        |                         |                         |  79.0              |  24.6              |  |
+| FreeYOLOv2-L |  640    |         49.3           |          49.8           |          56             |  156.2             |  48.2              | [ckpt](https://github.com/yjh0410/FreeYOLOv2/releases/download/yolo_free_v2_weights/yolo_free_v2_large_coco.pth) |
+| FreeYOLOv2-H |  640    |                        |                         |                         |                    |                    |  |
 
 
 ### WiderFace
