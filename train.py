@@ -172,14 +172,15 @@ def train():
 
     # batch size
     total_bs = args.batch_size
-    accumulate = max(1, round(64 / args.batch_size))
+    accumulate = max(1, round(64 / total_bs))
     print('Grad_Accumulate: ', accumulate)
 
     # learning rate
-    base_lr = args.base_lr * total_bs * accumulate / 64
+    base_lr = args.base_lr
     min_lr = base_lr * args.min_lr_ratio
 
     # optimizer
+    cfg['weight_decay'] *= total_bs / 64
     optimizer, start_epoch = build_optimizer(cfg, model_without_ddp, base_lr, args.resume)
     
     # warmup scheduler
