@@ -66,12 +66,12 @@ Main results on COCO-val:
 
 | Model        |  Scale  | AP<sup>val<br>0.5:0.95 | AP<sup>test<br>0.5:0.95 |FPS<sup>3090<br>FP32-bs1 |  FLOPs<br><sup>(G) |  Params<br><sup>(M)  |  Weight  |
 |--------------|---------|------------------------|-------------------------|-------------------------|--------------------|----------------------|----------|
-| FreeYOLOv2-N |  416    |                        |                         |                         |                    |                    |  |
-| FreeYOLOv2-T |  640    |                        |                         |                         |  8.0               |  2.5               |  |
-| FreeYOLOv2-S |  640    |                        |                         |                         |                    |                    |  |
-| FreeYOLOv2-M |  640    |                        |                         |                         |  79.0              |  24.6              |  |
-| FreeYOLOv2-L |  640    |         49.3           |          49.8           |          56             |  156.2             |  48.2              | [ckpt](https://github.com/yjh0410/FreeYOLOv2/releases/download/yolo_free_v2_weights/yolo_free_v2_large_coco.pth) |
-| FreeYOLOv2-H |  640    |                        |                         |                         |                    |                    |  |
+| FreeYOLOv2-N |  416    |                        |                         |                         |  1.4               |  0.9               |  |
+| FreeYOLOv2-T |  640    |                        |                         |                         |  7.3               |  2.0               |  |
+| FreeYOLOv2-S |  640    |                        |                         |                         |  28.5              |  8.2               |  |
+| FreeYOLOv2-M |  640    |                        |                         |                         |  72.5              |  21.0              |  |
+| FreeYOLOv2-L |  640    |                        |                         |                         |  144.1             |  41.8              |  |
+| FreeYOLOv2-H |  640    |                        |                         |                         |  250.4             |  72.5              |  |
 
 
 ### WiderFace
