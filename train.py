@@ -173,6 +173,7 @@ def train():
     # batch size
     total_bs = args.batch_size
     accumulate = max(1, round(64 / args.batch_size))
+    print('Grad_Accumulate: ', accumulate)
 
     # learning rate
     base_lr = args.base_lr * total_bs * accumulate / 64
