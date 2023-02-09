@@ -4,7 +4,7 @@ python train.py \
         -d coco \
         --root /mnt/share/ssd2/dataset/ \
         -v yolo_free_tiny \
-        -bs 64 \
+        -bs 16 \
         -accu 4 \
         -lr 0.01 \
         -mlr 0.01 \
