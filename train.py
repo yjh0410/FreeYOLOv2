@@ -175,7 +175,7 @@ def train():
     accumulate = max(1, round(64 / args.batch_size))
 
     # learning rate
-    base_lr = args.base_lr * total_bs / 64
+    base_lr = args.base_lr * total_bs * accumulate / 64
     min_lr = base_lr * args.min_lr_ratio
 
     # optimizer
