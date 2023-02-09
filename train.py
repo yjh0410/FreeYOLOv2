@@ -280,6 +280,9 @@ def train():
             print('close Mixup Augmentation ...')
             dataloader.dataset.mixup_prob = 0.
 
+    # Empty cache after train loop
+    if args.cuda:
+        torch.cuda.empty_cache()
 
 if __name__ == '__main__':
     train()
