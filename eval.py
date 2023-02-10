@@ -20,7 +20,7 @@ from models import build_model
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description='FreeYOLO')
+    parser = argparse.ArgumentParser(description='FreeYOLOv2')
     # basic
     parser.add_argument('-size', '--img_size', default=640, type=int,
                         help='the max size of input image')
@@ -28,8 +28,8 @@ def parse_args():
                         help='Use cuda')
 
     # model
-    parser.add_argument('-v', '--version', default='yolo_free_large', type=str,
-                        help='build YOLO')
+    parser.add_argument('-v', '--version', default='yolo_free_v2_large', type=str,
+                        help='build yolo_free_v2')
     parser.add_argument('--weight', default=None,
                         type=str, help='Trained state_dict file path to open')
     parser.add_argument('-ct', '--conf_thresh', default=0.005, type=float,

@@ -15,10 +15,10 @@ from models import build_model
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description='FreeYOLO')
+    parser = argparse.ArgumentParser(description='FreeYOLOv2')
     # Model
-    parser.add_argument('-v', '--version', default='yolo_free_large', type=str,
-                        help='build yolo')
+    parser.add_argument('-v', '--version', default='yolo_free_v2_large', type=str,
+                        help='build yolo_free_v2')
     parser.add_argument('--fuse_conv_bn', action='store_true', default=False,
                         help='fuse conv and bn')
     parser.add_argument('--conf_thresh', default=0.1, type=float,

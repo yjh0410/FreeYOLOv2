@@ -1,11 +1,14 @@
 import torch
 import torch.nn as nn
-import os
 
 
 model_urls = {
-    "darknet53": "https://github.com/yjh0410/image_classification_pytorch/releases/download/weight/darknet53_silu.pth",
-    "cspdarknet53": "https://github.com/yjh0410/image_classification_pytorch/releases/download/weight/cspdarknet53_silu.pth",
+    "elan_cspnet_nano": None,
+    "elan_cspnet_tiny": None,
+    "elan_cspnet_small": None,
+    "elan_cspnet_medium": None,
+    "elan_cspnet_large": None,
+    "elan_cspnet_huge": None,
 }
 
 
@@ -79,7 +82,7 @@ class Bottleneck(nn.Module):
                  norm_type='BN'):
         super(Bottleneck, self).__init__()
         inter_dim = int(out_dim * expand_ratio)  # hidden channels            
-        self.cv1 = Conv(in_dim, inter_dim, k=1, norm_type=norm_type, act_type=act_type)
+        self.cv1 = Conv(in_dim, inter_dim, k=3, p=1, norm_type=norm_type, act_type=act_type, depthwise=depthwise)
         self.cv2 = Conv(inter_dim, out_dim, k=3, p=1, norm_type=norm_type, act_type=act_type, depthwise=depthwise)
         self.shortcut = shortcut and in_dim == out_dim
 
@@ -89,28 +92,8 @@ class Bottleneck(nn.Module):
         return x + h if self.shortcut else h
 
 
-# ResBlock
-class ResBlock(nn.Module):
-    def __init__(self,
-                 in_dim,
-                 out_dim,
-                 nblocks=1,
-                 act_type='silu',
-                 norm_type='BN'):
-        super(ResBlock, self).__init__()
-        assert in_dim == out_dim
-        self.m = nn.Sequential(*[
-            Bottleneck(in_dim, out_dim, expand_ratio=0.5, shortcut=True,
-                       norm_type=norm_type, act_type=act_type)
-                       for _ in range(nblocks)
-                       ])
-
-    def forward(self, x):
-        return self.m(x)
-
-
-# CSPBlock
-class CSPBlock(nn.Module):
+# ELAN-CSP-Block
+class ELAN_CSP_Block(nn.Module):
     def __init__(self,
                  in_dim,
                  out_dim,
@@ -120,67 +103,92 @@ class CSPBlock(nn.Module):
                  depthwise=False,
                  act_type='silu',
                  norm_type='BN'):
-        super(CSPBlock, self).__init__()
+        super(ELAN_CSP_Block, self).__init__()
         inter_dim = int(out_dim * expand_ratio)
         self.cv1 = Conv(in_dim, inter_dim, k=1, norm_type=norm_type, act_type=act_type)
         self.cv2 = Conv(in_dim, inter_dim, k=1, norm_type=norm_type, act_type=act_type)
-        self.cv3 = Conv(2 * inter_dim, out_dim, k=1, norm_type=norm_type, act_type=act_type)
-        self.m = nn.Sequential(*[
-            Bottleneck(inter_dim, inter_dim, expand_ratio=1.0, shortcut=shortcut,
-                       depthwise=depthwise, norm_type=norm_type, act_type=act_type)
-                       for _ in range(nblocks)
-                       ])
+        self.m = nn.Sequential(*(
+            Bottleneck(inter_dim, inter_dim, 1.0, shortcut, depthwise, act_type, norm_type)
+            for _ in range(nblocks)))
+        self.cv3 = Conv((2 + nblocks) * inter_dim, out_dim, k=1, act_type=act_type, norm_type=norm_type)
+
 
     def forward(self, x):
         x1 = self.cv1(x)
         x2 = self.cv2(x)
-        x3 = self.m(x1)
-        out = self.cv3(torch.cat([x3, x2], dim=1))
+        out = list([x1, x2])
+
+        out.extend(m(out[-1]) for m in self.m)
+
+        out = self.cv3(torch.cat(out, dim=1))
 
         return out
 
 
-# DarkNet53
-class DarkNet53(nn.Module):
-    def __init__(self, csp_block=False, act_type='silu', norm_type='BN'):
-        super(DarkNet53, self).__init__()
-        self.feat_dims = [256, 512, 1024]
+# DownSample
+class DownSample(nn.Module):
+    def __init__(self, in_dim, out_dim, act_type='silu', norm_type='BN', depthwise=False):
+        super().__init__()
+        inter_dim = out_dim // 2
+        self.mp = nn.MaxPool2d((2, 2), 2)
+        self.cv1 = Conv(in_dim, inter_dim, k=1, act_type=act_type, norm_type=norm_type)
+        self.cv2 = nn.Sequential(
+            Conv(in_dim, inter_dim, k=1, act_type=act_type, norm_type=norm_type),
+            Conv(inter_dim, inter_dim, k=3, p=1, s=2, act_type=act_type, norm_type=norm_type, depthwise=depthwise)
+        )
+
+    def forward(self, x):
+        """
+        Input:
+            x: [B, C, H, W]
+        Output:
+            out: [B, C, H//2, W//2]
+        """
+        # [B, C, H, W] -> [B, C//2, H//2, W//2]
+        x1 = self.cv1(self.mp(x))
+        x2 = self.cv2(x)
+
+        # [B, C, H//2, W//2]
+        out = torch.cat([x1, x2], dim=1)
+
+        return out
+
+
+# ELAN-CSPNet
+class ELAN_CSPNet(nn.Module):
+    def __init__(self, width=1.0, depth=1.0, ratio=1.0, act_type='silu', norm_type='BN', depthwise=False):
+        super(ELAN_CSPNet, self).__init__()
+        self.feat_dims = [int(256*width), int(512*width), int(512*width*ratio)]
 
         # stride = 2
         self.layer_1 = nn.Sequential(
-            Conv(3, 32, k=3, p=1, act_type=act_type, norm_type=norm_type),
-            Conv(32, 64, k=3, p=1, s=2, act_type=act_type, norm_type=norm_type),
-            self.make_block(64, 64, nblocks=1, csp_block=csp_block, act_type=act_type, norm_type=norm_type)
+            Conv(3, int(64*width), k=3, p=1, s=2, act_type=act_type, norm_type=norm_type),
+            Conv(int(64*width), int(64*width), k=3, p=1, act_type=act_type, norm_type=norm_type, depthwise=depthwise) # P1/2
         )
         # stride = 4
         self.layer_2 = nn.Sequential(
-            Conv(64, 128, k=3, p=1, s=2, act_type=act_type, norm_type=norm_type),
-            self.make_block(128, 128, nblocks=2, csp_block=csp_block, act_type=act_type, norm_type=norm_type)
+            Conv(int(64*width), int(128*width), k=3, p=1, s=2, act_type=act_type, norm_type=norm_type),
+            ELAN_CSP_Block(int(128*width), int(128*width), expand_ratio=0.5, nblocks=int(3*depth),
+                           shortcut=True, act_type=act_type, norm_type=norm_type, depthwise=depthwise)
         )
         # stride = 8
         self.layer_3 = nn.Sequential(
-            Conv(128, 256, k=3, p=1, s=2, act_type=act_type, norm_type=norm_type),
-            self.make_block(256, 256, nblocks=8, csp_block=csp_block, act_type=act_type, norm_type=norm_type)
+            DownSample(in_dim=int(128*width), out_dim=int(256*width), act_type=act_type, norm_type=norm_type),             
+            ELAN_CSP_Block(int(256*width), int(256*width), expand_ratio=0.5, nblocks=int(6*depth),
+                           shortcut=True, act_type=act_type, norm_type=norm_type, depthwise=depthwise)
         )
         # stride = 16
         self.layer_4 = nn.Sequential(
-            Conv(256, 512, k=3, p=1, s=2, act_type=act_type, norm_type=norm_type),
-            self.make_block(512, 512, nblocks=8, csp_block=csp_block, act_type=act_type, norm_type=norm_type)
+            DownSample(in_dim=int(256*width), out_dim=int(512*width), act_type=act_type, norm_type=norm_type),             
+            ELAN_CSP_Block(int(512*width), int(512*width), expand_ratio=0.5, nblocks=int(6*depth),
+                           shortcut=True, act_type=act_type, norm_type=norm_type, depthwise=depthwise)
         )
         # stride = 32
         self.layer_5 = nn.Sequential(
-            Conv(512, 1024, k=3, p=1, s=2, act_type=act_type, norm_type=norm_type),
-            self.make_block(1024, 1024, nblocks=4, csp_block=csp_block, act_type=act_type, norm_type=norm_type)
+            DownSample(in_dim=int(512*width), out_dim=int(512*width*ratio), act_type=act_type, norm_type=norm_type),             
+            ELAN_CSP_Block(int(512*width*ratio), int(512*width*ratio), expand_ratio=0.5, nblocks=int(3*depth),
+                           shortcut=True, act_type=act_type, norm_type=norm_type, depthwise=depthwise)
         )
-
-
-    def make_block(self, in_dim, out_dim, nblocks=1, csp_block=False, act_type='silu', norm_type='BN'):
-        if csp_block:
-            return CSPBlock(in_dim, out_dim, expand_ratio=0.5, nblocks=nblocks,
-                            shortcut=True, act_type=act_type, norm_type=norm_type)
-        else:
-            return ResBlock(in_dim, out_dim, nblocks=nblocks,
-                            act_type=act_type, norm_type=norm_type)
 
 
     def forward(self, x):
@@ -198,22 +206,16 @@ class DarkNet53(nn.Module):
         return outputs
 
 
-def build_darknet53(cfg, pretrained=False): 
-    """Constructs a darknet-53 model.
-
-    Args:
-        pretrained (bool): If True, returns a model pre-trained on ImageNet
-    """
-    backbone = DarkNet53(cfg['csp_block'], cfg['bk_act'], cfg['bk_norm'])
+# build ELAN-Net
+def build_elan_cspnet(cfg, pretrained=False): 
+    # model
+    backbone = ELAN_CSPNet(width=cfg['width'], depth=cfg['depth'], ratio=cfg['ratio'],
+                           act_type=cfg['bk_act'], norm_type=cfg['bk_norm'], depthwise=cfg['bk_dpw'])
     feat_dims = backbone.feat_dims
 
     # load weight
     if pretrained:
-        if cfg['csp_block']:
-            arc = 'cspdarknet53'
-        else:
-            arc = 'darknet53'
-        url = model_urls[arc]
+        url = model_urls[cfg['backbone']]
         if url is not None:
             print('Loading pretrained weight ...')
             checkpoint = torch.hub.load_state_dict_from_url(
@@ -235,7 +237,7 @@ def build_darknet53(cfg, pretrained=False):
 
             backbone.load_state_dict(checkpoint_state_dict)
         else:
-            print('No backbone pretrained: {}'.format(arc))
+            print('No backbone pretrained: {}'.format(cfg['backbone']))
 
     return backbone, feat_dims
 
@@ -244,11 +246,15 @@ if __name__ == '__main__':
     import time
     from thop import profile
     cfg = {
-        'bk_act': 'silu',
+        'backbone': 'elan_cspnet_tiny',
+        'bk_act': 'lrelu',
         'bk_norm': 'BN',
-        'csp_block': False,
+        'bk_dpw': False,
+        'width': 0.25,
+        'depth': 0.34,
+        'ratio': 2.0
     }
-    model, feats = build_darknet53(cfg, pretrained=True)
+    model, feats = build_elan_cspnet(cfg, pretrained=True)
     x = torch.randn(1, 3, 224, 224)
     t0 = time.time()
     outputs = model(x)

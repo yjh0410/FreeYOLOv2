@@ -1,7 +1,5 @@
-from .spp import SPPF, SPPFBlock, SPPFBlockCSP
-from .elan_pafpn import ELAN_PaFPN
-from .csp_pafpn import CSP_PaFPN
-from .fpn import BasicFPN
+from .spp import SPPF, SPPFBlockCSP
+from .elan_csp_pafpn import ELAN_CSP_PaFPN
 
 
 def build_fpn(cfg, in_dims, out_dim=None):
@@ -9,28 +7,17 @@ def build_fpn(cfg, in_dims, out_dim=None):
     print('==============================')
     print('FPN: {}'.format(model))
     # build neck
-    if model == 'elan_pafpn':
-        fpn_net = ELAN_PaFPN(in_dims=in_dims,
-                             out_dim=out_dim,
-                             width=cfg['width'],
-                             depth=cfg['depth'],
-                             act_type=cfg['fpn_act'],
-                             norm_type=cfg['fpn_norm'],
-                             depthwise=cfg['fpn_depthwise']
-                             )
-    elif model == 'csp_pafpn':
-        fpn_net = CSP_PaFPN(in_dims=in_dims,
-                             out_dim=out_dim,
-                             act_type=cfg['fpn_act'],
-                             norm_type=cfg['fpn_norm'],
-                             depthwise=cfg['fpn_depthwise']
-                             )
-    elif model == 'basic_fpn':
-        fpn_net = BasicFPN(in_dims=in_dims,
-                            out_dim=out_dim,
-                            act_type=cfg['fpn_act'],
-                            norm_type=cfg['fpn_norm']
-                            )
+    if model == 'elan_csp_pafpn':
+        fpn_net = ELAN_CSP_PaFPN(
+            in_dims=in_dims,
+            out_dim=out_dim,
+            width=cfg['width'],
+            depth=cfg['depth'],
+            ratio=cfg['ratio'],
+            act_type=cfg['fpn_act'],
+            norm_type=cfg['fpn_norm'],
+            depthwise=cfg['fpn_depthwise']
+            )
 
     return fpn_net
 

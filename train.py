@@ -22,7 +22,7 @@ from models import build_model
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description='FreeYOLO')
+    parser = argparse.ArgumentParser(description='FreeYOLOv2')
     # basic
     parser.add_argument('--cuda', action='store_true', default=False,
                         help='use cuda.')
@@ -54,7 +54,7 @@ def parse_args():
                         help='after eval epoch, the model is evaluated on val dataset.')
     
     # model
-    parser.add_argument('-v', '--version', default='yolo_free_large', type=str,
+    parser.add_argument('-v', '--version', default='yolo_free_v2_large', type=str,
                         help='build yolo')
     parser.add_argument('-ct', '--conf_thresh', default=0.005, type=float,
                         help='confidence threshold')

@@ -10,7 +10,7 @@ from utils.nms import multiclass_nms
 
 
 # Anchor-free YOLO
-class FreeYOLO(nn.Module):
+class FreeYOLOv2(nn.Module):
     def __init__(self, 
                  cfg,
                  device, 
@@ -20,7 +20,7 @@ class FreeYOLO(nn.Module):
                  trainable = False, 
                  topk = 1000,
                  no_decode = False):
-        super(FreeYOLO, self).__init__()
+        super(FreeYOLOv2, self).__init__()
         # --------- Basic Parameters ----------
         self.cfg = cfg
         self.device = device
@@ -41,7 +41,7 @@ class FreeYOLO(nn.Module):
         self.backbone, feats_dim = build_backbone(cfg=cfg, trainable=trainable)
 
         ## neck
-        self.neck = build_neck(cfg=cfg, in_dim=feats_dim[-1], out_dim=feats_dim[-1]//2)
+        self.neck = build_neck(cfg=cfg, in_dim=feats_dim[-1], out_dim=feats_dim[-1])
         feats_dim[-1] = self.neck.out_dim
         
         ## fpn

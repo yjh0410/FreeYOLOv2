@@ -1,8 +1,8 @@
 # yolo-free config
 
 
-yolo_free_config = {
-    'yolo_free_nano': {
+yolo_free_v2_config = {
+    'yolo_free_v2_nano': {
         # input
         'train_size': 640,
         'test_size': 416,
@@ -22,13 +22,14 @@ yolo_free_config = {
                           'hsv_v': 0.4
                           },
         # model
-        'backbone': 'elannet_nano',
-        'pretrained': True,
+        'backbone': 'elan_cspnet_nano',
+        'pretrained': False,
         'bk_act': 'lrelu',
         'bk_norm': 'BN',
         'bk_dpw': True,
         'width': 0.25,
         'depth': 0.34,
+        'ratio': 2.0,
         'stride': [8, 16, 32],  # P3, P4, P5
         # neck
         'neck': 'sppf',
@@ -38,7 +39,7 @@ yolo_free_config = {
         'neck_norm': 'BN',
         'neck_depthwise': True,
         # fpn
-        'fpn': 'elan_pafpn',
+        'fpn': 'elan_csp_pafpn',
         'fpn_act': 'lrelu',
         'fpn_norm': 'BN',
         'fpn_depthwise': True,
@@ -71,7 +72,7 @@ yolo_free_config = {
         'warmup_factor': 0.00066667,
         },
 
-    'yolo_free_tiny': {
+    'yolo_free_v2_tiny': {
         # input
         'train_size': 800,
         'test_size': 640,
@@ -92,13 +93,14 @@ yolo_free_config = {
                           'hsv_v': 0.4
                           },
         # model
-        'backbone': 'elannet_tiny',
-        'pretrained': True,
+        'backbone': 'elan_cspnet_tiny',
+        'pretrained': False,
         'bk_act': 'lrelu',
         'bk_norm': 'BN',
         'bk_dpw': False,
         'width': 0.25,
         'depth': 0.34,
+        'ratio': 2.0,
         'stride': [8, 16, 32],  # P3, P4, P5
         # neck
         'neck': 'sppf_block_csp',
@@ -108,7 +110,7 @@ yolo_free_config = {
         'neck_norm': 'BN',
         'neck_depthwise': False,
         # fpn
-        'fpn': 'elan_pafpn',
+        'fpn': 'elan_csp_pafpn',
         'fpn_act': 'lrelu',
         'fpn_norm': 'BN',
         'fpn_depthwise': False,
@@ -141,7 +143,7 @@ yolo_free_config = {
         'warmup_factor': 0.00066667,
         },
 
-    'yolo_free_small': {
+    'yolo_free_v2_small': {
         # input
         'train_size': 800,
         'test_size': 640,
@@ -162,13 +164,14 @@ yolo_free_config = {
                           'hsv_v': 0.4
                           },
         # model
-        'backbone': 'elannet_small',
-        'pretrained': True,
+        'backbone': 'elan_cspnet_small',
+        'pretrained': False,
         'bk_act': 'silu',
         'bk_norm': 'BN',
         'bk_dpw': False,
         'width': 0.50,
         'depth': 0.34,
+        'ratio': 2.0,
         'stride': [8, 16, 32],  # P3, P4, P5
         # neck
         'neck': 'sppf_block_csp',
@@ -178,7 +181,7 @@ yolo_free_config = {
         'neck_norm': 'BN',
         'neck_depthwise': False,
         # fpn
-        'fpn': 'elan_pafpn',
+        'fpn': 'elan_csp_pafpn',
         'fpn_act': 'silu',
         'fpn_norm': 'BN',
         'fpn_depthwise': False,
@@ -211,7 +214,7 @@ yolo_free_config = {
         'warmup_factor': 0.00066667,
         },
 
-    'yolo_free_medium': {
+    'yolo_free_v2_medium': {
         # input
         'train_size': 800,
         'test_size': 640,
@@ -232,13 +235,14 @@ yolo_free_config = {
                           'hsv_v': 0.4
                           },
         # model
-        'backbone': 'elannet_medium',
-        'pretrained': True,
+        'backbone': 'elan_cspnet_medium',
+        'pretrained': False,
         'bk_act': 'silu',
         'bk_norm': 'BN',
         'bk_dpw': False,
         'width': 0.75,
         'depth': 0.67,
+        'ratio': 1.5,
         'stride': [8, 16, 32],  # P3, P4, P5
         # neck
         'neck': 'sppf_block_csp',
@@ -248,7 +252,7 @@ yolo_free_config = {
         'neck_norm': 'BN',
         'neck_depthwise': False,
         # fpn
-        'fpn': 'elan_pafpn',
+        'fpn': 'elan_csp_pafpn',
         'fpn_act': 'silu',
         'fpn_norm': 'BN',
         'fpn_depthwise': False,
@@ -281,7 +285,7 @@ yolo_free_config = {
         'warmup_factor': 0.00066667,
         },
 
-    'yolo_free_large': {
+    'yolo_free_v2_large': {
         # input
         'train_size': 800,
         'test_size': 640,
@@ -302,13 +306,14 @@ yolo_free_config = {
                           'hsv_v': 0.4
                           },
         # model
-        'backbone': 'elannet_large',
-        'pretrained': True,
+        'backbone': 'elan_cspnet_large',
+        'pretrained': False,
         'bk_act': 'silu',
         'bk_norm': 'BN',
         'bk_dpw': False,
         'width': 1.0,
         'depth': 1.0,
+        'ratio': 1.0,
         'stride': [8, 16, 32],  # P3, P4, P5
         # neck
         'neck': 'sppf_block_csp',
@@ -318,7 +323,7 @@ yolo_free_config = {
         'neck_norm': 'BN',
         'neck_depthwise': False,
         # fpn
-        'fpn': 'elan_pafpn',
+        'fpn': 'elan_csp_pafpn',
         'fpn_act': 'silu',
         'fpn_norm': 'BN',
         'fpn_depthwise': False,
@@ -351,7 +356,7 @@ yolo_free_config = {
         'warmup_factor': 0.00066667,
         },
 
-    'yolo_free_huge': {
+    'yolo_free_v2_huge': {
         # input
         'train_size': 800,
         'test_size': 640,
@@ -372,13 +377,14 @@ yolo_free_config = {
                           'hsv_v': 0.4
                           },
         # model
-        'backbone': 'elannet_huge',
-        'pretrained': True,
+        'backbone': 'elan_cspnet_huge',
+        'pretrained': False,
         'bk_act': 'silu',
         'bk_norm': 'BN',
         'bk_dpw': False,
         'width': 1.25,
         'depth': 1.34,
+        'ratio': 1.0,
         'stride': [8, 16, 32],  # P3, P4, P5
         # neck
         'neck': 'sppf_block_csp',
@@ -388,7 +394,7 @@ yolo_free_config = {
         'neck_norm': 'BN',
         'neck_depthwise': False,
         # fpn
-        'fpn': 'elan_pafpn',
+        'fpn': 'elan_csp_pafpn',
         'fpn_act': 'silu',
         'fpn_norm': 'BN',
         'fpn_depthwise': False,
