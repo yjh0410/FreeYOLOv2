@@ -66,12 +66,12 @@ Main results on COCO-val:
 
 | Model        |  Scale  | AP<sup>val<br>0.5:0.95 | AP<sup>test<br>0.5:0.95 |FPS<sup>3090<br>FP32-bs1 |  FLOPs<br><sup>(G) |  Params<br><sup>(M)  |  Weight  |
 |--------------|---------|------------------------|-------------------------|-------------------------|--------------------|----------------------|----------|
-| FreeYOLOv2-N |  416    |                        |                         |                         |  1.3               |  1.0               |  |
-| FreeYOLOv2-T |  640    |                        |                         |                         |  7.2               |  2.3               |  |
-| FreeYOLOv2-S |  640    |                        |                         |                         |  27.9              |  9.1               |  |
-| FreeYOLOv2-M |  640    |                        |                         |                         |  74.0              |  20.4              |  |
-| FreeYOLOv2-L |  640    |                        |                         |                         |  151.0             |  35.2              |  |
-| FreeYOLOv2-H |  640    |                        |                         |                         |  276.7             |  65.4              |  |
+| FreeYOLOv2-N |  416    |                        |                         |                         |  1.4               |  1.3               |  |
+| FreeYOLOv2-T |  640    |                        |                         |                         |  7.8               |  2.5               |  |
+| FreeYOLOv2-S |  640    |                        |                         |                         |  30.5              |  10.6              |  |
+| FreeYOLOv2-M |  640    |                        |                         |                         |  82.9              |  24.6              |  |
+| FreeYOLOv2-L |  640    |                        |                         |                         |  147.6             |  38.8              |  |
+| FreeYOLOv2-H |  640    |                        |                         |                         |  261.0             |  66.2              |  |
 
 
 ### WiderFace

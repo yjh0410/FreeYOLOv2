@@ -76,14 +76,17 @@ class Bottleneck(nn.Module):
                  in_dim,
                  out_dim,
                  expand_ratio=0.5,
+                 kernel_size=(3, 3),
                  shortcut=False,
                  depthwise=False,
                  act_type='silu',
                  norm_type='BN'):
         super(Bottleneck, self).__init__()
-        inter_dim = int(out_dim * expand_ratio)  # hidden channels            
-        self.cv1 = Conv(in_dim, inter_dim, k=3, p=1, norm_type=norm_type, act_type=act_type, depthwise=depthwise)
-        self.cv2 = Conv(inter_dim, out_dim, k=3, p=1, norm_type=norm_type, act_type=act_type, depthwise=depthwise)
+        inter_dim = int(in_dim * expand_ratio)  # hidden channels       
+        self.cv1 = Conv(in_dim, inter_dim, k=kernel_size[0], p=kernel_size[0]//2,
+                        norm_type=norm_type, act_type=act_type, depthwise=depthwise if kernel_size[0] > 1 else False)
+        self.cv2 = Conv(inter_dim, out_dim, k=kernel_size[1], p=kernel_size[1]//2,
+                        norm_type=norm_type, act_type=act_type, depthwise=depthwise)
         self.shortcut = shortcut and in_dim == out_dim
 
     def forward(self, x):
@@ -98,17 +101,18 @@ class ELAN_CSP_Block(nn.Module):
                  in_dim,
                  out_dim,
                  expand_ratio=0.5,
+                 kernel_size=(3, 3),
                  nblocks=1,
                  shortcut=False,
                  depthwise=False,
                  act_type='silu',
                  norm_type='BN'):
         super(ELAN_CSP_Block, self).__init__()
-        inter_dim = int(out_dim * expand_ratio)
+        inter_dim = int(in_dim * expand_ratio)
         self.cv1 = Conv(in_dim, inter_dim, k=1, norm_type=norm_type, act_type=act_type)
         self.cv2 = Conv(in_dim, inter_dim, k=1, norm_type=norm_type, act_type=act_type)
         self.m = nn.Sequential(*(
-            Bottleneck(inter_dim, inter_dim, 1.0, shortcut, depthwise, act_type, norm_type)
+            Bottleneck(inter_dim, inter_dim, 1.0, kernel_size, shortcut, depthwise, act_type, norm_type)
             for _ in range(nblocks)))
         self.cv3 = Conv((2 + nblocks) * inter_dim, out_dim, k=1, act_type=act_type, norm_type=norm_type)
 
@@ -168,25 +172,25 @@ class ELAN_CSPNet(nn.Module):
         # stride = 4
         self.layer_2 = nn.Sequential(
             Conv(int(64*width), int(128*width), k=3, p=1, s=2, act_type=act_type, norm_type=norm_type),
-            ELAN_CSP_Block(int(128*width), int(128*width), expand_ratio=0.5, nblocks=int(3*depth),
+            ELAN_CSP_Block(int(128*width), int(128*width), expand_ratio=0.5, kernel_size=[3, 3], nblocks=int(3*depth),
                            shortcut=True, act_type=act_type, norm_type=norm_type, depthwise=depthwise)
         )
         # stride = 8
         self.layer_3 = nn.Sequential(
             DownSample(in_dim=int(128*width), out_dim=int(256*width), act_type=act_type, norm_type=norm_type),             
-            ELAN_CSP_Block(int(256*width), int(256*width), expand_ratio=0.5, nblocks=int(6*depth),
+            ELAN_CSP_Block(int(256*width), int(256*width), expand_ratio=0.5, kernel_size=[3, 3], nblocks=int(6*depth),
                            shortcut=True, act_type=act_type, norm_type=norm_type, depthwise=depthwise)
         )
         # stride = 16
         self.layer_4 = nn.Sequential(
             DownSample(in_dim=int(256*width), out_dim=int(512*width), act_type=act_type, norm_type=norm_type),             
-            ELAN_CSP_Block(int(512*width), int(512*width), expand_ratio=0.5, nblocks=int(6*depth),
+            ELAN_CSP_Block(int(512*width), int(512*width), expand_ratio=0.5, kernel_size=[3, 3], nblocks=int(6*depth),
                            shortcut=True, act_type=act_type, norm_type=norm_type, depthwise=depthwise)
         )
         # stride = 32
         self.layer_5 = nn.Sequential(
             DownSample(in_dim=int(512*width), out_dim=int(512*width*ratio), act_type=act_type, norm_type=norm_type),             
-            ELAN_CSP_Block(int(512*width*ratio), int(512*width*ratio), expand_ratio=0.5, nblocks=int(3*depth),
+            ELAN_CSP_Block(int(512*width*ratio), int(512*width*ratio), expand_ratio=0.5, kernel_size=[3, 3], nblocks=int(3*depth),
                            shortcut=True, act_type=act_type, norm_type=norm_type, depthwise=depthwise)
         )
 

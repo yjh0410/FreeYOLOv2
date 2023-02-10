@@ -103,7 +103,7 @@ yolo_free_v2_config = {
         'ratio': 2.0,
         'stride': [8, 16, 32],  # P3, P4, P5
         # neck
-        'neck': 'sppf_block_csp',
+        'neck': 'sppf',
         'expand_ratio': 0.5,
         'pooling_size': 5,
         'neck_act': 'lrelu',
@@ -174,7 +174,7 @@ yolo_free_v2_config = {
         'ratio': 2.0,
         'stride': [8, 16, 32],  # P3, P4, P5
         # neck
-        'neck': 'sppf_block_csp',
+        'neck': 'sppf',
         'expand_ratio': 0.5,
         'pooling_size': 5,
         'neck_act': 'silu',
@@ -245,7 +245,7 @@ yolo_free_v2_config = {
         'ratio': 1.5,
         'stride': [8, 16, 32],  # P3, P4, P5
         # neck
-        'neck': 'sppf_block_csp',
+        'neck': 'sppf',
         'expand_ratio': 0.5,
         'pooling_size': 5,
         'neck_act': 'silu',
@@ -316,7 +316,7 @@ yolo_free_v2_config = {
         'ratio': 1.0,
         'stride': [8, 16, 32],  # P3, P4, P5
         # neck
-        'neck': 'sppf_block_csp',
+        'neck': 'sppf',
         'expand_ratio': 0.5,
         'pooling_size': 5,
         'neck_act': 'silu',
@@ -331,8 +331,8 @@ yolo_free_v2_config = {
         'head': 'decoupled_head',
         'head_act': 'silu',
         'head_norm': 'BN',
-        'num_cls_head': 2,
-        'num_reg_head': 2,
+        'num_cls_head': 1,
+        'num_reg_head': 1,
         'head_depthwise': False,
         'reg_max': 16,
         # matcher
@@ -383,11 +383,11 @@ yolo_free_v2_config = {
         'bk_norm': 'BN',
         'bk_dpw': False,
         'width': 1.25,
-        'depth': 1.34,
+        'depth': 1.0,
         'ratio': 1.0,
         'stride': [8, 16, 32],  # P3, P4, P5
         # neck
-        'neck': 'sppf_block_csp',
+        'neck': 'sppf',
         'expand_ratio': 0.5,
         'pooling_size': 5,
         'neck_act': 'silu',

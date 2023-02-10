@@ -11,16 +11,17 @@ class ELAN_CSP_Block(nn.Module):
                  out_dim,
                  expand_ratio=0.5,
                  nblocks=1,
+                 kernel_size=(3, 3),
                  shortcut=False,
                  depthwise=False,
                  act_type='silu',
                  norm_type='BN'):
         super(ELAN_CSP_Block, self).__init__()
-        inter_dim = int(out_dim * expand_ratio)
+        inter_dim = int(in_dim * expand_ratio)
         self.cv1 = Conv(in_dim, inter_dim, k=1, norm_type=norm_type, act_type=act_type)
         self.cv2 = Conv(in_dim, inter_dim, k=1, norm_type=norm_type, act_type=act_type)
         self.m = nn.Sequential(*(
-            Bottleneck(inter_dim, inter_dim, 1.0, shortcut, depthwise, act_type, norm_type)
+            Bottleneck(inter_dim, inter_dim, 1.0, kernel_size, shortcut, depthwise, act_type, norm_type)
             for _ in range(nblocks)))
         self.cv3 = Conv((2 + nblocks) * inter_dim, out_dim, k=1, act_type=act_type, norm_type=norm_type)
 
