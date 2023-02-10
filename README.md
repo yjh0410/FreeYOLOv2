@@ -70,7 +70,7 @@ Main results on COCO-val:
 | FreeYOLOv2-T |  640    |                        |                         |                         |  7.8               |  2.5               |  |
 | FreeYOLOv2-S |  640    |                        |                         |                         |  30.5              |  10.6              |  |
 | FreeYOLOv2-M |  640    |                        |                         |                         |  82.9              |  24.6              |  |
-| FreeYOLOv2-L |  640    |                        |                         |                         |  147.6             |  38.8              |  |
+| FreeYOLOv2-L |  640    |                        |                         |                         |  167.3             |  42.4              |  |
 | FreeYOLOv2-H |  640    |                        |                         |                         |  261.0             |  66.2              |  |
 
 

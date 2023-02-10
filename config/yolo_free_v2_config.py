@@ -331,8 +331,8 @@ yolo_free_v2_config = {
         'head': 'decoupled_head',
         'head_act': 'silu',
         'head_norm': 'BN',
-        'num_cls_head': 1,
-        'num_reg_head': 1,
+        'num_cls_head': 2,
+        'num_reg_head': 2,
         'head_depthwise': False,
         'reg_max': 16,
         # matcher
