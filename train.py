@@ -15,7 +15,7 @@ from utils.misc import ModelEMA, CollateFunc, build_dataset, build_dataloader
 from utils.solver.optimizer import build_optimizer
 from utils.solver.lr_scheduler import build_lr_scheduler
 
-from engine import train_with_warmup, train_one_epoch, val_one_epoch
+from engine import train_one_epoch, val_one_epoch
 
 from config import build_config
 from models import build_model
@@ -207,40 +207,21 @@ def train():
             dataloader.batch_sampler.sampler.set_epoch(epoch)
 
         # train one epoch
-        if epoch < args.wp_epoch:
-            # warmup training loop
-            last_opt_step = train_with_warmup(
-                epoch=epoch,
-                total_epochs=total_epochs,
-                args=args, 
-                device=device, 
-                ema=ema,
-                model=model,
-                criterion=criterion,
-                cfg=cfg, 
-                dataloader=dataloader, 
-                optimizer=optimizer,
-                scheduler=scheduler,
-                lf=lf,
-                scaler=scaler,
-                last_opt_step=last_opt_step)
-
-        else:
-            # train one epoch
-            last_opt_step = train_one_epoch(
-                epoch=epoch,
-                total_epochs=total_epochs,
-                args=args, 
-                device=device,
-                ema=ema, 
-                model=model,
-                criterion=criterion,
-                cfg=cfg, 
-                dataloader=dataloader, 
-                optimizer=optimizer,
-                scheduler=scheduler,
-                scaler=scaler,
-                last_opt_step=last_opt_step)
+        last_opt_step = train_one_epoch(
+            epoch=epoch,
+            total_epochs=total_epochs,
+            args=args, 
+            device=device,
+            ema=ema, 
+            model=model,
+            criterion=criterion,
+            cfg=cfg, 
+            dataloader=dataloader, 
+            optimizer=optimizer,
+            scheduler=scheduler,
+            lf=lf,
+            scaler=scaler,
+            last_opt_step=last_opt_step)
 
         # eval
         if heavy_eval:

@@ -30,27 +30,27 @@ def rescale_image_targets(images, targets, new_img_size):
     return images, targets
 
 
-def train_with_warmup(epoch,
-                      total_epochs,
-                      args, 
-                      device, 
-                      ema,
-                      model,
-                      criterion,
-                      cfg, 
-                      dataloader, 
-                      optimizer,
-                      scheduler,
-                      lf,
-                      scaler,
-                      last_opt_step):
+def train_one_epoch(epoch,
+                    total_epochs,
+                    args, 
+                    device, 
+                    ema,
+                    model,
+                    criterion,
+                    cfg, 
+                    dataloader, 
+                    optimizer,
+                    scheduler,
+                    lf,
+                    scaler,
+                    last_opt_step):
     epoch_size = len(dataloader)
     img_size = cfg['train_size']
     t0 = time.time()
+    nw = epoch_size * args.wp_epoch
     # train one epoch
     for iter_i, (images, targets) in enumerate(dataloader):
         ni = iter_i + epoch * epoch_size
-        nw = epoch_size * args.wp_epoch
         # Warmup
         if ni <= nw:
             xi = [0, nw]  # x interp
@@ -140,104 +140,6 @@ def train_with_warmup(epoch,
     
     scheduler.step()
 
-    return last_opt_step
-
-
-def train_one_epoch(epoch,
-                    total_epochs,
-                    args, 
-                    device, 
-                    ema,
-                    model,
-                    criterion,
-                    cfg, 
-                    dataloader, 
-                    optimizer,
-                    scheduler,
-                    scaler,
-                    last_opt_step):
-    epoch_size = len(dataloader)
-    img_size = cfg["train_size"]
-    t0 = time.time()
-    # train one epoch
-    for iter_i, (images, targets) in enumerate(dataloader):
-        ni = iter_i + epoch * epoch_size
-        # to device
-        images = images.to(device, non_blocking=True).float() / 255
-
-        # multi scale
-        # # choose a new image size
-        if ni % 10 == 0 and cfg['random_size']:
-            idx = np.random.randint(len(cfg['random_size']))
-            img_size = cfg['random_size'][idx]
-        # # rescale data with new image size
-        if cfg['random_size']:
-            images, targets = rescale_image_targets(images, targets, img_size)
-
-        # inference
-        with torch.cuda.amp.autocast(enabled=args.fp16):
-            outputs = model(images)
-            # loss
-            loss_dict = criterion(outputs=outputs, targets=targets)
-            losses = loss_dict['losses']
-
-        # reduce            
-        loss_dict_reduced = distributed_utils.reduce_dict(loss_dict)
-
-        # check loss
-        if torch.isnan(losses):
-            print('loss is NAN !!')
-            continue
-
-        if args.distributed:
-            # gradient averaged between devices in DDP mode
-            losses *= distributed_utils.get_world_size()
-
-        # backward
-        scaler.scale(losses).backward()
-
-        # Optimize
-        accumulate = max(1, round(64 / args.batch_size))
-        if ni - last_opt_step >= accumulate:
-            scaler.unscale_(optimizer)  # unscale gradients
-            torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=10.0)  # clip gradients
-            scaler.step(optimizer)  # optimizer.step
-            scaler.update()
-            optimizer.zero_grad()
-
-            # ema
-            if ema:
-                ema.update(model)
-                
-            last_opt_step = ni
-
-        # display
-        if distributed_utils.is_main_process() and iter_i % 10 == 0:
-            t1 = time.time()
-            cur_lr = [param_group['lr']  for param_group in optimizer.param_groups]
-            # basic infor
-            log =  '[Epoch: {}/{}]'.format(epoch+1, total_epochs)
-            log += '[Iter: {}/{}]'.format(iter_i, epoch_size)
-            log += '[lr: {:.6f}]'.format(cur_lr[0])
-            # loss infor
-            for k in loss_dict_reduced.keys():
-                if k == 'losses' and args.distributed:
-                    world_size = distributed_utils.get_world_size()
-                    log += '[{}: {:.2f}]'.format(k, loss_dict[k] / world_size)
-                else:
-                    log += '[{}: {:.2f}]'.format(k, loss_dict[k])
-
-            # other infor
-            log += '[time: {:.2f}]'.format(t1 - t0)
-            log += '[size: {}]'.format(img_size)
-
-            # print log infor
-            print(log, flush=True)
-            
-            t0 = time.time()
-
-    scheduler.step()
-    
     return last_opt_step
 
 
