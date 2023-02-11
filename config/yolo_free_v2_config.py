@@ -61,15 +61,17 @@ yolo_free_v2_config = {
         'loss_iou_weight': 7.5,
         'loss_dfl_weight': 1.5,
         # training configuration
-        'no_aug_epoch': 15,
-        'base_lr': 0.01 / 64.,
+        'no_aug_epoch': 10,
         # optimizer
         'optimizer': 'sgd',
-        'momentum': 0.9,
+        'momentum': 0.937,
         'weight_decay': 5e-4,
-        # warmup strategy
-        'warmup': 'linear',
-        'warmup_factor': 0.00066667,
+        # lr schedule
+        'scheduler': 'cosine',
+        'lr0': 0.01,
+        'lrf': 0.01,
+        'warmup_momentum': 0.8,
+        'warmup_bias_lr': 0.1,
         },
 
     'yolo_free_v2_tiny': {
@@ -132,15 +134,17 @@ yolo_free_v2_config = {
         'loss_iou_weight': 7.5,
         'loss_dfl_weight': 1.5,
         # training configuration
-        'no_aug_epoch': 15,
-        'base_lr': 0.01 / 64.,
+        'no_aug_epoch': 10,
         # optimizer
         'optimizer': 'sgd',
-        'momentum': 0.9,
+        'momentum': 0.937,
         'weight_decay': 5e-4,
-        # warmup strategy
-        'warmup': 'linear',
-        'warmup_factor': 0.00066667,
+        # lr schedule
+        'scheduler': 'cosine',
+        'lr0': 0.01,
+        'lrf': 0.01,
+        'warmup_momentum': 0.8,
+        'warmup_bias_lr': 0.1,
         },
 
     'yolo_free_v2_small': {
@@ -203,15 +207,17 @@ yolo_free_v2_config = {
         'loss_iou_weight': 7.5,
         'loss_dfl_weight': 1.5,
         # training configuration
-        'no_aug_epoch': 15,
-        'base_lr': 0.01 / 64.,
+        'no_aug_epoch': 10,
         # optimizer
         'optimizer': 'sgd',
-        'momentum': 0.9,
+        'momentum': 0.937,
         'weight_decay': 5e-4,
-        # warmup strategy
-        'warmup': 'linear',
-        'warmup_factor': 0.00066667,
+        # lr schedule
+        'scheduler': 'cosine',
+        'lr0': 0.01,
+        'lrf': 0.01,
+        'warmup_momentum': 0.8,
+        'warmup_bias_lr': 0.1,
         },
 
     'yolo_free_v2_medium': {
@@ -274,15 +280,17 @@ yolo_free_v2_config = {
         'loss_iou_weight': 7.5,
         'loss_dfl_weight': 1.5,
         # training configuration
-        'no_aug_epoch': 15,
-        'base_lr': 0.01 / 64.,
+        'no_aug_epoch': 10,
         # optimizer
         'optimizer': 'sgd',
-        'momentum': 0.9,
+        'momentum': 0.937,
         'weight_decay': 5e-4,
-        # warmup strategy
-        'warmup': 'linear',
-        'warmup_factor': 0.00066667,
+        # lr schedule
+        'scheduler': 'cosine',
+        'lr0': 0.01,
+        'lrf': 0.01,
+        'warmup_momentum': 0.8,
+        'warmup_bias_lr': 0.1,
         },
 
     'yolo_free_v2_large': {
@@ -345,15 +353,17 @@ yolo_free_v2_config = {
         'loss_iou_weight': 7.5,
         'loss_dfl_weight': 1.5,
         # training configuration
-        'no_aug_epoch': 15,
-        'base_lr': 0.01 / 64.,
+        'no_aug_epoch': 10,
         # optimizer
         'optimizer': 'sgd',
-        'momentum': 0.9,
+        'momentum': 0.937,
         'weight_decay': 5e-4,
-        # warmup strategy
-        'warmup': 'linear',
-        'warmup_factor': 0.00066667,
+        # lr schedule
+        'scheduler': 'cosine',
+        'lr0': 0.01,
+        'lrf': 0.01,
+        'warmup_momentum': 0.8,
+        'warmup_bias_lr': 0.1,
         },
 
     'yolo_free_v2_huge': {
@@ -416,15 +426,17 @@ yolo_free_v2_config = {
         'loss_iou_weight': 7.5,
         'loss_dfl_weight': 1.5,
         # training configuration
-        'no_aug_epoch': 15,
-        'base_lr': 0.01 / 64.,
+        'no_aug_epoch': 10,
         # optimizer
         'optimizer': 'sgd',
-        'momentum': 0.9,
+        'momentum': 0.937,
         'weight_decay': 5e-4,
-        # warmup strategy
-        'warmup': 'linear',
-        'warmup_factor': 0.00066667,
+        # lr schedule
+        'scheduler': 'cosine',
+        'lr0': 0.01,
+        'lrf': 0.01,
+        'warmup_momentum': 0.8,
+        'warmup_bias_lr': 0.1,
         },
 
 }

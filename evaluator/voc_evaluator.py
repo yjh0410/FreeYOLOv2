@@ -62,7 +62,7 @@ class VOCAPIEvaluator():
 
             # preprocess
             x = self.transform(im)[0]
-            x = x.unsqueeze(0).to(self.device)
+            x = x.unsqueeze(0).to(self.device) / 255
 
             t0 = time.time()
             # forward

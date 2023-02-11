@@ -40,20 +40,29 @@ def train_with_warmup(epoch,
                       cfg, 
                       dataloader, 
                       optimizer, 
-                      warmup_scheduler,
+                      lf,
                       scaler,
-                      accumulate):
+                      last_opt_step):
     epoch_size = len(dataloader)
     img_size = cfg['train_size']
     t0 = time.time()
     # train one epoch
     for iter_i, (images, targets) in enumerate(dataloader):
         ni = iter_i + epoch * epoch_size
-        # warmup
-        warmup_scheduler.warmup(ni, optimizer)
-
+        nw = epoch_size * args.wp_epoch
+        # Warmup
+        if ni <= nw:
+            xi = [0, nw]  # x interp
+            # compute_loss.gr = np.interp(ni, xi, [0.0, 1.0])  # iou loss ratio (obj_loss = 1.0 or iou)
+            accumulate = max(1, np.interp(ni, xi, [1, 64 / args.batch_size]).round())
+            for k, param in enumerate(optimizer.param_groups):
+                warmup_bias_lr = cfg['warmup_bias_lr'] if k == 2 else 0.0
+                param['lr'] = np.interp(ni, [0, nw], [warmup_bias_lr, param['initial_lr'] * lf(epoch)])
+                if 'momentum' in param:
+                    param['momentum'] = np.interp(ni, [0, nw], [cfg['warmup_momentum'], cfg['momentum']])
+        
         # to device
-        images = images.to(device)
+        images = images.to(device, non_blocking=True).float() / 255
 
         # multi scale
         # # choose a new image size
@@ -90,14 +99,18 @@ def train_with_warmup(epoch,
         scaler.scale(losses).backward()
 
         # Optimize
-        if ni % accumulate == 0:
-            scaler.step(optimizer)
+        if ni - last_opt_step >= accumulate:
+            scaler.unscale_(optimizer)  # unscale gradients
+            torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=10.0)  # clip gradients
+            scaler.step(optimizer)  # optimizer.step
             scaler.update()
             optimizer.zero_grad()
 
             # ema
             if ema:
                 ema.update(model)
+
+            last_opt_step = ni
 
         # display
         if distributed_utils.is_main_process() and iter_i % 10 == 0:
@@ -123,6 +136,8 @@ def train_with_warmup(epoch,
             print(log, flush=True)
             
             t0 = time.time()
+    
+    return last_opt_step
 
 
 def train_one_epoch(epoch,
@@ -136,7 +151,7 @@ def train_one_epoch(epoch,
                     dataloader, 
                     optimizer,
                     scaler,
-                    accumulate):
+                    last_opt_step):
     epoch_size = len(dataloader)
     img_size = cfg["train_size"]
     t0 = time.time()
@@ -144,7 +159,7 @@ def train_one_epoch(epoch,
     for iter_i, (images, targets) in enumerate(dataloader):
         ni = iter_i + epoch * epoch_size
         # to device
-        images = images.to(device)
+        images = images.to(device, non_blocking=True).float() / 255
 
         # multi scale
         # # choose a new image size
@@ -178,14 +193,19 @@ def train_one_epoch(epoch,
         scaler.scale(losses).backward()
 
         # Optimize
-        if ni % accumulate == 0:
-            scaler.step(optimizer)
+        accumulate = max(1, round(64 / args.batch_size))
+        if ni - last_opt_step >= accumulate:
+            scaler.unscale_(optimizer)  # unscale gradients
+            torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=10.0)  # clip gradients
+            scaler.step(optimizer)  # optimizer.step
             scaler.update()
             optimizer.zero_grad()
 
             # ema
             if ema:
                 ema.update(model)
+                
+            last_opt_step = ni
 
         # display
         if distributed_utils.is_main_process() and iter_i % 10 == 0:
@@ -211,6 +231,8 @@ def train_one_epoch(epoch,
             print(log, flush=True)
             
             t0 = time.time()
+
+    return last_opt_step
 
 
 def val_one_epoch(args, 

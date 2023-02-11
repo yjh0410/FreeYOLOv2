@@ -70,7 +70,7 @@ class WiderFaceEvaluator():
 
             # preprocess
             x = self.transform(img)[0]
-            x = x.unsqueeze(0).to(self.device)
+            x = x.unsqueeze(0).to(self.device) / 255
             
             id_ = int(id_)
             ids.append(id_)

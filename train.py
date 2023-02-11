@@ -13,7 +13,7 @@ from utils import distributed_utils
 from utils.com_flops_params import FLOPs_and_Params
 from utils.misc import ModelEMA, CollateFunc, build_dataset, build_dataloader
 from utils.solver.optimizer import build_optimizer
-from utils.solver.warmup_schedule import build_warmup
+from utils.solver.lr_scheduler import build_lr_scheduler
 
 from engine import train_with_warmup, train_one_epoch, val_one_epoch
 
@@ -175,17 +175,12 @@ def train():
     accumulate = max(1, round(64 / total_bs))
     print('Grad_Accumulate: ', accumulate)
 
-    # learning rate
-    base_lr = args.base_lr
-    min_lr = base_lr * args.min_lr_ratio
-
     # optimizer
-    cfg['weight_decay'] *= total_bs / 64
-    optimizer, start_epoch = build_optimizer(cfg, model_without_ddp, base_lr, args.resume)
-    
-    # warmup scheduler
-    wp_iter = len(dataloader) * args.wp_epoch
-    warmup_scheduler = build_warmup(cfg=cfg, base_lr=base_lr, wp_iter=wp_iter)
+    cfg['weight_decay'] *= total_bs * accumulate / 64
+    optimizer, start_epoch = build_optimizer(cfg, model_without_ddp, cfg['lr0'], args.resume)
+
+    # Scheduler
+    scheduler, lf = build_lr_scheduler(cfg, optimizer, args.max_epoch)
 
     # EMA
     if args.ema and distributed_utils.get_rank() in [-1, 0]:
@@ -196,9 +191,12 @@ def train():
 
     # start training loop
     best_map = -1.0
-    lr_schedule=True
-    total_epochs = args.wp_epoch + args.max_epoch
-
+    last_opt_step = -1
+    total_epochs = args.max_epoch
+    heavy_eval = False
+    scheduler.last_epoch = start_epoch - 1  # do not move
+    optimizer.zero_grad()
+    
     # eval before training
     if args.eval_first and distributed_utils.is_main_process():
         # to check whether the evaluator can work
@@ -212,57 +210,44 @@ def train():
         if args.distributed:
             dataloader.batch_sampler.sampler.set_epoch(epoch)
 
+        scheduler.step()
+
         # train one epoch
         if epoch < args.wp_epoch:
             # warmup training loop
-            train_with_warmup(epoch=epoch,
-                              total_epochs=total_epochs,
-                              args=args, 
-                              device=device, 
-                              ema=ema,
-                              model=model,
-                              criterion=criterion,
-                              cfg=cfg, 
-                              dataloader=dataloader, 
-                              optimizer=optimizer, 
-                              warmup_scheduler=warmup_scheduler,
-                              scaler=scaler,
-                              accumulate=accumulate)
+            last_opt_step = train_with_warmup(
+                epoch=epoch,
+                total_epochs=total_epochs,
+                args=args, 
+                device=device, 
+                ema=ema,
+                model=model,
+                criterion=criterion,
+                cfg=cfg, 
+                dataloader=dataloader, 
+                optimizer=optimizer,
+                lf=lf,
+                scaler=scaler,
+                last_opt_step=last_opt_step)
 
         else:
-            if epoch == args.wp_epoch:
-                print('Warmup is Over !!!')
-                warmup_scheduler.set_lr(optimizer, base_lr)
-                
-            # use cos lr decay
-            T_max = total_epochs - cfg['no_aug_epoch']
-            if epoch > T_max:
-                print('Cosine annealing is over !!')
-                lr_schedule = False
-                for param_group in optimizer.param_groups:
-                    param_group['lr'] = min_lr
-
-            if lr_schedule:
-                tmp_lr = min_lr + 0.5*(base_lr - min_lr)*(1 + math.cos(math.pi*epoch / T_max))
-                for param_group in optimizer.param_groups:
-                    param_group['lr'] = tmp_lr
-
             # train one epoch
-            train_one_epoch(epoch=epoch,
-                            total_epochs=total_epochs,
-                            args=args, 
-                            device=device,
-                            ema=ema, 
-                            model=model,
-                            criterion=criterion,
-                            cfg=cfg, 
-                            dataloader=dataloader, 
-                            optimizer=optimizer,
-                            scaler=scaler,
-                            accumulate=accumulate)
-        
+            last_opt_step = train_one_epoch(
+                epoch=epoch,
+                total_epochs=total_epochs,
+                args=args, 
+                device=device,
+                ema=ema, 
+                model=model,
+                criterion=criterion,
+                cfg=cfg, 
+                dataloader=dataloader, 
+                optimizer=optimizer,
+                scaler=scaler,
+                last_opt_step=last_opt_step)
+
         # eval
-        if (epoch % args.eval_epoch) == 0 or (epoch == total_epochs - 1):
+        if heavy_eval:
             best_map = val_one_epoch(
                             args=args, 
                             model=ema.ema if ema else model_without_ddp, 
@@ -271,15 +256,27 @@ def train():
                             epoch=epoch,
                             best_map=best_map,
                             path_to_save=path_to_save)
+        else:
+            if (epoch % args.eval_epoch) == 0 or (epoch == total_epochs - 1):
+                best_map = val_one_epoch(
+                                args=args, 
+                                model=ema.ema if ema else model_without_ddp, 
+                                evaluator=evaluator,
+                                optimizer=optimizer,
+                                epoch=epoch,
+                                best_map=best_map,
+                                path_to_save=path_to_save)
 
         # close mosaic augmentation
-        if dataloader.dataset.mosaic_prob > 0. and total_epochs - epoch == cfg['no_aug_epoch']:
+        if dataloader.dataset.mosaic_prob > 0. and total_epochs - epoch == cfg['no_aug_epoch'] - 1:
             print('close Mosaic Augmentation ...')
             dataloader.dataset.mosaic_prob = 0.
+            heavy_eval = True
         # close mixup augmentation
-        if dataloader.dataset.mixup_prob > 0. and total_epochs - epoch == cfg['no_aug_epoch']:
+        if dataloader.dataset.mixup_prob > 0. and total_epochs - epoch == cfg['no_aug_epoch'] - 1:
             print('close Mixup Augmentation ...')
             dataloader.dataset.mixup_prob = 0.
+            heavy_eval = True
 
     # Empty cache after train loop
     if args.cuda:
