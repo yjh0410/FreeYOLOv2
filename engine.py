@@ -56,7 +56,6 @@ def train_one_epoch(epoch,
         # Warmup
         if ni <= nw:
             xi = [0, nw]  # x interp
-            # compute_loss.gr = np.interp(ni, xi, [0.0, 1.0])  # iou loss ratio (obj_loss = 1.0 or iou)
             accumulate = max(1, np.interp(ni, xi, [1, 64 / args.batch_size]).round())
             for k, param in enumerate(optimizer.param_groups):
                 warmup_bias_lr = cfg['warmup_bias_lr'] if k == 2 else 0.0

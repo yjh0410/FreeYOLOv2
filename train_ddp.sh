@@ -5,12 +5,11 @@ python -m torch.distributed.run --nproc_per_node=8 train.py \
                                                     -dist \
                                                     -d coco \
                                                     --root /data/datasets/ \
-                                                    -v yolo_free_large \
+                                                    -v yolo_free_v2_tiny \
                                                     -bs 128 \
-                                                    -lr 0.01 \
-                                                    -mlr 0.05 \
+                                                    --sybn \
                                                     --max_epoch 300 \
-                                                    --wp_epoch 1 \
+                                                    --wp_epoch 3 \
                                                     --eval_epoch 10 \
                                                     --num_workers 4 \
                                                     --ema \
