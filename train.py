@@ -40,10 +40,6 @@ def parse_args():
     # Batchsize
     parser.add_argument('-bs', '--batch_size', default=16, type=int, 
                         help='batch size on all the GPUs.')
-    parser.add_argument('-lr', '--base_lr', default=0.01, type=float, 
-                        help='base lr.')
-    parser.add_argument('-mlr', '--min_lr_ratio', default=0.05, type=float, 
-                        help='base lr.')
 
     # Epoch
     parser.add_argument('--max_epoch', default=300, type=int, 
