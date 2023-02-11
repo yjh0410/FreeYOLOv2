@@ -83,7 +83,6 @@ class ELAN_CSP_PaFPN(nn.Module):
             act_type=act_type
             )
 
-
         if out_dim is not None:
             # output proj layers
             self.out_layers = nn.ModuleList([

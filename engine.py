@@ -48,9 +48,11 @@ def train_one_epoch(epoch,
     img_size = cfg['train_size']
     t0 = time.time()
     nw = epoch_size * args.wp_epoch
+    accumulate = max(1, round(64 / args.batch_size))
     # train one epoch
     for iter_i, (images, targets) in enumerate(dataloader):
         ni = iter_i + epoch * epoch_size
+
         # Warmup
         if ni <= nw:
             xi = [0, nw]  # x interp
