@@ -206,8 +206,6 @@ def train():
         if args.distributed:
             dataloader.batch_sampler.sampler.set_epoch(epoch)
 
-        scheduler.step()
-
         # train one epoch
         if epoch < args.wp_epoch:
             # warmup training loop
@@ -222,6 +220,7 @@ def train():
                 cfg=cfg, 
                 dataloader=dataloader, 
                 optimizer=optimizer,
+                scheduler=scheduler,
                 lf=lf,
                 scaler=scaler,
                 last_opt_step=last_opt_step)
@@ -239,6 +238,7 @@ def train():
                 cfg=cfg, 
                 dataloader=dataloader, 
                 optimizer=optimizer,
+                scheduler=scheduler,
                 scaler=scaler,
                 last_opt_step=last_opt_step)
 

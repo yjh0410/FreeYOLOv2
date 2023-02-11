@@ -39,7 +39,8 @@ def train_with_warmup(epoch,
                       criterion,
                       cfg, 
                       dataloader, 
-                      optimizer, 
+                      optimizer,
+                      scheduler,
                       lf,
                       scaler,
                       last_opt_step):
@@ -137,6 +138,8 @@ def train_with_warmup(epoch,
             
             t0 = time.time()
     
+    scheduler.step()
+
     return last_opt_step
 
 
@@ -150,6 +153,7 @@ def train_one_epoch(epoch,
                     cfg, 
                     dataloader, 
                     optimizer,
+                    scheduler,
                     scaler,
                     last_opt_step):
     epoch_size = len(dataloader)
@@ -232,6 +236,8 @@ def train_one_epoch(epoch,
             
             t0 = time.time()
 
+    scheduler.step()
+    
     return last_opt_step
 
 
