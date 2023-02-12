@@ -75,7 +75,7 @@ yolo_free_v2_config = {
 
     'yolo_free_v2_tiny': {
         # input
-        'train_size': 800,
+        'train_size': 640,
         'test_size': 640,
         'random_size': [320, 352, 384, 416,
                         448, 480, 512, 544,
@@ -147,7 +147,7 @@ yolo_free_v2_config = {
 
     'yolo_free_v2_small': {
         # input
-        'train_size': 800,
+        'train_size': 640,
         'test_size': 640,
         'random_size': [320, 352, 384, 416,
                         448, 480, 512, 544,
@@ -219,7 +219,7 @@ yolo_free_v2_config = {
 
     'yolo_free_v2_medium': {
         # input
-        'train_size': 800,
+        'train_size': 640,
         'test_size': 640,
         'random_size': [320, 352, 384, 416,
                         448, 480, 512, 544,
@@ -291,7 +291,7 @@ yolo_free_v2_config = {
 
     'yolo_free_v2_large': {
         # input
-        'train_size': 800,
+        'train_size': 640,
         'test_size': 640,
         'random_size': [320, 352, 384, 416,
                         448, 480, 512, 544,
@@ -363,7 +363,7 @@ yolo_free_v2_config = {
 
     'yolo_free_v2_huge': {
         # input
-        'train_size': 800,
+        'train_size': 640,
         'test_size': 640,
         'random_size': [320, 352, 384, 416,
                         448, 480, 512, 544,
