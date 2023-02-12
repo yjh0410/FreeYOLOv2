@@ -38,7 +38,7 @@ class FreeYOLOv2(nn.Module):
         self.proj_conv = nn.Conv2d(self.reg_max + 1, 1, kernel_size=1, bias=False)
 
         ## backbone
-        self.backbone, feats_dim = build_backbone(cfg=cfg, trainable=trainable)
+        self.backbone, feats_dim = build_backbone(cfg=cfg)
 
         ## neck
         self.neck = build_neck(cfg=cfg, in_dim=feats_dim[-1], out_dim=feats_dim[-1])

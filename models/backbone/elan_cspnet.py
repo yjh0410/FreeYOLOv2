@@ -2,16 +2,6 @@ import torch
 import torch.nn as nn
 
 
-model_urls = {
-    "elan_cspnet_nano": None,
-    "elan_cspnet_tiny": None,
-    "elan_cspnet_small": None,
-    "elan_cspnet_medium": None,
-    "elan_cspnet_large": None,
-    "elan_cspnet_huge": None,
-}
-
-
 def get_activation(act_type=None):
     if act_type == 'relu':
         return nn.ReLU(inplace=True)
@@ -211,37 +201,11 @@ class ELAN_CSPNet(nn.Module):
 
 
 # build ELAN-Net
-def build_elan_cspnet(cfg, pretrained=False): 
+def build_elan_cspnet(cfg): 
     # model
     backbone = ELAN_CSPNet(width=cfg['width'], depth=cfg['depth'], ratio=cfg['ratio'],
                            act_type=cfg['bk_act'], norm_type=cfg['bk_norm'], depthwise=cfg['bk_dpw'])
     feat_dims = backbone.feat_dims
-
-    # load weight
-    if pretrained:
-        url = model_urls[cfg['backbone']]
-        if url is not None:
-            print('Loading pretrained weight ...')
-            checkpoint = torch.hub.load_state_dict_from_url(
-                url=url, map_location="cpu", check_hash=True)
-            # checkpoint state dict
-            checkpoint_state_dict = checkpoint.pop("model")
-            # model state dict
-            model_state_dict = backbone.state_dict()
-            # check
-            for k in list(checkpoint_state_dict.keys()):
-                if k in model_state_dict:
-                    shape_model = tuple(model_state_dict[k].shape)
-                    shape_checkpoint = tuple(checkpoint_state_dict[k].shape)
-                    if shape_model != shape_checkpoint:
-                        checkpoint_state_dict.pop(k)
-                else:
-                    checkpoint_state_dict.pop(k)
-                    print(k)
-
-            backbone.load_state_dict(checkpoint_state_dict)
-        else:
-            print('No backbone pretrained: {}'.format(cfg['backbone']))
 
     return backbone, feat_dims
 
