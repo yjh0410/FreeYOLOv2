@@ -15,12 +15,11 @@ def rescale_image_targets(images, targets, new_img_size):
     # During training phase, the shape of input image is square.
     old_img_size = images.shape[-1]
     # interpolate
-    if new_img_size != old_img_size:
-        images = torch.nn.functional.interpolate(
-                            input=images, 
-                            size=new_img_size, 
-                            mode='bilinear', 
-                            align_corners=False)
+    images = torch.nn.functional.interpolate(
+                        input=images, 
+                        size=new_img_size, 
+                        mode='bilinear', 
+                        align_corners=False)
     # rescale targets
     for tgt in targets:
         boxes = tgt["boxes"].clone()
