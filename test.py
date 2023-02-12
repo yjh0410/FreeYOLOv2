@@ -133,7 +133,7 @@ def test(args,
 
         # prepare
         x = transforms(image)[0]
-        x = x.unsqueeze(0).to(device) / 255
+        x = x.unsqueeze(0).to(device)
 
         t0 = time.time()
         # inference

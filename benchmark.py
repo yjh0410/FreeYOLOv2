@@ -65,7 +65,7 @@ def test(net, device, img_size, testset, transform):
 
             # prepare
             x = transform(image)[0]
-            x = x.unsqueeze(0).to(device) / 255
+            x = x.unsqueeze(0).to(device)
 
             # star time
             torch.cuda.synchronize()

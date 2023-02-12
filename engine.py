@@ -64,7 +64,7 @@ def train_one_epoch(epoch,
                     param['momentum'] = np.interp(ni, [0, nw], [cfg['warmup_momentum'], cfg['momentum']])
         
         # to device
-        images = images.to(device, non_blocking=True).float() / 255
+        images = images.to(device, non_blocking=True).float()
 
         # multi scale
         # # choose a new image size
