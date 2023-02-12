@@ -23,7 +23,7 @@ yolo_free_v2_config = {
                           },
         # model
         'backbone': 'elan_cspnet_nano',
-        'bk_act': 'lrelu',
+        'bk_act': 'silu',
         'bk_norm': 'BN',
         'bk_dpw': True,
         'width': 0.25,
@@ -34,17 +34,17 @@ yolo_free_v2_config = {
         'neck': 'sppf',
         'expand_ratio': 0.5,
         'pooling_size': 5,
-        'neck_act': 'lrelu',
+        'neck_act': 'silu',
         'neck_norm': 'BN',
         'neck_depthwise': True,
         # fpn
         'fpn': 'elan_csp_pafpn',
-        'fpn_act': 'lrelu',
+        'fpn_act': 'silu',
         'fpn_norm': 'BN',
         'fpn_depthwise': True,
         # head
         'head': 'decoupled_head',
-        'head_act': 'lrelu',
+        'head_act': 'silu',
         'head_norm': 'BN',
         'num_cls_head': 2,
         'num_reg_head': 2,
@@ -75,13 +75,12 @@ yolo_free_v2_config = {
 
     'yolo_free_v2_tiny': {
         # input
-        'train_size': 640,
+        'train_size': 800,
         'test_size': 640,
         'random_size': [320, 352, 384, 416,
                         448, 480, 512, 544,
                         576, 608, 640, 672,
-                        704, 736, 768, 800,
-                        832, 864, 896, 928, 960],
+                        704, 736, 768, 800],
         'mosaic_prob': 1.0,
         'mixup_prob': 0.05,
         'format': 'RGB',
@@ -96,7 +95,7 @@ yolo_free_v2_config = {
                           },
         # model
         'backbone': 'elan_cspnet_tiny',
-        'bk_act': 'lrelu',
+        'bk_act': 'silu',
         'bk_norm': 'BN',
         'bk_dpw': False,
         'width': 0.25,
@@ -107,17 +106,17 @@ yolo_free_v2_config = {
         'neck': 'sppf',
         'expand_ratio': 0.5,
         'pooling_size': 5,
-        'neck_act': 'lrelu',
+        'neck_act': 'silu',
         'neck_norm': 'BN',
         'neck_depthwise': False,
         # fpn
         'fpn': 'elan_csp_pafpn',
-        'fpn_act': 'lrelu',
+        'fpn_act': 'silu',
         'fpn_norm': 'BN',
         'fpn_depthwise': False,
         # head
         'head': 'decoupled_head',
-        'head_act': 'lrelu',
+        'head_act': 'silu',
         'head_norm': 'BN',
         'num_cls_head': 2,
         'num_reg_head': 2,
@@ -148,13 +147,12 @@ yolo_free_v2_config = {
 
     'yolo_free_v2_small': {
         # input
-        'train_size': 640,
+        'train_size': 800,
         'test_size': 640,
         'random_size': [320, 352, 384, 416,
                         448, 480, 512, 544,
                         576, 608, 640, 672,
-                        704, 736, 768, 800,
-                        832, 864, 896, 928, 960],
+                        704, 736, 768, 800],
         'mosaic_prob': 1.0,
         'mixup_prob': 0.05,
         'format': 'RGB',
@@ -221,13 +219,12 @@ yolo_free_v2_config = {
 
     'yolo_free_v2_medium': {
         # input
-        'train_size': 640,
+        'train_size': 800,
         'test_size': 640,
         'random_size': [320, 352, 384, 416,
                         448, 480, 512, 544,
                         576, 608, 640, 672,
-                        704, 736, 768, 800,
-                        832, 864, 896, 928, 960],
+                        704, 736, 768, 800],
         'mosaic_prob': 1.0,
         'mixup_prob': 0.15,
         'format': 'RGB',
@@ -294,13 +291,12 @@ yolo_free_v2_config = {
 
     'yolo_free_v2_large': {
         # input
-        'train_size': 640,
+        'train_size': 800,
         'test_size': 640,
         'random_size': [320, 352, 384, 416,
                         448, 480, 512, 544,
                         576, 608, 640, 672,
-                        704, 736, 768, 800,
-                        832, 864, 896, 928, 960],
+                        704, 736, 768, 800],
         'mosaic_prob': 1.0,
         'mixup_prob': 0.15,
         'format': 'RGB',
@@ -367,13 +363,12 @@ yolo_free_v2_config = {
 
     'yolo_free_v2_huge': {
         # input
-        'train_size': 640,
+        'train_size': 800,
         'test_size': 640,
         'random_size': [320, 352, 384, 416,
                         448, 480, 512, 544,
                         576, 608, 640, 672,
-                        704, 736, 768, 800,
-                        832, 864, 896, 928, 960],
+                        704, 736, 768, 800],
         'mosaic_prob': 1.0,
         'mixup_prob': 0.15,
         'format': 'RGB',

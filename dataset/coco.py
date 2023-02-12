@@ -179,13 +179,13 @@ class COCODataset(Dataset):
         mosaic = False
         if random.random() < self.mosaic_prob:
             mosaic = True
-            if random.random() < 1.0:
+            if random.random() < 0.8:
                 image, target = self.load_mosaic(index, True)
             else:
                 image, target = self.load_mosaic(index, False)
             # MixUp
             if random.random() < self.mixup_prob:
-                if random.random() < 1.0:
+                if random.random() < 0.8:
                     new_index = np.random.randint(0, len(self.ids))
                     new_image, new_target = self.load_mosaic(new_index, True)
                 else:
