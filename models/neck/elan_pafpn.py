@@ -2,20 +2,20 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from ..basic.conv import Conv
-from ..basic.elan_cspblock import ELAN_CSP_Block, DownSample
+from ..basic.elan_block import ELANBlock, DownSample
 
 
-class ELAN_CSP_PaFPN(nn.Module):
+# PaFPN-ELAN (YOLOv7's)
+class ELAN_PaFPN(nn.Module):
     def __init__(self, 
-                 in_dims=[256, 512, 512],
+                 in_dims=[512, 1024, 512],
                  out_dim=None,
                  width=1.0,
                  depth=1.0,
-                 ratio=1.0,
                  act_type='silu',
                  norm_type='BN',
                  depthwise=False):
-        super(ELAN_CSP_PaFPN, self).__init__()
+        super(ELAN_PaFPN, self).__init__()
         self.in_dims = in_dims
         self.width = width
         self.depth = depth
@@ -23,65 +23,49 @@ class ELAN_CSP_PaFPN(nn.Module):
 
         # top dwon
         ## P5 -> P4
-        self.cv1 = Conv(c5, int(256 * width * ratio), k=1, norm_type=norm_type, act_type=act_type)
+        self.cv1 = Conv(c5, int(256 * width), k=1, norm_type=norm_type, act_type=act_type)
         self.cv2 = Conv(c4, int(256 * width), k=1, norm_type=norm_type, act_type=act_type)
-        self.head_elan_1 = ELAN_CSP_Block(
-            in_dim=int(256 * width) + int(256 * width * ratio),
-            out_dim=int(256 * width),
-            expand_ratio=0.5,
-            kernel_size=[1, 3],
-            nblocks=int(3*depth),
-            shortcut=False,
-            depthwise=depthwise,
-            norm_type=norm_type,
-            act_type=act_type
-            )
+        self.head_elan_1 = ELANBlock(in_dim=int(256 * width) + int(256 * width),
+                                     out_dim=int(256 * width),
+                                     expand_ratio=[0.5, 0.5],
+                                     depth=depth,
+                                     depthwise=depthwise,
+                                     norm_type=norm_type,
+                                     act_type=act_type)
 
         # P4 -> P3
         self.cv3 = Conv(int(256 * width), int(128 * width), k=1, norm_type=norm_type, act_type=act_type)
         self.cv4 = Conv(c3, int(128 * width), k=1, norm_type=norm_type, act_type=act_type)
-        self.head_elan_2 = ELAN_CSP_Block(
-            in_dim=int(128 * width) + int(128 * width),
-            out_dim=int(128 * width),
-            expand_ratio=0.5,
-            kernel_size=[1, 3],
-            nblocks=int(3*depth),
-            shortcut=False,
-            depthwise=depthwise,
-            norm_type=norm_type,
-            act_type=act_type
-            )
+        self.head_elan_2 = ELANBlock(in_dim=int(128 * width) + int(128 * width),
+                                     out_dim=int(128 * width),  # 128
+                                     expand_ratio=[0.5, 0.5],
+                                     depth=depth,
+                                     depthwise=depthwise,
+                                     norm_type=norm_type,
+                                     act_type=act_type)
 
         # bottom up
         # P3 -> P4
         self.mp1 = DownSample(int(128 * width), out_dim=int(256 * width), 
                               act_type=act_type, norm_type=norm_type, depthwise=depthwise)
-        self.head_elan_3 = ELAN_CSP_Block(
-            in_dim=int(256 * width) + int(256 * width),
-            out_dim=int(256 * width),
-            expand_ratio=0.5,
-            kernel_size=[1, 3],
-            nblocks=int(3*depth),
-            shortcut=False,
-            depthwise=depthwise,
-            norm_type=norm_type,
-            act_type=act_type
-            )
+        self.head_elan_3 = ELANBlock(in_dim=int(256 * width) + int(256 * width),
+                                     out_dim=int(256 * width),  # 256
+                                     expand_ratio=[0.5, 0.5],
+                                     depth=depth,
+                                     depthwise=depthwise,
+                                     norm_type=norm_type,
+                                     act_type=act_type)
 
         # P4 -> P5
         self.mp2 = DownSample(int(256 * width), out_dim=int(512 * width),
                               act_type=act_type, norm_type=norm_type, depthwise=depthwise)
-        self.head_elan_4 = ELAN_CSP_Block(
-            in_dim=int(512 * width) + c5,
-            out_dim=int(512 * width),
-            expand_ratio=0.5,
-            kernel_size=[1, 3],
-            nblocks=int(3*depth),
-            shortcut=False,
-            depthwise=depthwise,
-            norm_type=norm_type,
-            act_type=act_type
-            )
+        self.head_elan_4 = ELANBlock(in_dim=int(512 * width) + c5,
+                                     out_dim=int(512 * width),  # 512
+                                     expand_ratio=[0.5, 0.5],
+                                     depth=depth,
+                                     depthwise=depthwise,
+                                     norm_type=norm_type,
+                                     act_type=act_type)
 
         if out_dim is not None:
             # output proj layers
@@ -132,4 +116,3 @@ class ELAN_CSP_PaFPN(nn.Module):
             return out_feats_proj
 
         return out_feats
-        

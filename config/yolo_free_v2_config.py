@@ -22,13 +22,12 @@ yolo_free_v2_config = {
                           'hsv_v': 0.4
                           },
         # model
-        'backbone': 'elan_cspnet_nano',
+        'backbone': 'elannet_nano',
         'bk_act': 'lrelu',
         'bk_norm': 'BN',
         'bk_dpw': True,
         'width': 0.25,
         'depth': 0.34,
-        'ratio': 2.0,
         'stride': [8, 16, 32],  # P3, P4, P5
         # neck
         'neck': 'sppf',
@@ -38,7 +37,7 @@ yolo_free_v2_config = {
         'neck_norm': 'BN',
         'neck_depthwise': True,
         # fpn
-        'fpn': 'elan_csp_pafpn',
+        'fpn': 'elan_pafpn',
         'fpn_act': 'lrelu',
         'fpn_norm': 'BN',
         'fpn_depthwise': True,
@@ -95,23 +94,22 @@ yolo_free_v2_config = {
                           'hsv_v': 0.4
                           },
         # model
-        'backbone': 'elan_cspnet_tiny',
+        'backbone': 'elannet_tiny',
         'bk_act': 'lrelu',
         'bk_norm': 'BN',
         'bk_dpw': False,
         'width': 0.25,
         'depth': 0.34,
-        'ratio': 2.0,
         'stride': [8, 16, 32],  # P3, P4, P5
         # neck
-        'neck': 'sppf',
+        'neck': 'sppf_block_csp',
         'expand_ratio': 0.5,
         'pooling_size': 5,
         'neck_act': 'lrelu',
         'neck_norm': 'BN',
         'neck_depthwise': False,
         # fpn
-        'fpn': 'elan_csp_pafpn',
+        'fpn': 'elan_pafpn',
         'fpn_act': 'lrelu',
         'fpn_norm': 'BN',
         'fpn_depthwise': False,
@@ -168,23 +166,22 @@ yolo_free_v2_config = {
                           'hsv_v': 0.4
                           },
         # model
-        'backbone': 'elan_cspnet_small',
+        'backbone': 'elannet_small',
         'bk_act': 'silu',
         'bk_norm': 'BN',
         'bk_dpw': False,
         'width': 0.50,
         'depth': 0.34,
-        'ratio': 2.0,
         'stride': [8, 16, 32],  # P3, P4, P5
         # neck
-        'neck': 'sppf',
+        'neck': 'sppf_block_csp',
         'expand_ratio': 0.5,
         'pooling_size': 5,
         'neck_act': 'silu',
         'neck_norm': 'BN',
         'neck_depthwise': False,
         # fpn
-        'fpn': 'elan_csp_pafpn',
+        'fpn': 'elan_pafpn',
         'fpn_act': 'silu',
         'fpn_norm': 'BN',
         'fpn_depthwise': False,
@@ -241,23 +238,22 @@ yolo_free_v2_config = {
                           'hsv_v': 0.4
                           },
         # model
-        'backbone': 'elan_cspnet_medium',
+        'backbone': 'elannet_medium',
         'bk_act': 'silu',
         'bk_norm': 'BN',
         'bk_dpw': False,
         'width': 0.75,
         'depth': 0.67,
-        'ratio': 1.5,
         'stride': [8, 16, 32],  # P3, P4, P5
         # neck
-        'neck': 'sppf',
+        'neck': 'sppf_block_csp',
         'expand_ratio': 0.5,
         'pooling_size': 5,
         'neck_act': 'silu',
         'neck_norm': 'BN',
         'neck_depthwise': False,
         # fpn
-        'fpn': 'elan_csp_pafpn',
+        'fpn': 'elan_pafpn',
         'fpn_act': 'silu',
         'fpn_norm': 'BN',
         'fpn_depthwise': False,
@@ -314,23 +310,22 @@ yolo_free_v2_config = {
                           'hsv_v': 0.4
                           },
         # model
-        'backbone': 'elan_cspnet_large',
+        'backbone': 'elannet_large',
         'bk_act': 'silu',
         'bk_norm': 'BN',
         'bk_dpw': False,
         'width': 1.0,
         'depth': 1.0,
-        'ratio': 1.0,
         'stride': [8, 16, 32],  # P3, P4, P5
         # neck
-        'neck': 'sppf',
+        'neck': 'sppf_block_csp',
         'expand_ratio': 0.5,
         'pooling_size': 5,
         'neck_act': 'silu',
         'neck_norm': 'BN',
         'neck_depthwise': False,
         # fpn
-        'fpn': 'elan_csp_pafpn',
+        'fpn': 'elan_pafpn',
         'fpn_act': 'silu',
         'fpn_norm': 'BN',
         'fpn_depthwise': False,
@@ -387,23 +382,22 @@ yolo_free_v2_config = {
                           'hsv_v': 0.4
                           },
         # model
-        'backbone': 'elan_cspnet_huge',
+        'backbone': 'elannet_huge',
         'bk_act': 'silu',
         'bk_norm': 'BN',
         'bk_dpw': False,
         'width': 1.25,
-        'depth': 1.0,
-        'ratio': 1.0,
+        'depth': 1.34,
         'stride': [8, 16, 32],  # P3, P4, P5
         # neck
-        'neck': 'sppf',
+        'neck': 'sppf_block_csp',
         'expand_ratio': 0.5,
         'pooling_size': 5,
         'neck_act': 'silu',
         'neck_norm': 'BN',
         'neck_depthwise': False,
         # fpn
-        'fpn': 'elan_csp_pafpn',
+        'fpn': 'elan_pafpn',
         'fpn_act': 'silu',
         'fpn_norm': 'BN',
         'fpn_depthwise': False,

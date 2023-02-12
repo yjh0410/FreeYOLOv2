@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 
 
+
 def get_activation(act_type=None):
     if act_type == 'relu':
         return nn.ReLU(inplace=True)
@@ -60,75 +61,56 @@ class Conv(nn.Module):
         return self.convs(x)
 
 
-# BottleNeck
-class Bottleneck(nn.Module):
-    def __init__(self,
-                 in_dim,
-                 out_dim,
-                 expand_ratio=0.5,
-                 kernel_size=(3, 3),
-                 shortcut=False,
-                 depthwise=False,
-                 act_type='silu',
-                 norm_type='BN'):
-        super(Bottleneck, self).__init__()
-        inter_dim = int(in_dim * expand_ratio)  # hidden channels       
-        self.cv1 = Conv(in_dim, inter_dim, k=kernel_size[0], p=kernel_size[0]//2,
-                        norm_type=norm_type, act_type=act_type, depthwise=depthwise if kernel_size[0] > 1 else False)
-        self.cv2 = Conv(inter_dim, out_dim, k=kernel_size[1], p=kernel_size[1]//2,
-                        norm_type=norm_type, act_type=act_type, depthwise=depthwise)
-        self.shortcut = shortcut and in_dim == out_dim
-
-    def forward(self, x):
-        h = self.cv2(self.cv1(x))
-
-        return x + h if self.shortcut else h
-
-
-# ELAN-CSP-Block
-class ELAN_CSP_Block(nn.Module):
-    def __init__(self,
-                 in_dim,
-                 out_dim,
-                 expand_ratio=0.5,
-                 kernel_size=(3, 3),
-                 nblocks=1,
-                 shortcut=False,
-                 depthwise=False,
-                 act_type='silu',
-                 norm_type='BN'):
-        super(ELAN_CSP_Block, self).__init__()
+# ELANBlock
+class ELANBlock(nn.Module):
+    """
+    ELAN BLock of YOLOv7's backbone
+    """
+    def __init__(self, in_dim, out_dim, expand_ratio=0.5, depth=1.0, act_type='silu', norm_type='BN', depthwise=False):
+        super(ELANBlock, self).__init__()
         inter_dim = int(in_dim * expand_ratio)
-        self.cv1 = Conv(in_dim, inter_dim, k=1, norm_type=norm_type, act_type=act_type)
-        self.cv2 = Conv(in_dim, inter_dim, k=1, norm_type=norm_type, act_type=act_type)
-        self.m = nn.Sequential(*(
-            Bottleneck(inter_dim, inter_dim, 1.0, kernel_size, shortcut, depthwise, act_type, norm_type)
-            for _ in range(nblocks)))
-        self.cv3 = Conv((2 + nblocks) * inter_dim, out_dim, k=1, act_type=act_type, norm_type=norm_type)
+        self.cv1 = Conv(in_dim, inter_dim, k=1, act_type=act_type, norm_type=norm_type)
+        self.cv2 = Conv(in_dim, inter_dim, k=1, act_type=act_type, norm_type=norm_type)
+        self.cv3 = nn.Sequential(*[
+            Conv(inter_dim, inter_dim, k=3, p=1, act_type=act_type, norm_type=norm_type, depthwise=depthwise)
+            for _ in range(int(3*depth))
+        ])
+        self.cv4 = nn.Sequential(*[
+            Conv(inter_dim, inter_dim, k=3, p=1, act_type=act_type, norm_type=norm_type, depthwise=depthwise)
+            for _ in range(int(3*depth))
+        ])
+
+        self.out = Conv(inter_dim*4, out_dim, k=1, act_type=act_type, norm_type=norm_type)
 
 
     def forward(self, x):
+        """
+        Input:
+            x: [B, C_in, H, W]
+        Output:
+            out: [B, C_out, H, W]
+        """
         x1 = self.cv1(x)
         x2 = self.cv2(x)
-        out = list([x1, x2])
+        x3 = self.cv3(x2)
+        x4 = self.cv4(x3)
 
-        out.extend(m(out[-1]) for m in self.m)
-
-        out = self.cv3(torch.cat(out, dim=1))
+        # [B, C, H, W] -> [B, 2C, H, W]
+        out = self.out(torch.cat([x1, x2, x3, x4], dim=1))
 
         return out
 
 
 # DownSample
 class DownSample(nn.Module):
-    def __init__(self, in_dim, out_dim, act_type='silu', norm_type='BN', depthwise=False):
+    def __init__(self, in_dim, out_dim, act_type='silu', norm_type='BN'):
         super().__init__()
         inter_dim = out_dim // 2
         self.mp = nn.MaxPool2d((2, 2), 2)
         self.cv1 = Conv(in_dim, inter_dim, k=1, act_type=act_type, norm_type=norm_type)
         self.cv2 = nn.Sequential(
             Conv(in_dim, inter_dim, k=1, act_type=act_type, norm_type=norm_type),
-            Conv(inter_dim, inter_dim, k=3, p=1, s=2, act_type=act_type, norm_type=norm_type, depthwise=depthwise)
+            Conv(inter_dim, inter_dim, k=3, p=1, s=2, act_type=act_type, norm_type=norm_type)
         )
 
     def forward(self, x):
@@ -148,40 +130,36 @@ class DownSample(nn.Module):
         return out
 
 
-# ELAN-CSPNet
-class ELAN_CSPNet(nn.Module):
-    def __init__(self, width=1.0, depth=1.0, ratio=1.0, act_type='silu', norm_type='BN', depthwise=False):
-        super(ELAN_CSPNet, self).__init__()
-        self.feat_dims = [int(256*width), int(512*width), int(512*width*ratio)]
-
-        # stride = 2
+# ELANNet
+class ELANNet(nn.Module):
+    def __init__(self, width=1.0, depth=1.0, act_type='silu', norm_type='BN', depthwise=False):
+        super(ELANNet, self).__init__()
+        self.feat_dims = [int(512 * width), int(1024 * width),int(1024 * width)]
+        
+        # large backbone
         self.layer_1 = nn.Sequential(
             Conv(3, int(64*width), k=3, p=1, s=2, act_type=act_type, norm_type=norm_type),
             Conv(int(64*width), int(64*width), k=3, p=1, act_type=act_type, norm_type=norm_type, depthwise=depthwise) # P1/2
         )
-        # stride = 4
-        self.layer_2 = nn.Sequential(
-            Conv(int(64*width), int(128*width), k=3, p=1, s=2, act_type=act_type, norm_type=norm_type),
-            ELAN_CSP_Block(int(128*width), int(128*width), expand_ratio=0.5, kernel_size=[3, 3], nblocks=int(3*depth),
-                           shortcut=True, act_type=act_type, norm_type=norm_type, depthwise=depthwise)
+        self.layer_2 = nn.Sequential(   
+            Conv(int(64*width), int(128*width), k=3, p=1, s=2, act_type=act_type, norm_type=norm_type, depthwise=depthwise),             
+            ELANBlock(in_dim=int(128*width), out_dim=int(256*width), expand_ratio=0.5, depth=depth,
+                      act_type=act_type, norm_type=norm_type, depthwise=depthwise)                     # P2/4
         )
-        # stride = 8
         self.layer_3 = nn.Sequential(
-            DownSample(in_dim=int(128*width), out_dim=int(256*width), act_type=act_type, norm_type=norm_type),             
-            ELAN_CSP_Block(int(256*width), int(256*width), expand_ratio=0.5, kernel_size=[3, 3], nblocks=int(6*depth),
-                           shortcut=True, act_type=act_type, norm_type=norm_type, depthwise=depthwise)
+            DownSample(in_dim=int(256*width), out_dim=int(256*width), act_type=act_type, norm_type=norm_type),             
+            ELANBlock(in_dim=int(256*width), out_dim=int(512*width), expand_ratio=0.5, depth=depth,
+                      act_type=act_type, norm_type=norm_type, depthwise=depthwise)                     # P3/8
         )
-        # stride = 16
         self.layer_4 = nn.Sequential(
-            DownSample(in_dim=int(256*width), out_dim=int(512*width), act_type=act_type, norm_type=norm_type),             
-            ELAN_CSP_Block(int(512*width), int(512*width), expand_ratio=0.5, kernel_size=[3, 3], nblocks=int(6*depth),
-                           shortcut=True, act_type=act_type, norm_type=norm_type, depthwise=depthwise)
+            DownSample(in_dim=int(512*width), out_dim=int(512*width), act_type=act_type, norm_type=norm_type),             
+            ELANBlock(in_dim=int(512*width), out_dim=int(1024*width), expand_ratio=0.5, depth=depth,
+                      act_type=act_type, norm_type=norm_type, depthwise=depthwise)                    # P4/16
         )
-        # stride = 32
         self.layer_5 = nn.Sequential(
-            DownSample(in_dim=int(512*width), out_dim=int(512*width*ratio), act_type=act_type, norm_type=norm_type),             
-            ELAN_CSP_Block(int(512*width*ratio), int(512*width*ratio), expand_ratio=0.5, kernel_size=[3, 3], nblocks=int(3*depth),
-                           shortcut=True, act_type=act_type, norm_type=norm_type, depthwise=depthwise)
+            DownSample(in_dim=int(1024*width), out_dim=int(1024*width), act_type=act_type, norm_type=norm_type),             
+            ELANBlock(in_dim=int(1024*width), out_dim=int(1024*width), expand_ratio=0.25, depth=depth,
+                      act_type=act_type, norm_type=norm_type, depthwise=depthwise)                  # P5/32
         )
 
 
@@ -201,10 +179,9 @@ class ELAN_CSPNet(nn.Module):
 
 
 # build ELAN-Net
-def build_elan_cspnet(cfg): 
+def build_elannet(cfg): 
     # model
-    backbone = ELAN_CSPNet(width=cfg['width'], depth=cfg['depth'], ratio=cfg['ratio'],
-                           act_type=cfg['bk_act'], norm_type=cfg['bk_norm'], depthwise=cfg['bk_dpw'])
+    backbone = ELANNet(width=cfg['width'], depth=cfg['depth'], act_type=cfg['bk_act'], norm_type=cfg['bk_norm'], depthwise=cfg['bk_dpw'])
     feat_dims = backbone.feat_dims
 
     return backbone, feat_dims
@@ -214,15 +191,14 @@ if __name__ == '__main__':
     import time
     from thop import profile
     cfg = {
-        'backbone': 'elan_cspnet_tiny',
+        'backbone': 'elannet_tiny',
         'bk_act': 'lrelu',
         'bk_norm': 'BN',
         'bk_dpw': False,
         'width': 0.25,
         'depth': 0.34,
-        'ratio': 2.0
     }
-    model, feats = build_elan_cspnet(cfg, pretrained=True)
+    model, feats = build_elannet(cfg)
     x = torch.randn(1, 3, 224, 224)
     t0 = time.time()
     outputs = model(x)
