@@ -15,7 +15,7 @@ def rescale_image_targets(images, targets, new_img_size):
     # During training phase, the shape of input image is square.
     old_img_size = images.shape[-1]
     # interpolate
-    if old_img_size != max(images.shape[-2:]):
+    if new_img_size != old_img_size:
         images = torch.nn.functional.interpolate(
                             input=images, 
                             size=new_img_size, 
