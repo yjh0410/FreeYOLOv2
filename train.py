@@ -219,10 +219,21 @@ def train():
             if warmup_scheduler is None:
                 # warmup has been over
                 if epoch == T_max:
-                    print('CLose cosine annealing.')
+                    # close Cosine scheduler
+                    print('CLose Cosine annealing.')
                     lr_schedule = False
                     for param_group in optimizer.param_groups:
                         param_group['lr'] = cfg['lr0'] * cfg['lrf']
+                    # close mosaic augmentation
+                    if dataloader.dataset.mosaic_prob > 0.:
+                        print('close Mosaic Augmentation ...')
+                        dataloader.dataset.mosaic_prob = 0.
+                        heavy_eval = True
+                    # close mixup augmentation
+                    if dataloader.dataset.mixup_prob > 0.:
+                        print('close Mixup Augmentation ...')
+                        dataloader.dataset.mixup_prob = 0.
+                        heavy_eval = True
 
                 if lr_schedule:
                     tmp_lr = min_lr + 0.5*(cfg['lr0'] - min_lr)*(1 + math.cos(math.pi*epoch / T_max))
@@ -265,17 +276,6 @@ def train():
                                 epoch=epoch,
                                 best_map=best_map,
                                 path_to_save=path_to_save)
-
-        # close mosaic augmentation
-        if dataloader.dataset.mosaic_prob > 0. and total_epochs - epoch == cfg['no_aug_epoch'] - 1:
-            print('close Mosaic Augmentation ...')
-            dataloader.dataset.mosaic_prob = 0.
-            heavy_eval = True
-        # close mixup augmentation
-        if dataloader.dataset.mixup_prob > 0. and total_epochs - epoch == cfg['no_aug_epoch'] - 1:
-            print('close Mixup Augmentation ...')
-            dataloader.dataset.mixup_prob = 0.
-            heavy_eval = True
 
     # Empty cache after train loop
     if args.cuda:
