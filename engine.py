@@ -40,8 +40,7 @@ def train_one_epoch(epoch,
                     cfg, 
                     dataloader, 
                     optimizer,
-                    scheduler,
-                    lf,
+                    warmup_scheduler,
                     scaler,
                     last_opt_step):
     epoch_size = len(dataloader)
@@ -54,14 +53,8 @@ def train_one_epoch(epoch,
         ni = iter_i + epoch * epoch_size
 
         # Warmup
-        if ni <= nw:
-            xi = [0, nw]  # x interp
-            accumulate = max(1, np.interp(ni, xi, [1, 64 / args.batch_size]).round())
-            for k, param in enumerate(optimizer.param_groups):
-                warmup_bias_lr = cfg['warmup_bias_lr'] if k == 2 else 0.0
-                param['lr'] = np.interp(ni, [0, nw], [warmup_bias_lr, param['initial_lr'] * lf(epoch)])
-                if 'momentum' in param:
-                    param['momentum'] = np.interp(ni, [0, nw], [cfg['warmup_momentum'], cfg['momentum']])
+        if warmup_scheduler is not None:
+            warmup_scheduler.warmup(ni, optimizer)
         
         # to device
         images = images.to(device, non_blocking=True).float()
@@ -103,7 +96,6 @@ def train_one_epoch(epoch,
         # Optimize
         if ni - last_opt_step >= accumulate:
             scaler.unscale_(optimizer)  # unscale gradients
-            torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=10.0)  # clip gradients
             scaler.step(optimizer)  # optimizer.step
             scaler.update()
             optimizer.zero_grad()
@@ -139,8 +131,6 @@ def train_one_epoch(epoch,
             
             t0 = time.time()
     
-    scheduler.step()
-
     return last_opt_step
 
 

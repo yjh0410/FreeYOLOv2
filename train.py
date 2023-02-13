@@ -14,6 +14,7 @@ from utils.com_flops_params import FLOPs_and_Params
 from utils.misc import ModelEMA, CollateFunc, build_dataset, build_dataloader
 from utils.solver.optimizer import build_optimizer
 from utils.solver.lr_scheduler import build_lr_scheduler
+from utils.solver.warmup_schedule import build_warmup
 
 from engine import train_one_epoch, val_one_epoch
 
@@ -175,8 +176,9 @@ def train():
     cfg['weight_decay'] *= total_bs * accumulate / 64
     optimizer, start_epoch = build_optimizer(cfg, model_without_ddp, cfg['lr0'], args.resume)
 
-    # Scheduler
-    scheduler, lf = build_lr_scheduler(cfg, optimizer, args.max_epoch)
+    # warmup scheduler
+    wp_iter = len(dataloader) * args.wp_epoch
+    warmup_scheduler = build_warmup(cfg=cfg, base_lr=cfg['lr0'], wp_iter=wp_iter)
 
     # EMA
     if args.ema and distributed_utils.get_rank() in [-1, 0]:
@@ -188,9 +190,10 @@ def train():
     # start training loop
     best_map = -1.0
     last_opt_step = -1
-    total_epochs = args.max_epoch
+    total_epochs = args.wp_epoch + args.max_epoch
     heavy_eval = False
-    scheduler.last_epoch = start_epoch - 1  # do not move
+    lr_schedule = True
+    min_lr = cfg['lr0'] * cfg['lrf']
     optimizer.zero_grad()
     
     # eval before training
@@ -206,6 +209,25 @@ def train():
         if args.distributed:
             dataloader.batch_sampler.sampler.set_epoch(epoch)
 
+        if epoch == args.wp_epoch:
+            print("Warmup is Over.")
+            warmup_scheduler.set_lr(optimizer, cfg['lr0'])
+            warmup_scheduler = None
+        else:
+            if warmup_scheduler is None:
+                # warmup has been over
+                T_max = total_epochs - cfg['no_aug_epoch']
+                if epoch == T_max:
+                    print('CLose sosine annealing.')
+                    lr_schedule = False
+                    for param_group in optimizer.param_groups:
+                        param_group['lr'] = cfg['lr0'] * cfg['lrf']
+
+                if lr_schedule:
+                    tmp_lr = min_lr + 0.5*(cfg['lr0'] - min_lr)*(1 + math.cos(math.pi*epoch / T_max))
+                    for param_group in optimizer.param_groups:
+                        param_group['lr'] = tmp_lr
+                        
         # train one epoch
         last_opt_step = train_one_epoch(
             epoch=epoch,
@@ -218,8 +240,7 @@ def train():
             cfg=cfg, 
             dataloader=dataloader, 
             optimizer=optimizer,
-            scheduler=scheduler,
-            lf=lf,
+            warmup_scheduler=warmup_scheduler,
             scaler=scaler,
             last_opt_step=last_opt_step)
 
