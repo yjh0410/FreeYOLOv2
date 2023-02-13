@@ -52,7 +52,7 @@ def train_one_epoch(epoch,
     for iter_i, (images, targets) in enumerate(dataloader):
         ni = iter_i + epoch * epoch_size
 
-        # Warmup
+        # check warmup
         if warmup_scheduler is not None:
             warmup_scheduler.warmup(ni, optimizer)
         

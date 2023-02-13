@@ -191,6 +191,7 @@ def train():
     best_map = -1.0
     last_opt_step = -1
     total_epochs = args.wp_epoch + args.max_epoch
+    T_max = total_epochs - cfg['no_aug_epoch'] - 1
     heavy_eval = False
     lr_schedule = True
     min_lr = cfg['lr0'] * cfg['lrf']
@@ -209,6 +210,7 @@ def train():
         if args.distributed:
             dataloader.batch_sampler.sampler.set_epoch(epoch)
 
+        # check whether it is warmup stage
         if epoch == args.wp_epoch:
             print("Warmup is Over.")
             warmup_scheduler.set_lr(optimizer, cfg['lr0'])
@@ -216,9 +218,8 @@ def train():
         else:
             if warmup_scheduler is None:
                 # warmup has been over
-                T_max = total_epochs - cfg['no_aug_epoch']
                 if epoch == T_max:
-                    print('CLose sosine annealing.')
+                    print('CLose cosine annealing.')
                     lr_schedule = False
                     for param_group in optimizer.param_groups:
                         param_group['lr'] = cfg['lr0'] * cfg['lrf']
