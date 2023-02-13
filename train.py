@@ -223,7 +223,7 @@ def train():
                     print('CLose Cosine annealing.')
                     lr_schedule = False
                     for param_group in optimizer.param_groups:
-                        param_group['lr'] = cfg['lr0'] * cfg['lrf']
+                        param_group['lr'] = min_lr
                     # close mosaic augmentation
                     if dataloader.dataset.mosaic_prob > 0.:
                         print('close Mosaic Augmentation ...')
