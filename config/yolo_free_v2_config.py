@@ -97,7 +97,7 @@ yolo_free_v2_config = {
         'bk_act': 'lrelu',
         'bk_norm': 'BN',
         'bk_dpw': False,
-        'width': 0.25,
+        'width': 0.375,
         'depth': 0.34,
         'stride': [8, 16, 32],  # P3, P4, P5
         # neck
