@@ -78,11 +78,11 @@ P6-Model on COCO:
 
 | Model         | Scale | AP<sup>val<br>0.5:0.95 | AP<sup>test<br>0.5:0.95 |FPS<sup>3090<br>FP32-bs1 | FLOPs<br><sup>(G) | Params<br><sup>(M) | Weight |
 |---------------|-------|------------------------|-------------------------|-------------------------|-------------------|--------------------|--------|
-| FreeYOLOv2-T6 | 1280  |                        |                         |                         |  63.0             |  6.6               |  |
-| FreeYOLOv2-S6 | 1280  |                        |                         |                         |  111.0            |  11.7              |  |
-| FreeYOLOv2-M6 | 1280  |                        |                         |                         |  288.1            |  31.0              |  |
-| FreeYOLOv2-L6 | 1280  |                        |                         |                         |  581.9            |  63.8              |  |
-| FreeYOLOv2-H6 | 1280  |                        |                         |                         |  1019.0           |  113.0             |  |
+| FreeYOLOv2-T6 | 1280  |                        |                         |                         |  59.0             |  7.1               |  |
+| FreeYOLOv2-S6 | 1280  |                        |                         |                         |  104.0            |  12.6              |  |
+| FreeYOLOv2-M6 | 1280  |                        |                         |                         |  274.2            |  35.0              |  |
+| FreeYOLOv2-L6 | 1280  |                        |                         |                         |  560.1            |  74.3              |  |
+| FreeYOLOv2-H6 | 1280  |                        |                         |                         |  973.8            |  135.1             |  |
 
 ### WiderFace
 - Download [WiderFace](http://shuoyang1213.me/WIDERFACE/).

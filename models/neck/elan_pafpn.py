@@ -124,7 +124,7 @@ class ELAN_PaFPN(nn.Module):
 # PaFPN-ELAN-P6
 class ELAN_PaFPN_P6(nn.Module):
     def __init__(self, 
-                 in_dims=[512, 768, 1024, 512],
+                 in_dims=[256, 512, 768, 512],
                  out_dim=None,
                  width=1.0,
                  depth=1.0,

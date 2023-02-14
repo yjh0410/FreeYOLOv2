@@ -132,16 +132,9 @@ class DownSample(nn.Module):
 
 # ELANNet
 class ELANNet(nn.Module):
-    def __init__(self, width=1.0, depth=1.0, act_type='silu', norm_type='BN', depthwise=False, p6_feat=False):
+    def __init__(self, width=1.0, depth=1.0, act_type='silu', norm_type='BN', depthwise=False):
         super(ELANNet, self).__init__()
-        self.p6_feat = p6_feat
-        if p6_feat:
-            self.p5_stage_dim = 768
-            self.p6_stage_dim = 1024
-            self.feat_dims = [int(512 * width), int(768 * width), int(1024 * width), int(1024 * width)]
-        else:
-            self.p5_stage_dim = 1024
-            self.feat_dims = [int(512 * width), int(1024 * width), int(1024 * width)]
+        self.feat_dims = [int(512 * width), int(1024 * width), int(1024 * width)]
         
         # large backbone
         self.layer_1 = nn.Sequential(
@@ -160,29 +153,15 @@ class ELANNet(nn.Module):
         )
         self.layer_4 = nn.Sequential(
             DownSample(in_dim=int(512*width), out_dim=int(512*width), act_type=act_type, norm_type=norm_type),             
-            ELANBlock(in_dim=int(512*width), out_dim=int(self.p5_stage_dim*width), expand_ratio=0.5, depth=depth,
+            ELANBlock(in_dim=int(512*width), out_dim=int(1024*width), expand_ratio=0.5, depth=depth,
                       act_type=act_type, norm_type=norm_type, depthwise=depthwise)                    # P4/16
         )
 
-        # P5 Model
-        if not self.p6_feat:
-            self.layer_5 = nn.Sequential(
-                DownSample(in_dim=int(self.p5_stage_dim*width), out_dim=int(self.p5_stage_dim*width), act_type=act_type, norm_type=norm_type),             
-                ELANBlock(in_dim=int(self.p5_stage_dim*width), out_dim=int(self.p5_stage_dim*width), expand_ratio=0.25, depth=depth,
-                        act_type=act_type, norm_type=norm_type, depthwise=depthwise)                  # P5/32
-            )
-        # P6 Model
-        else:
-            self.layer_5 = nn.Sequential(
-                DownSample(in_dim=int(self.p5_stage_dim*width), out_dim=int(self.p5_stage_dim*width), act_type=act_type, norm_type=norm_type),             
-                ELANBlock(in_dim=int(self.p5_stage_dim*width), out_dim=int(self.p6_stage_dim*width), expand_ratio=0.5, depth=depth,
-                        act_type=act_type, norm_type=norm_type, depthwise=depthwise)                  # P5/32
-            )
-            self.layer_6 = nn.Sequential(
-                DownSample(in_dim=int(self.p6_stage_dim*width), out_dim=int(self.p6_stage_dim*width), act_type=act_type, norm_type=norm_type),             
-                ELANBlock(in_dim=int(self.p6_stage_dim*width), out_dim=int(self.p6_stage_dim*width), expand_ratio=0.25, depth=depth,
-                        act_type=act_type, norm_type=norm_type, depthwise=depthwise)                  # P5/64
-            )
+        self.layer_5 = nn.Sequential(
+            DownSample(in_dim=int(1024*width), out_dim=int(1024*width), act_type=act_type, norm_type=norm_type),             
+            ELANBlock(in_dim=int(1024*width), out_dim=int(1024*width), expand_ratio=0.25, depth=depth,
+                    act_type=act_type, norm_type=norm_type, depthwise=depthwise)                  # P5/32
+        )
 
 
     def forward(self, x):
@@ -194,9 +173,58 @@ class ELANNet(nn.Module):
 
         outputs = [c3, c4, c5]
 
-        if self.p6_feat:
-            c6 = self.layer_6(c5)
-            outputs.append(c6)
+        return outputs
+
+
+# ELANNet-P6
+class ELANNet_P6(nn.Module):
+    def __init__(self, width=1.0, depth=1.0, act_type='silu', norm_type='BN', depthwise=False):
+        super(ELANNet_P6, self).__init__()
+        self.p5_stage_dim = 1024
+        self.feat_dims = [int(256 * width), int(512 * width), int(768 * width), int(1024 * width)]
+        
+        # large backbone
+        self.layer_1 = nn.Sequential(
+            Conv(3, int(64*width), k=3, p=1, s=2, act_type=act_type, norm_type=norm_type),
+            Conv(int(64*width), int(64*width), k=3, p=1, act_type=act_type, norm_type=norm_type, depthwise=depthwise) # P1/2
+        )
+        self.layer_2 = nn.Sequential(   
+            Conv(int(64*width), int(128*width), k=3, p=1, s=2, act_type=act_type, norm_type=norm_type, depthwise=depthwise),             
+            ELANBlock(in_dim=int(128*width), out_dim=int(128*width), expand_ratio=0.5, depth=depth,
+                      act_type=act_type, norm_type=norm_type, depthwise=depthwise)                     # P2/4
+        )
+        self.layer_3 = nn.Sequential(
+            DownSample(in_dim=int(128*width), out_dim=int(256*width), act_type=act_type, norm_type=norm_type),             
+            ELANBlock(in_dim=int(256*width), out_dim=int(256*width), expand_ratio=0.5, depth=depth,
+                      act_type=act_type, norm_type=norm_type, depthwise=depthwise)                     # P3/8
+        )
+        self.layer_4 = nn.Sequential(
+            DownSample(in_dim=int(256*width), out_dim=int(512*width), act_type=act_type, norm_type=norm_type),             
+            ELANBlock(in_dim=int(512*width), out_dim=int(512*width), expand_ratio=0.5, depth=depth,
+                      act_type=act_type, norm_type=norm_type, depthwise=depthwise)                    # P4/16
+        )
+
+        self.layer_5 = nn.Sequential(
+            DownSample(in_dim=int(512*width), out_dim=int(768*width), act_type=act_type, norm_type=norm_type),             
+            ELANBlock(in_dim=int(768*width), out_dim=int(768*width), expand_ratio=0.5, depth=depth,
+                    act_type=act_type, norm_type=norm_type, depthwise=depthwise)                  # P5/32
+        )
+        self.layer_6 = nn.Sequential(
+            DownSample(in_dim=int(768*width), out_dim=int(1024*width), act_type=act_type, norm_type=norm_type),             
+            ELANBlock(in_dim=int(1024*width), out_dim=int(1024*width), expand_ratio=0.5, depth=depth,
+                    act_type=act_type, norm_type=norm_type, depthwise=depthwise)                  # P5/64
+        )
+
+
+    def forward(self, x):
+        c1 = self.layer_1(x)
+        c2 = self.layer_2(c1)
+        c3 = self.layer_3(c2)
+        c4 = self.layer_4(c3)
+        c5 = self.layer_5(c4)
+        c6 = self.layer_6(c5)
+
+        outputs = [c3, c4, c5, c6]
 
         return outputs
 
@@ -204,15 +232,24 @@ class ELANNet(nn.Module):
 # build ELAN-Net
 def build_elannet(cfg): 
     # model
-    backbone = ELANNet(
-        width=cfg['width'],
-        depth=cfg['depth'],
-        act_type=cfg['bk_act'],
-        norm_type=cfg['bk_norm'],
-        depthwise=cfg['bk_dpw'],
-        p6_feat=cfg['p6_feat'])
-    feat_dims = backbone.feat_dims
-
+    if cfg['p6_feat']:
+        backbone = ELANNet_P6(
+            width=cfg['width'],
+            depth=cfg['depth'],
+            act_type=cfg['bk_act'],
+            norm_type=cfg['bk_norm'],
+            depthwise=cfg['bk_dpw']
+            )
+        feat_dims = backbone.feat_dims
+    else:
+        backbone = ELANNet(
+            width=cfg['width'],
+            depth=cfg['depth'],
+            act_type=cfg['bk_act'],
+            norm_type=cfg['bk_norm'],
+            depthwise=cfg['bk_dpw']
+            )
+        feat_dims = backbone.feat_dims
     return backbone, feat_dims
 
 
@@ -223,7 +260,7 @@ if __name__ == '__main__':
         'bk_act': 'lrelu',
         'bk_norm': 'BN',
         'bk_dpw': False,
-        'p6_feat': False,
+        'p6_feat': True,
         'width': 1.0,
         'depth': 1.0,
     }
