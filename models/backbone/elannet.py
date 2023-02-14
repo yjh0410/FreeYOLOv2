@@ -164,12 +164,14 @@ class ELANNet(nn.Module):
                       act_type=act_type, norm_type=norm_type, depthwise=depthwise)                    # P4/16
         )
 
+        # P5 Model
         if not self.p6_feat:
             self.layer_5 = nn.Sequential(
                 DownSample(in_dim=int(self.p5_stage_dim*width), out_dim=int(self.p5_stage_dim*width), act_type=act_type, norm_type=norm_type),             
                 ELANBlock(in_dim=int(self.p5_stage_dim*width), out_dim=int(self.p5_stage_dim*width), expand_ratio=0.25, depth=depth,
                         act_type=act_type, norm_type=norm_type, depthwise=depthwise)                  # P5/32
             )
+        # P6 Model
         else:
             self.layer_5 = nn.Sequential(
                 DownSample(in_dim=int(self.p5_stage_dim*width), out_dim=int(self.p5_stage_dim*width), act_type=act_type, norm_type=norm_type),             
