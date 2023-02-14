@@ -16,6 +16,9 @@ class ELAN_PaFPN(nn.Module):
                  norm_type='BN',
                  depthwise=False):
         super(ELAN_PaFPN, self).__init__()
+        print('==============================')
+        print('FPN: {}'.format("ELAN_PaFPN"))
+
         self.in_dims = in_dims
         self.width = width
         self.depth = depth
@@ -129,6 +132,9 @@ class ELAN_PaFPN_P6(nn.Module):
                  norm_type='BN',
                  depthwise=False):
         super(ELAN_PaFPN_P6, self).__init__()
+        print('==============================')
+        print('FPN: {}'.format("ELAN_PaFPN-P6"))
+
         self.in_dims = in_dims
         self.width = width
         self.depth = depth

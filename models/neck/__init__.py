@@ -4,8 +4,6 @@ from .elan_pafpn import ELAN_PaFPN, ELAN_PaFPN_P6
 
 def build_fpn(cfg, in_dims, out_dim=None):
     model = cfg['fpn']
-    print('==============================')
-    print('FPN: {}'.format(model))
     # build neck
     if model == 'elan_pafpn':
         fpn_net = ELAN_PaFPN(in_dims=in_dims,
