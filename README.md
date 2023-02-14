@@ -63,7 +63,7 @@ For example:
 python train.py --cuda -d coco -v yolo_free_v2_tiny -bs 16 --max_epoch 300 --wp_epoch 3 --eval_epoch 10 --fp16 --ema --root path/to/COCO
 ```
 
-Main results on COCO-val:
+P5-Model on COCO:
 
 | Model        | Scale | AP<sup>val<br>0.5:0.95 | AP<sup>test<br>0.5:0.95 |FPS<sup>3090<br>FP32-bs1 | FLOPs<br><sup>(G) | Params<br><sup>(M) | Weight |
 |--------------|-------|------------------------|-------------------------|-------------------------|-------------------|--------------------|--------|
@@ -74,6 +74,15 @@ Main results on COCO-val:
 | FreeYOLOv2-L |  640  |                        |                         |                         |  144.2            |  41.8              |  |
 | FreeYOLOv2-H |  640  |                        |                         |                         |  250.1            |  72.5              |  |
 
+P6-Model on COCO:
+
+| Model         | Scale | AP<sup>val<br>0.5:0.95 | AP<sup>test<br>0.5:0.95 |FPS<sup>3090<br>FP32-bs1 | FLOPs<br><sup>(G) | Params<br><sup>(M) | Weight |
+|---------------|-------|------------------------|-------------------------|-------------------------|-------------------|--------------------|--------|
+| FreeYOLOv2-T6 | 1280  |                        |                         |                         |  63.0             |  6.6               |  |
+| FreeYOLOv2-S6 | 1280  |                        |                         |                         |  111.0            |  11.7              |  |
+| FreeYOLOv2-M6 | 1280  |                        |                         |                         |  288.1            |  31.0              |  |
+| FreeYOLOv2-L6 | 1280  |                        |                         |                         |  581.9            |  63.8              |  |
+| FreeYOLOv2-H6 | 1280  |                        |                         |                         |  1019.0           |  113.0             |  |
 
 ### WiderFace
 - Download [WiderFace](http://shuoyang1213.me/WIDERFACE/).

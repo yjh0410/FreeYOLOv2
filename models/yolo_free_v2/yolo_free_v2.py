@@ -205,13 +205,12 @@ class FreeYOLOv2(nn.Module):
     def inference_single_image(self, x):
         img_h, img_w = x.shape[2:]
         # backbone
-        feats = self.backbone(x)
+        pyramid_feats = self.backbone(x)
 
         # neck
-        feats['layer4'] = self.neck(feats['layer4'])
+        pyramid_feats[-1] = self.neck(pyramid_feats[-1])
 
         # fpn
-        pyramid_feats = [feats['layer2'], feats['layer3'], feats['layer4']]
         pyramid_feats = self.fpn(pyramid_feats)
 
         # non-shared heads
@@ -281,13 +280,12 @@ class FreeYOLOv2(nn.Module):
             return self.inference_single_image(x)
         else:
             # backbone
-            feats = self.backbone(x)
+            pyramid_feats = self.backbone(x)
 
             # neck
-            feats['layer4'] = self.neck(feats['layer4'])
+            pyramid_feats[-1] = self.neck(pyramid_feats[-1])
 
             # fpn
-            pyramid_feats = [feats['layer2'], feats['layer3'], feats['layer4']]
             pyramid_feats = self.fpn(pyramid_feats)
 
             # non-shared heads

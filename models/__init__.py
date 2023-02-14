@@ -14,7 +14,10 @@ def build_model(args,
     # detector    
     if args.version in ['yolo_free_v2_nano',  'yolo_free_v2_tiny',
                         'yolo_free_v2_small', 'yolo_free_v2_medium',
-                        'yolo_free_v2_large', 'yolo_free_v2_huge']:
+                        'yolo_free_v2_large', 'yolo_free_v2_huge',
+                        'yolo_free_v2_nano_p6',  'yolo_free_v2_tiny_p6',
+                        'yolo_free_v2_small_p6', 'yolo_free_v2_medium_p6',
+                        'yolo_free_v2_large_p6', 'yolo_free_v2_huge_p6']:
         model, criterion = build_yolo_free_v2(
             args, cfg, device, num_classes, trainable)
 
