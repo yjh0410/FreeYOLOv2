@@ -5,12 +5,13 @@ from .nms import multiclass_nms
 
 
 class PostProcessor(object):
-    def __init__(self, img_size, strides, num_classes, conf_thresh=0.15, nms_thresh=0.5):
+    def __init__(self, img_size, strides, num_classes, conf_thresh=0.15, nms_thresh=0.5, use_dfl=False):
         self.img_size = img_size
         self.num_classes = num_classes
         self.conf_thresh = conf_thresh
         self.nms_thresh = nms_thresh
         self.strides = strides
+        self.use_dfl = use_dfl
 
         # generate anchors
         self.anchors, self.expand_strides = self.generate_anchors()
@@ -41,20 +42,16 @@ class PostProcessor(object):
         expand_strides = np.concatenate(all_expand_strides, axis=0)
 
         return anchors, expand_strides
-
+        
 
     def decode_boxes(self, anchors, pred_regs):
         """
             anchors:  (List[Tensor]) [1, M, 2] or [M, 2]
             pred_reg: (List[Tensor]) [B, M, 4] or [B, M, 4]
         """
-        # center of bbox
-        pred_ctr_xy = anchors[..., :2] + pred_regs[..., :2] * self.expand_strides
-        # size of bbox
-        pred_box_wh = np.exp(pred_regs[..., 2:]) * self.expand_strides
-
-        pred_x1y1 = pred_ctr_xy - 0.5 * pred_box_wh
-        pred_x2y2 = pred_ctr_xy + 0.5 * pred_box_wh
+        # tlbr -> xyxy
+        pred_x1y1 = anchors - pred_regs[..., :2] * self.expand_strides
+        pred_x2y2 = anchors + pred_regs[..., 2:] * self.expand_strides
         pred_box = np.concatenate([pred_x1y1, pred_x2y2], axis=-1)
 
         return pred_box
@@ -66,9 +63,7 @@ class PostProcessor(object):
             predictions: (ndarray) [n_anchors_all, 4+1+C]
         """
         reg_preds = predictions[..., :4]
-        obj_preds = predictions[..., 4:5]
-        cls_preds = predictions[..., 5:]
-        scores = np.sqrt(obj_preds * cls_preds)
+        scores = predictions[..., 4:]
 
         # scores & labels
         labels = np.argmax(scores, axis=1)                      # [M,]
