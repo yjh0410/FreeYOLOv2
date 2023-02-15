@@ -3,8 +3,8 @@ python train.py \
         --cuda \
         -d coco \
         --root /mnt/share/ssd2/dataset/ \
-        -v yolo_free_v2_large \
-        -bs 16 \
+        -v yolo_free_v2_huge \
+        -bs 8 \
         --max_epoch 300 \
         --wp_epoch 3 \
         --eval_epoch 10 \
