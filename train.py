@@ -37,6 +37,8 @@ def parse_args():
                         help='evaluate model before training.')
     parser.add_argument('--fp16', dest="fp16", action="store_true", default=False,
                         help="Adopting mix precision training.")
+    parser.add_argument('--vis_tgt', action="store_true", default=False,
+                        help="visualize training data.")
     
     # Batchsize
     parser.add_argument('-bs', '--batch_size', default=16, type=int, 

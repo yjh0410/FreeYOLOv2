@@ -407,8 +407,8 @@ class TrainTransforms(object):
             boxes[..., [0, 2]] = w - boxes[..., [2, 0]]
             target["boxes"] = boxes
 
-        # refine target
-        target = refine_targets(target, self.img_size, self.min_box_size)
+        # # refine target
+        # target = refine_targets(target, self.img_size, self.min_box_size)
         # to tensor
         img_tensor = torch.from_numpy(img).permute(2, 0, 1).contiguous().float()
 
@@ -456,8 +456,8 @@ class ValTransforms(object):
             boxes_[:, [1, 3]] = boxes_[:, [1, 3]] / img_h0 * img_h
             target["boxes"] = boxes_
 
-            # refine target
-            target = refine_targets(target, self.img_size, 8)
+            # # refine target
+            # target = refine_targets(target, self.img_size, 8)
 
             # to tensor
             target["boxes"] = torch.as_tensor(target["boxes"]).float()

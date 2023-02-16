@@ -6,9 +6,10 @@ import os
 import numpy as np
 
 from utils import distributed_utils
+from utils.vis_tools import vis_data
 
 
-def rescale_image_targets(images, targets, new_img_size):
+def rescale_image_targets(images, targets, new_img_size, min_box_size):
     """
         Deployed for Multi scale trick.
     """
@@ -23,9 +24,18 @@ def rescale_image_targets(images, targets, new_img_size):
     # rescale targets
     for tgt in targets:
         boxes = tgt["boxes"].clone()
+        labels = tgt["labels"].clone()
+        boxes = torch.clamp(boxes, 0, old_img_size)
+        # rescale box
         boxes[:, [0, 2]] = boxes[:, [0, 2]] / old_img_size * new_img_size
         boxes[:, [1, 3]] = boxes[:, [1, 3]] / old_img_size * new_img_size
-        tgt["boxes"] = boxes
+        # refine tgt
+        tgt_boxes_wh = boxes[..., 2:] - boxes[..., :2]
+        min_tgt_size = torch.min(tgt_boxes_wh, dim=-1)[0]
+        keep = (min_tgt_size > min_box_size)
+
+        tgt["boxes"] = boxes[keep]
+        tgt["labels"] = labels[keep]
 
     return images, targets
 
@@ -63,11 +73,16 @@ def train_one_epoch(epoch,
         # # choose a new image size
         if ni % 10 == 0 and cfg['random_size']:
             idx = np.random.randint(len(cfg['random_size']))
-            img_size = cfg['random_size'][idx]
+            new_img_size = cfg['random_size'][idx]
         # # rescale data with new image size
         if cfg['random_size']:
-            images, targets = rescale_image_targets(images, targets, img_size)
+            images, targets = rescale_image_targets(
+                images, targets, new_img_size, args.min_box_size)
 
+        # visualize train targets
+        if args.vis_tgt:
+            vis_data(images, targets)
+            
         # inference
         with torch.cuda.amp.autocast(enabled=args.fp16):
             outputs = model(images)

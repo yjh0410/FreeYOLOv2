@@ -249,7 +249,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='FreeYOLO-Seg')
 
     # opt
-    parser.add_argument('--root', default='D:\\python_work\\object-detection\\dataset\\COCO',
+    parser.add_argument('--root', default='D:\\python_work\\object-detection\\dataset\\VOCdevkit',
                         help='data root')
     
     args = parser.parse_args()
