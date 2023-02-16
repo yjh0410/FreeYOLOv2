@@ -85,6 +85,8 @@ P6-Model on COCO:
 | FreeYOLOv2-L6 | 1280  |                        |                         |                         |  560.1            |  74.3              |  |
 | FreeYOLOv2-H6 | 1280  |                        |                         |                         |  973.8            |  135.1             |  |
 
+*All FLOPs are measured with a 640x640 or 1280x1280 image size on COCO val2017. The FPS is measured with batch size 1 on 3090 GPU from the model inference to the NMS operation.*
+
 ### WiderFace
 - Download [WiderFace](http://shuoyang1213.me/WIDERFACE/).
 
