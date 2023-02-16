@@ -198,6 +198,16 @@ sh train.sh
 
 You can change the configurations of `train.sh`, according to your own situation.
 
+You also can add `--vis_tgt`  to check the images and targets during the training stage. For example:
+```Shell
+python train.py --cuda -d coco --root path/to/coco -v yolo_free_v2_large --vis_tgt
+```
+
+![image](./img_files/tgt_data_0.png)
+![image](./img_files/tgt_data_1.png)
+![image](./img_files/tgt_data_2.png)
+![image](./img_files/tgt_data_3.png)
+
 ### Multi GPUs
 ```Shell
 sh train_ddp.sh

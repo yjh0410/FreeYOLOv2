@@ -3,42 +3,6 @@ import cv2
 import math
 import numpy as np
 import torch
-import torchvision.transforms.functional as F
-import time
-
-
-def refine_targets(target, img_size, min_box_size):
-    # check target
-    valid_bboxes = []
-    valid_labels = []
-    target_bboxes = target['boxes'].copy()
-    target_labels = target['labels'].copy()
-
-    if len(target_bboxes) > 0:
-        # Cutout/Clip targets
-        target_bboxes = np.clip(target_bboxes, 0, img_size)
-
-        # check boxes
-        target_bboxes_wh = target_bboxes[..., 2:] - target_bboxes[..., :2]
-        min_tgt_boxes_size = np.min(target_bboxes_wh, axis=-1)
-
-        keep = (min_tgt_boxes_size > min_box_size)
-
-        valid_bboxes = target_bboxes[keep]
-        valid_labels = target_labels[keep]
-        
-    else:
-        valid_bboxes = target_bboxes
-        valid_labels = target_labels
-
-    # guard against no boxes via resizing
-    valid_bboxes = valid_bboxes.reshape(-1, 4)
-    valid_labels = valid_labels.reshape(-1)
-
-    target['boxes'] = valid_bboxes
-    target['labels'] = valid_labels
-
-    return target
 
 
 def random_perspective(image,
@@ -407,8 +371,6 @@ class TrainTransforms(object):
             boxes[..., [0, 2]] = w - boxes[..., [2, 0]]
             target["boxes"] = boxes
 
-        # # refine target
-        # target = refine_targets(target, self.img_size, self.min_box_size)
         # to tensor
         img_tensor = torch.from_numpy(img).permute(2, 0, 1).contiguous().float()
 
@@ -455,9 +417,6 @@ class ValTransforms(object):
             boxes_[:, [0, 2]] = boxes_[:, [0, 2]] / img_w0 * img_w
             boxes_[:, [1, 3]] = boxes_[:, [1, 3]] / img_h0 * img_h
             target["boxes"] = boxes_
-
-            # # refine target
-            # target = refine_targets(target, self.img_size, 8)
 
             # to tensor
             target["boxes"] = torch.as_tensor(target["boxes"]).float()

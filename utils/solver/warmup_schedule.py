@@ -9,10 +9,12 @@ def build_warmup(cfg, base_lr=0.01, wp_iter=500):
     print('--warmup_factor: {}'.format(cfg['warmup_factor']))
     print('--wp_iter: {}'.format(wp_iter))
 
-    warmup_scheduler = WarmUpScheduler(name=cfg['warmup'], 
-                                       base_lr=base_lr, 
-                                       wp_iter=wp_iter, 
-                                       warmup_factor=cfg['warmup_factor'])
+    warmup_scheduler = WarmUpScheduler(
+        name=cfg['warmup'], 
+        base_lr=base_lr, 
+        wp_iter=wp_iter, 
+        warmup_factor=cfg['warmup_factor']
+        )
     
     return warmup_scheduler
 
@@ -28,12 +30,6 @@ class WarmUpScheduler(object):
         self.base_lr = base_lr
         self.wp_iter = wp_iter
         self.warmup_factor = warmup_factor
-        print('==============================')
-        print('WarmUpScheduler: {}'.format(name))
-        print('--base_lr: {}'.format(base_lr))
-        print('--wp_iter: {}'.format(wp_iter))
-        if self.name == 'linear':
-            print('--warmup_factor: {}'.format(warmup_factor))
 
 
     def set_lr(self, optimizer, lr):

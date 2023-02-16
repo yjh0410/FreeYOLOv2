@@ -57,8 +57,6 @@ def vis_data(images, targets):
             color = class_colors[cls_id]
             # draw box
             cv2.rectangle(image, (x1, y1), (x2, y2), color, 2)
-            # # draw label
-            # cv2.putText(image, label, (x1, y1 - 5), 0, 0.5, color, 1, lineType=cv2.LINE_AA)
 
         cv2.imshow('train target', image)
         cv2.waitKey(0)
