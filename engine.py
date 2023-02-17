@@ -9,7 +9,7 @@ from utils import distributed_utils
 from utils.vis_tools import vis_data
 
 
-def rescale_image_targets(images, targets, new_img_size, min_box_size):
+def rescale_image_targets(images, targets, img_size, min_box_size):
     """
         Deployed for Multi scale trick.
     """
@@ -18,7 +18,7 @@ def rescale_image_targets(images, targets, new_img_size, min_box_size):
     # interpolate
     images = torch.nn.functional.interpolate(
                         input=images, 
-                        size=new_img_size, 
+                        size=img_size, 
                         mode='bilinear', 
                         align_corners=False)
     # rescale targets
@@ -27,8 +27,8 @@ def rescale_image_targets(images, targets, new_img_size, min_box_size):
         labels = tgt["labels"].clone()
         boxes = torch.clamp(boxes, 0, old_img_size)
         # rescale box
-        boxes[:, [0, 2]] = boxes[:, [0, 2]] / old_img_size * new_img_size
-        boxes[:, [1, 3]] = boxes[:, [1, 3]] / old_img_size * new_img_size
+        boxes[:, [0, 2]] = boxes[:, [0, 2]] / old_img_size * img_size
+        boxes[:, [1, 3]] = boxes[:, [1, 3]] / old_img_size * img_size
         # refine tgt
         tgt_boxes_wh = boxes[..., 2:] - boxes[..., :2]
         min_tgt_size = torch.min(tgt_boxes_wh, dim=-1)[0]
@@ -56,7 +56,6 @@ def train_one_epoch(epoch,
     epoch_size = len(dataloader)
     img_size = cfg['train_size']
     t0 = time.time()
-    nw = epoch_size * args.wp_epoch
     accumulate = max(1, round(64 / args.batch_size))
     # train one epoch
     for iter_i, (images, targets) in enumerate(dataloader):
@@ -73,11 +72,11 @@ def train_one_epoch(epoch,
         # # choose a new image size
         if ni % 10 == 0 and cfg['random_size']:
             idx = np.random.randint(len(cfg['random_size']))
-            new_img_size = cfg['random_size'][idx]
+            img_size = cfg['random_size'][idx]
         # # rescale data with new image size
         if cfg['random_size']:
             images, targets = rescale_image_targets(
-                images, targets, new_img_size, args.min_box_size)
+                images, targets, img_size, args.min_box_size)
 
         # visualize train targets
         if args.vis_tgt:
