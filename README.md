@@ -28,17 +28,17 @@ At least, please make sure your torch is version 1.x.
 - [x] Cosine Annealing Schedule
 
 ## Training Configuration
-|   Configuration         |                          |
-|-------------------------|--------------------------|
-| Per GPU Batch Size      | 16 (8 for FreeYOLO-Huge) |
-| Init Lr                 | 0.01                     |
-| Warmup Scheduler        | Linear                   |
-| Lr Scheduler            | Cosine                   |
-| Optimizer               | SGD                      |
-| Train from scratch      | True                     |
-| Multi Scale Train       | True                     |
-| Mosaic                  | True                     |
-| Mixup                   | True                     |
+|   Configuration         |                            |
+|-------------------------|----------------------------|
+| Per GPU Batch Size      | 16 (8 for FreeYOLOv2-Huge) |
+| Init Lr                 | 0.01                       |
+| Warmup Scheduler        | Linear                     |
+| Lr Scheduler            | Cosine                     |
+| Optimizer               | SGD                        |
+| Train from scratch      | True                       |
+| Multi Scale Train       | True                       |
+| Mosaic                  | True                       |
+| Mixup                   | True                       |
 
 
 ## Experiments
