@@ -213,14 +213,14 @@ def train():
             dataloader.batch_sampler.sampler.set_epoch(epoch)
 
         # check whether it is warmup stage
-        if epoch == args.wp_epoch:
+        if epoch >= args.wp_epoch and warmup_scheduler is not None:
             print("Warmup is Over.")
             warmup_scheduler.set_lr(optimizer, cfg['lr0'])
             warmup_scheduler = None
         else:
             if warmup_scheduler is None:
                 # warmup has been over
-                if epoch == T_max:
+                if epoch >= T_max and lr_schedule:
                     # close Cosine scheduler
                     print('CLose Cosine annealing.')
                     lr_schedule = False
