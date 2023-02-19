@@ -217,30 +217,30 @@ def train():
             print("Warmup is Over.")
             warmup_scheduler.set_lr(optimizer, cfg['lr0'])
             warmup_scheduler = None
-        else:
-            if warmup_scheduler is None:
-                # warmup has been over
-                if epoch >= T_max and lr_schedule:
-                    # close Cosine scheduler
-                    print('CLose Cosine annealing.')
-                    lr_schedule = False
-                    for param_group in optimizer.param_groups:
-                        param_group['lr'] = min_lr
-                    # close mosaic augmentation
-                    if dataloader.dataset.mosaic_prob > 0.:
-                        print('close Mosaic Augmentation ...')
-                        dataloader.dataset.mosaic_prob = 0.
-                        heavy_eval = True
-                    # close mixup augmentation
-                    if dataloader.dataset.mixup_prob > 0.:
-                        print('close Mixup Augmentation ...')
-                        dataloader.dataset.mixup_prob = 0.
-                        heavy_eval = True
 
-                if lr_schedule:
-                    tmp_lr = min_lr + 0.5*(cfg['lr0'] - min_lr)*(1 + math.cos(math.pi*epoch / T_max))
-                    for param_group in optimizer.param_groups:
-                        param_group['lr'] = tmp_lr
+        if warmup_scheduler is None:
+            # warmup has been over
+            if epoch >= T_max and lr_schedule:
+                # close Cosine scheduler
+                print('CLose Cosine annealing.')
+                lr_schedule = False
+                for param_group in optimizer.param_groups:
+                    param_group['lr'] = min_lr
+                # close mosaic augmentation
+                if dataloader.dataset.mosaic_prob > 0.:
+                    print('close Mosaic Augmentation ...')
+                    dataloader.dataset.mosaic_prob = 0.
+                    heavy_eval = True
+                # close mixup augmentation
+                if dataloader.dataset.mixup_prob > 0.:
+                    print('close Mixup Augmentation ...')
+                    dataloader.dataset.mixup_prob = 0.
+                    heavy_eval = True
+
+            if lr_schedule:
+                tmp_lr = min_lr + 0.5*(cfg['lr0'] - min_lr)*(1 + math.cos(math.pi*epoch / T_max))
+                for param_group in optimizer.param_groups:
+                    param_group['lr'] = tmp_lr
                         
         # train one epoch
         last_opt_step = train_one_epoch(
