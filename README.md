@@ -1,4 +1,6 @@
 # FreeYOLOv2
+English | [简体中文](.README_CN.md)
+
 ## Requirements
 - We recommend you to use Anaconda to create a conda environment:
 ```Shell
