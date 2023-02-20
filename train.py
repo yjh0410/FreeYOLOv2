@@ -145,16 +145,16 @@ def train():
         )
     model = model.to(device).train()
 
-    # SyncBatchNorm
-    if args.sybn and args.distributed:
-        print('use SyncBatchNorm ...')
-        model = torch.nn.SyncBatchNorm.convert_sync_batchnorm(model)
-
     # DDP
     model_without_ddp = model
     if args.distributed:
         model = DDP(model, device_ids=[args.gpu])
         model_without_ddp = model.module
+
+    # SyncBatchNorm
+    if args.sybn and args.distributed:
+        print('use SyncBatchNorm ...')
+        model = torch.nn.SyncBatchNorm.convert_sync_batchnorm(model)
 
     # compute FLOPs and Params
     if distributed_utils.is_main_process:

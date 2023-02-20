@@ -32,7 +32,7 @@ def parse_args():
                         type=str, help='The path to video files')
     parser.add_argument('--path_to_save', default='det_results/demos/',
                         type=str, help='The path to save the detection results')
-    parser.add_argument('-vs', '--visual_threshold', default=0.35, type=float,
+    parser.add_argument('-vs', '--visual_threshold', default=0.3, type=float,
                         help='Final confidence threshold for visualization')
     parser.add_argument('--show', action='store_true', default=False,
                         help='show visualization')
