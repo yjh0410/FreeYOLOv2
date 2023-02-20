@@ -73,6 +73,8 @@ P5-Model on COCO:
 | FreeYOLOv2-M |  640  |                        |                         |                           |  72.5             |  21.0              |  |
 | FreeYOLOv2-L |  640  |                        |                         |                           |  144.2            |  41.8              |  |
 | FreeYOLOv2-H |  640  |                        |                         |                           |  250.1            |  72.5              |  |
+| YOLOv3-E     |  640  |                        |                         |                           |  179.0            |  61.4              |  |
+| YOLOv4-E     |  640  |                        |                         |                           |  163.0            |  61.4              |  |
 
 P6-Model on COCO:
 

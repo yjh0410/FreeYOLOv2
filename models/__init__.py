@@ -3,7 +3,8 @@
 
 import torch
 from .yolo_free_v2.build import build_yolo_free_v2
-
+from .yolov3_e.build import build_yolov3
+from .yolov4_e.build import build_yolov4
 
 # build object detector
 def build_model(args, 
@@ -19,6 +20,14 @@ def build_model(args,
                         'yolo_free_v2_small_p6', 'yolo_free_v2_medium_p6',
                         'yolo_free_v2_large_p6', 'yolo_free_v2_huge_p6']:
         model, criterion = build_yolo_free_v2(
+            args, cfg, device, num_classes, trainable)
+
+    elif args.version == 'yolov3_e':
+        model, criterion = build_yolov3(
+            args, cfg, device, num_classes, trainable)
+
+    elif args.version == 'yolov4_e':
+        model, criterion = build_yolov4(
             args, cfg, device, num_classes, trainable)
 
     if trainable:
