@@ -1,4 +1,6 @@
 # FreeYOLOv2
+![image](/img_files/overview_yolofreev2.png)
+
 ## 配置运行环境
 - 首先，我们建议使用Anaconda来创建一个conda的虚拟环境
 ```Shell
