@@ -63,7 +63,7 @@ For example:
 python train.py --cuda -d coco -v yolo_free_v2_tiny -bs 16 --max_epoch 300 --wp_epoch 3 --eval_epoch 10 --fp16 --ema --root path/to/COCO
 ```
 
-P5-Model on COCO:
+**P5-Model on COCO:**
 
 | Model        | Scale | AP<sup>val<br>0.5:0.95 | AP<sup>test<br>0.5:0.95 |FPS<sup>2080ti<br>FP32-bs1 | FLOPs<br><sup>(G) | Params<br><sup>(M) | Weight |
 |--------------|-------|------------------------|-------------------------|---------------------------|-------------------|--------------------|--------|
@@ -76,7 +76,7 @@ P5-Model on COCO:
 | YOLOv3-E     |  640  |                        |                         |                           |  179.0            |  61.4              |  |
 | YOLOv4-E     |  640  |                        |                         |                           |  163.0            |  61.4              |  |
 
-P6-Model on COCO:
+**P6-Model on COCO:**
 
 | Model         | Scale | AP<sup>val<br>0.5:0.95 | AP<sup>test<br>0.5:0.95 |FPS<sup>2080ti<br>FP32-bs1 | FLOPs<br><sup>(G) | Params<br><sup>(M) | Weight |
 |---------------|-------|------------------------|-------------------------|---------------------------|-------------------|--------------------|--------|
@@ -87,7 +87,7 @@ P6-Model on COCO:
 | FreeYOLOv2-L6 | 1280  |                        |                         |                           |  560.1            |  74.3              |  |
 | FreeYOLOv2-H6 | 1280  |                        |                         |                           |  973.8            |  135.1             |  |
 
-P7-Model on COCO:
+**P7-Model on COCO:**
 
 | Model         | Scale | AP<sup>val<br>0.5:0.95 | AP<sup>test<br>0.5:0.95 |FPS<sup>2080ti<br>FP32-bs1 | FLOPs<br><sup>(G) | Params<br><sup>(M) | Weight |
 |---------------|-------|------------------------|-------------------------|---------------------------|-------------------|--------------------|--------|
