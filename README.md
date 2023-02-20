@@ -87,6 +87,17 @@ P6-Model on COCO:
 | FreeYOLOv2-L6 | 1280  |                        |                         |                           |  560.1            |  74.3              |  |
 | FreeYOLOv2-H6 | 1280  |                        |                         |                           |  973.8            |  135.1             |  |
 
+P7-Model on COCO:
+
+| Model         | Scale | AP<sup>val<br>0.5:0.95 | AP<sup>test<br>0.5:0.95 |FPS<sup>2080ti<br>FP32-bs1 | FLOPs<br><sup>(G) | Params<br><sup>(M) | Weight |
+|---------------|-------|------------------------|-------------------------|---------------------------|-------------------|--------------------|--------|
+| FreeYOLOv2-N7 | 1280  |                        |                         |                           |  26.9             |  3.8               |  |
+| FreeYOLOv2-T7 | 1280  |                        |                         |                           |  59.3             |  9.3               |  |
+| FreeYOLOv2-S7 | 1280  |                        |                         |                           |  104.5            |  16.5              |  |
+| FreeYOLOv2-M7 | 1280  |                        |                         |                           |  275.8            |  45.8              |  |
+| FreeYOLOv2-L7 | 1280  |                        |                         |                           |  564.4            |  97.0              |  |
+| FreeYOLOv2-H7 | 1280  |                        |                         |                           |  998.4            |  176.0             |  |
+
 *All FLOPs are measured with a 640x640 or 1280x1280 image size on COCO val2017. The FPS is measured with batch size 1 on 2080ti GPU from the model inference to the NMS operation.*
 
 ### WiderFace

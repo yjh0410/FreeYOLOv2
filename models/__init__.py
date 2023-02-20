@@ -18,7 +18,10 @@ def build_model(args,
                         'yolo_free_v2_large', 'yolo_free_v2_huge',
                         'yolo_free_v2_nano_p6',  'yolo_free_v2_tiny_p6',
                         'yolo_free_v2_small_p6', 'yolo_free_v2_medium_p6',
-                        'yolo_free_v2_large_p6', 'yolo_free_v2_huge_p6']:
+                        'yolo_free_v2_large_p6', 'yolo_free_v2_huge_p6',
+                        'yolo_free_v2_nano_p7', 'yolo_free_v2_tiny_p7',
+                        'yolo_free_v2_small_p7', 'yolo_free_v2_medium_p7',
+                        'yolo_free_v2_large_p7', 'yolo_free_v2_huge_p7']:
         model, criterion = build_yolo_free_v2(
             args, cfg, device, num_classes, trainable)
 
