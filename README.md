@@ -1,5 +1,5 @@
 # FreeYOLOv2
-English | [简体中文](.README_CN.md)
+English | [简体中文](https://github.com/yjh0410/FreeYOLOv2/blob/main/README_CN.md)
 
 ## Requirements
 - We recommend you to use Anaconda to create a conda environment:
