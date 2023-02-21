@@ -218,7 +218,7 @@ class ELAN_PaFPN_P6(nn.Module):
 
         else:
             self.out_layers = None
-            self.out_dim = [int(128 * width), int(256 * width), int(512 * width), int(512 * width)]
+            self.out_dim = [int(128 * width), int(256 * width), int(384 * width), int(512 * width)]
 
 
     def forward(self, features):

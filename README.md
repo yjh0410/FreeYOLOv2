@@ -144,7 +144,7 @@ Main results on WiderFace-val:
 
 | Model        |  Scale  |    AP    |    AP50    |  Weight  |
 |--------------|---------|----------|------------|----------|
-| FreeYOLOv2-N |  416    |      |        |  |
+| FreeYOLOv2-N |  640    |      |        |  |
 | FreeYOLOv2-T |  640    |      |        |  |
 | FreeYOLOv2-S |  640    |      |        |  |
 | FreeYOLOv2-M |  640    |      |        |  |
@@ -192,6 +192,7 @@ python dataset/crowdhuman.py
 ```
 
 - Train on CrowdHuman
+
 For example:
 ```Shell
 python train.py --cuda -d crowdhuman -v yolo_free_v2_tiny -bs 16 --max_epoch 100 --wp_epoch 1 --eval_epoch 10 --fp16 --ema --root path/to/CrowdHuman --pretrained path/to/coco/yolo_free_v2_tiny.pth
@@ -201,7 +202,7 @@ Main results on CrowdHuman-val:
 
 | Model        |  Scale  |    AP    |    AP50    |  Weight  |
 |--------------|---------|----------|------------|----------|
-| FreeYOLOv2-N |  416    |      |        |  |
+| FreeYOLOv2-N |  640    |      |        |  |
 | FreeYOLOv2-T |  640    |      |        |  |
 | FreeYOLOv2-S |  640    |      |        |  |
 | FreeYOLOv2-M |  640    |      |        |  |
