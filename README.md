@@ -73,7 +73,7 @@ python train.py --cuda -d coco -v yolo_free_v2_tiny -bs 16 --max_epoch 300 --wp_
 |--------------|-------|------------------------|-------------------------|---------------------------|-------------------|--------------------|--------|
 | FreeYOLOv2-N |  640  |                        |                         |                           |  6.9              |  1.7               |  |
 | FreeYOLOv2-T |  640  |         37.6           |          38.0           |           77              |  16.1             |  4.6               | [ckpt](https://github.com/yjh0410/FreeYOLOv2/releases/download/yolo_free_v2_weights/yolo_free_v2_tiny_coco.pth) |
-| FreeYOLOv2-S |  640  |                        |                         |                           |  28.3             |  8.2               |  |
+| FreeYOLOv2-S |  640  |                        |                         |           70              |  28.3             |  8.2               |  |
 | FreeYOLOv2-M |  640  |                        |                         |                           |  72.5             |  21.0              |  |
 | FreeYOLOv2-L |  640  |                        |                         |                           |  144.2            |  41.8              |  |
 | FreeYOLOv2-H |  640  |                        |                         |                           |  250.1            |  72.5              |  |
