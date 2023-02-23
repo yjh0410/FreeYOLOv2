@@ -70,9 +70,10 @@ python train.py --cuda -d coco -v yolo_free_v2_tiny -bs 16 --max_epoch 300 --wp_
 
 | Model        | Scale | AP<sup>val<br>0.5:0.95 | AP<sup>test<br>0.5:0.95 |FPS<sup>2080ti<br>FP32-bs1 | FLOPs<br><sup>(G) | Params<br><sup>(M) | Weight |
 |--------------|-------|------------------------|-------------------------|---------------------------|-------------------|--------------------|--------|
+| FreeYOLOv2-P |  640  |                        |                         |                           |  1.4              |  1.0               |  |
 | FreeYOLOv2-N |  640  |                        |                         |                           |  6.9              |  1.7               |  |
-| FreeYOLOv2-T |  640  |         37.6           |          38.0           |           77              |  16.1             |  4.6               | [ckpt](https://github.com/yjh0410/FreeYOLOv2/releases/download/yolo_free_v2_weights/yolo_free_v2_tiny_coco.pth) |
-| FreeYOLOv2-S |  640  |                        |                         |                           |  28.3             |  8.2               |  |
+| FreeYOLOv2-T |  640  |         37.6           |          38.0           |           87              |  16.1             |  4.6               | [ckpt](https://github.com/yjh0410/FreeYOLOv2/releases/download/yolo_free_v2_weights/yolo_free_v2_tiny_coco.pth) |
+| FreeYOLOv2-S |  640  |         42.0           |          42.4           |           90              |  28.3             |  8.2               | [ckpt](https://github.com/yjh0410/FreeYOLOv2/releases/download/yolo_free_v2_weights/yolo_free_v2_small_coco.pth) |
 | FreeYOLOv2-M |  640  |                        |                         |                           |  72.5             |  21.0              |  |
 | FreeYOLOv2-L |  640  |                        |                         |                           |  144.2            |  41.8              |  |
 | FreeYOLOv2-H |  640  |                        |                         |                           |  250.1            |  72.5              |  |
@@ -83,6 +84,7 @@ python train.py --cuda -d coco -v yolo_free_v2_tiny -bs 16 --max_epoch 300 --wp_
 
 | Model         | Scale | AP<sup>val<br>0.5:0.95 | AP<sup>test<br>0.5:0.95 |FPS<sup>2080ti<br>FP32-bs1 | FLOPs<br><sup>(G) | Params<br><sup>(M) | Weight |
 |---------------|-------|------------------------|-------------------------|---------------------------|-------------------|--------------------|--------|
+| FreeYOLOv2-P6 | 1280  |                        |                         |                           |  10.9             |  1.5               |  |
 | FreeYOLOv2-N6 | 1280  |                        |                         |                           |  26.4             |  2.8               |  |
 | FreeYOLOv2-T6 | 1280  |                        |                         |                           |  59.0             |  7.1               |  |
 | FreeYOLOv2-S6 | 1280  |                        |                         |                           |  104.0            |  12.6              |  |
@@ -94,6 +96,7 @@ python train.py --cuda -d coco -v yolo_free_v2_tiny -bs 16 --max_epoch 300 --wp_
 
 | Model         | Scale | AP<sup>val<br>0.5:0.95 | AP<sup>test<br>0.5:0.95 |FPS<sup>2080ti<br>FP32-bs1 | FLOPs<br><sup>(G) | Params<br><sup>(M) | Weight |
 |---------------|-------|------------------------|-------------------------|---------------------------|-------------------|--------------------|--------|
+| FreeYOLOv2-P7 | 1280  |                        |                         |                           |  11.1             |  2.2               |  |
 | FreeYOLOv2-N7 | 1280  |                        |                         |                           |  26.9             |  3.8               |  |
 | FreeYOLOv2-T7 | 1280  |                        |                         |                           |  59.3             |  9.3               |  |
 | FreeYOLOv2-S7 | 1280  |                        |                         |                           |  104.5            |  16.5              |  |

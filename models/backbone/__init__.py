@@ -7,9 +7,7 @@ def build_backbone(cfg):
     print('Backbone: {}'.format(cfg['backbone'].upper()))
 
     # build ELANNet
-    if cfg['backbone'] in ['elannet_nano',  'elannet_tiny',
-                           'elannet_small', 'elannet_medium',
-                           'elannet_large', 'elannet_huge']:
+    if cfg['backbone'] == 'elannet':
         model, feat_dim = build_elannet(cfg=cfg)
     
     # build (CSP-)DarkNet
