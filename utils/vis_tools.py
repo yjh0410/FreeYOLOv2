@@ -1,8 +1,11 @@
 import cv2
+import os
 import numpy as np
+import matplotlib.pyplot as plt
 from dataset.coco import coco_class_index, coco_class_labels
 
 
+# draw bbox & label on the image
 def plot_bbox_labels(img, bbox, label, cls_color, test_scale=0.4):
     x1, y1, x2, y2 = bbox
     x1, y1, x2, y2 = int(x1), int(y1), int(x2), int(y2)
@@ -17,6 +20,7 @@ def plot_bbox_labels(img, bbox, label, cls_color, test_scale=0.4):
     return img
 
 
+# visualize the detection results
 def visualize(img, bboxes, scores, labels, class_colors, vis_thresh=0.3):
     ts = 0.4
     for i, bbox in enumerate(bboxes):
@@ -29,6 +33,7 @@ def visualize(img, bboxes, scores, labels, class_colors, vis_thresh=0.3):
     return img
 
 
+# visualize the input data during the training stage
 def vis_data(images, targets):
     """
         images: (tensor) [B, 3, H, W]
@@ -60,3 +65,45 @@ def vis_data(images, targets):
 
         cv2.imshow('train target', image)
         cv2.waitKey(0)
+
+
+# convert feature to he heatmap
+def convert_feature_heatmap(feature):
+    """
+        feature: (ndarray) [H, W, C]
+    """
+    heatmap = None
+
+    return heatmap
+
+
+# draw feature on the image
+def draw_feature(img, features, save=None):
+    """
+        img: (ndarray & cv2.Mat) [H, W, C], where the C is 3 for RGB or 1 for Gray.
+        features: (List[ndarray]). It is a list of the multiple feature map whose shape is [H, W, C].
+        save: (bool) save the result or not.
+    """
+    img_h, img_w = img.shape[:2]
+
+    for i, fmp in enumerate(features):
+        hmp = convert_feature_heatmap(fmp)
+        hmp = cv2.resize(hmp, (img_w, img_h))
+        hmp = hmp.astype(np.uint8)*255
+        hmp_rgb = cv2.applyColorMap(hmp, cv2.COLORMAP_JET)
+        
+        superimposed_img = hmp_rgb * 0.4 + img 
+
+        # show the heatmap
+        plt.imshow(hmp)
+        plt.close()
+
+        # show the image with heatmap
+        cv2.imshow("image with heatmap", superimposed_img)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+
+        if save:
+            save_dir = 'feature_heatmap'
+            os.makedirs(save_dir, exist_ok=True)
+            cv2.imwrite(os.path.join(save_dir, 'feature_{}.png'.format(i) ), superimposed_img)    
