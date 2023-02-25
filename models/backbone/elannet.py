@@ -1,6 +1,9 @@
 import torch
 import torch.nn as nn
 
+model_urls = {
+    'elannet_nano': "https://github.com/yjh0410/image_classification_pytorch/releases/download/weight/elannet_nano.pth",
+}
 
 
 def get_activation(act_type=None):
@@ -331,8 +334,43 @@ def build_elannet(cfg):
             norm_type=cfg['bk_norm'],
             depthwise=cfg['bk_dpw']
             )
+        # check whether to load imagenet pretrained weight
+        if cfg['width'] == 0.25 and cfg['depth'] == 0.34 and cfg['bk_dpw']:
+            backbone = load_weight(backbone, model_name='elannet_nano')
+
     feat_dims = backbone.feat_dims
+
     return backbone, feat_dims
+
+
+# load pretrained weight
+def load_weight(model, model_name):
+    # load weight
+    print('Loading pretrained weight ...')
+    url = model_urls[model_name]
+    if url is not None:
+        checkpoint = torch.hub.load_state_dict_from_url(
+            url=url, map_location="cpu", check_hash=True)
+        # checkpoint state dict
+        checkpoint_state_dict = checkpoint.pop("model")
+        # model state dict
+        model_state_dict = model.state_dict()
+        # check
+        for k in list(checkpoint_state_dict.keys()):
+            if k in model_state_dict:
+                shape_model = tuple(model_state_dict[k].shape)
+                shape_checkpoint = tuple(checkpoint_state_dict[k].shape)
+                if shape_model != shape_checkpoint:
+                    checkpoint_state_dict.pop(k)
+            else:
+                checkpoint_state_dict.pop(k)
+                print(k)
+
+        model.load_state_dict(checkpoint_state_dict)
+    else:
+        print('No pretrained for {}'.format(model_name))
+
+    return model
 
 
 if __name__ == '__main__':
@@ -341,11 +379,11 @@ if __name__ == '__main__':
     cfg = {
         'bk_act': 'lrelu',
         'bk_norm': 'BN',
-        'bk_dpw': False,
-        'p6_feat': True,
+        'bk_dpw': True,
+        'p6_feat': False,
         'p7_feat': False,
-        'width': 1.0,
-        'depth': 1.0,
+        'width': 0.25,
+        'depth': 0.34,
     }
     model, feats = build_elannet(cfg)
     x = torch.randn(1, 3, 256, 256)

@@ -81,6 +81,8 @@ python train.py --cuda -d coco -v yolo_free_v2_tiny -bs 16 --max_epoch 300 --wp_
 | YOLOv3-E     |  640  |                        |                         |                           |  179.0            |  61.4              |  |
 | YOLOv4-E     |  640  |                        |                         |                           |  163.0            |  61.4              |  |
 
+*We use the **imagenet pretrained weight** for the backbone of **FreeYOLOv2-P** for stronger performance, while other models are trained from the scratch.*
+
 **P6-Model on COCO:**
 
 | Model         | Scale | AP<sup>val<br>0.5:0.95 | AP<sup>test<br>0.5:0.95 |FPS<sup>2080ti<br>FP32-bs1 | FLOPs<br><sup>(G) | Params<br><sup>(M) | Weight |
