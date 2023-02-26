@@ -10,7 +10,7 @@ yolo_free_v2_config = {
         'random_size': [320, 352, 384, 416,
                         448, 480, 512, 544,
                         576, 608, 640],
-        'mosaic_prob': 1.0,
+        'mosaic_prob': 0.5,
         'mixup_prob': 0.0,
         'format': 'RGB',
         'trans_config': {'degrees': 0.0,
