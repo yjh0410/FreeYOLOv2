@@ -10,7 +10,7 @@ python train.py \
         --eval_epoch 10 \
         --ema \
         --fp16 \
-        # --resume weights/coco/yolo_free_v2_pico/yolo_free_v2_pico_epoch_261_23.80.pth \
+        --resume weights/coco/yolo_free_v2_pico/yolo_free_v2_pico_epoch_171_22.87.pth \
         # --pretrained weights/coco/yolo_free_medium/yolo_free_medium_39.46.pth \
 
 

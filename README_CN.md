@@ -68,7 +68,7 @@ python train.py --cuda -d coco -v yolo_free_v2_tiny -bs 16 --max_epoch 300 --wp_
 
 **P5-Model on COCO:**
 
-| Model        | Scale | AP<sup>val<br>0.5:0.95 | AP<sup>test<br>0.5:0.95 |FPS<sup>2080ti<br>FP32-bs1 | FLOPs<br><sup>(G) | Params<br><sup>(M) | Weight |
+| Model        | Scale | AP<sup>val<br>0.5:0.95 | AP<sup>test<br>0.5:0.95 |FPS<sup>3090<br>FP32-bs1 | FLOPs<br><sup>(G) | Params<br><sup>(M) | Weight |
 |--------------|-------|------------------------|-------------------------|---------------------------|-------------------|--------------------|--------|
 | FreeYOLOv2-P |  416  |                        |                         |                           |  1.4              |  1.0               |  |
 | FreeYOLOv2-N |  640  |                        |                         |                           |  6.9              |  1.7               |  |
@@ -84,7 +84,7 @@ python train.py --cuda -d coco -v yolo_free_v2_tiny -bs 16 --max_epoch 300 --wp_
 
 **P6-Model on COCO:**
 
-| Model         | Scale | AP<sup>val<br>0.5:0.95 | AP<sup>test<br>0.5:0.95 |FPS<sup>2080ti<br>FP32-bs1 | FLOPs<br><sup>(G) | Params<br><sup>(M) | Weight |
+| Model         | Scale | AP<sup>val<br>0.5:0.95 | AP<sup>test<br>0.5:0.95 |FPS<sup>3090<br>FP32-bs1 | FLOPs<br><sup>(G) | Params<br><sup>(M) | Weight |
 |---------------|-------|------------------------|-------------------------|---------------------------|-------------------|--------------------|--------|
 | FreeYOLOv2-P6 | 1280  |                        |                         |                           |  10.9             |  1.5               |  |
 | FreeYOLOv2-N6 | 1280  |                        |                         |                           |  26.4             |  2.8               |  |
@@ -96,7 +96,7 @@ python train.py --cuda -d coco -v yolo_free_v2_tiny -bs 16 --max_epoch 300 --wp_
 
 **P7-Model on COCO:**
 
-| Model         | Scale | AP<sup>val<br>0.5:0.95 | AP<sup>test<br>0.5:0.95 |FPS<sup>2080ti<br>FP32-bs1 | FLOPs<br><sup>(G) | Params<br><sup>(M) | Weight |
+| Model         | Scale | AP<sup>val<br>0.5:0.95 | AP<sup>test<br>0.5:0.95 |FPS<sup>3090<br>FP32-bs1 | FLOPs<br><sup>(G) | Params<br><sup>(M) | Weight |
 |---------------|-------|------------------------|-------------------------|---------------------------|-------------------|--------------------|--------|
 | FreeYOLOv2-P7 | 1280  |                        |                         |                           |  11.1             |  2.2               |  |
 | FreeYOLOv2-N7 | 1280  |                        |                         |                           |  26.9             |  3.8               |  |
@@ -106,7 +106,7 @@ python train.py --cuda -d coco -v yolo_free_v2_tiny -bs 16 --max_epoch 300 --wp_
 | FreeYOLOv2-L7 | 1280  |                        |                         |                           |  564.4            |  97.0              |  |
 | FreeYOLOv2-H7 | 1280  |                        |                         |                           |  998.4            |  176.0             |  |
 
-*所有的FLOPs都是在COCO-val数据集上以640x640或1280x1280的输入尺寸来测试的。FPS指标是在一张2080ti型号的GPU上以batch size=1的输入来测试的，请注意，测速的内容包括模型前向推理、后处理以及NMS操作。*
+*所有的FLOPs都是在COCO-val数据集上以640x640或1280x1280的输入尺寸来测试的。FPS指标是在一张3090型号的GPU上以batch size=1的输入来测试的，请注意，测速的内容包括模型前向推理、后处理以及NMS操作。*
 
 ### WiderFace
 - 下载 [WiderFace](http://shuoyang1213.me/WIDERFACE/).
