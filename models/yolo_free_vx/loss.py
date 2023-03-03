@@ -79,10 +79,10 @@ class Criterion(object):
                     tgt_bboxes = tgt_bboxes
                     )
                 # cls target
+                cls_target = cls_preds.new_zeros((num_anchors, self.num_classes))
                 gt_classes = F.one_hot(gt_matched_classes.long(), self.num_classes)
                 gt_classes = gt_classes * pred_ious_this_matching.unsqueeze(-1)
-                cls_target = cls_preds.new_zeros((num_anchors, self.num_classes))
-                cls_target[fg_mask] = gt_classes.float()
+                cls_target[fg_mask] = gt_classes.type_as(cls_target)
                 # box target
                 box_target = tgt_bboxes[matched_gt_inds]
 
