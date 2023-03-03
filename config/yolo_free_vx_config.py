@@ -1,8 +1,9 @@
-# yolov3 config
+# yolo-free config
 
 
-yolov3_e_config = {
-    'yolov3_e': {
+yolo_free_vx_config = {
+    # P5
+    'yolo_free_vx_tiny': {
         # input
         'train_size': 640,
         'test_size': 640,
@@ -12,11 +13,11 @@ yolov3_e_config = {
                         704, 736, 768, 800,
                         832, 864, 896],
         'mosaic_prob': 1.0,
-        'mixup_prob': 0.15,
+        'mixup_prob': 0.05,
         'format': 'RGB',
         'trans_config': {'degrees': 0.0,
-                          'translate': 0.2,
-                          'scale': 0.9,
+                          'translate': 0.1,
+                          'scale': 0.5,
                           'shear': 0.0,
                           'perspective': 0.0,
                           'hsv_h': 0.015,
@@ -24,31 +25,30 @@ yolov3_e_config = {
                           'hsv_v': 0.4
                           },
         # model
-        'backbone': 'darknet53',
-        'csp_block': False,
-        'bk_act': 'silu',
+        'backbone': 'elannet',
+        'bk_act': 'lrelu',
         'bk_norm': 'BN',
         'bk_dpw': False,
         'p6_feat': False,
-        'width': 1.0,
-        'depth': 1.0,
+        'p7_feat': False,
+        'width': 0.375,
+        'depth': 0.34,
         'stride': [8, 16, 32],  # P3, P4, P5
         # neck
-        'neck': 'sppf',
+        'neck': 'sppf_block_csp',
         'expand_ratio': 0.5,
         'pooling_size': 5,
-        'neck_act': 'silu',
+        'neck_act': 'lrelu',
         'neck_norm': 'BN',
         'neck_depthwise': False,
         # fpn
-        'fpn': 'basic_fpn',
-        'fpn_act': 'silu',
+        'fpn': 'elan_pafpn',
+        'fpn_act': 'lrelu',
         'fpn_norm': 'BN',
         'fpn_depthwise': False,
         # head
         'head': 'decoupled_head',
-        'head_dim': 256,
-        'head_act': 'silu',
+        'head_act': 'lrelu',
         'head_norm': 'BN',
         'num_cls_head': 2,
         'num_reg_head': 2,

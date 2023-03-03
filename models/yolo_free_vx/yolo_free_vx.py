@@ -8,8 +8,8 @@ from ..head import build_head
 from utils.nms import multiclass_nms
 
 
-# Anchor-free YOLOv4
-class YOLOv4_E(nn.Module):
+# Anchor-free YOLOv3
+class FreeYOLOvx(nn.Module):
     def __init__(self, 
                  cfg,
                  device, 
@@ -19,7 +19,7 @@ class YOLOv4_E(nn.Module):
                  trainable = False, 
                  topk = 1000,
                  no_decode = False):
-        super(YOLOv4_E, self).__init__()
+        super(FreeYOLOvx, self).__init__()
         # --------- Basic Parameters ----------
         self.cfg = cfg
         self.device = device
@@ -36,7 +36,7 @@ class YOLOv4_E(nn.Module):
         self.backbone, feats_dim = build_backbone(cfg=cfg)
 
         ## neck
-        self.neck = build_neck(cfg=cfg, in_dim=feats_dim[-1], out_dim=feats_dim[-1])
+        self.neck = build_neck(cfg=cfg, in_dim=feats_dim[-1], out_dim=feats_dim[-1]//2)
         feats_dim[-1] = self.neck.out_dim
         
         ## fpn
@@ -69,8 +69,7 @@ class YOLOv4_E(nn.Module):
         for m in self.modules():
             if isinstance(m, nn.BatchNorm2d):
                 m.eps = 1e-3
-                m.momentum = 0.03
-                
+                m.momentum = 0.03    
         # Init bias
         init_prob = 0.01
         bias_value = -torch.log(torch.tensor((1. - init_prob) / init_prob))
@@ -79,6 +78,13 @@ class YOLOv4_E(nn.Module):
             b = cls_pred.bias.view(1, -1)
             b.data.fill_(bias_value.item())
             cls_pred.bias = torch.nn.Parameter(b.view(-1), requires_grad=True)
+        for reg_pred in self.reg_preds:
+            b = reg_pred.bias.view(-1, )
+            b.data.fill_(1.0)
+            reg_pred.bias = torch.nn.Parameter(b.view(-1), requires_grad=True)
+            w = reg_pred.weight
+            w.data.fill_(0.)
+            reg_pred.weight = torch.nn.Parameter(w, requires_grad=True)
 
 
     def generate_anchors(self, level, fmp_size):

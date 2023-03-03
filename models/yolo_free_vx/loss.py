@@ -3,7 +3,6 @@ import torch.nn as nn
 import torch.nn.functional as F
 from .matcher import AlignSimOTA
 from utils.box_ops import get_ious
-from utils.box_ops import get_ious, bbox2dist
 from utils.distributed_utils import get_world_size, is_dist_avail_and_initialized
 
 
