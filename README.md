@@ -69,7 +69,7 @@ python train.py --cuda -d coco -v yolo_free_v2_tiny -bs 16 --max_epoch 300 --wp_
 
 **P5-Model on COCO:**
 
-| Model        | Scale | AP<sup>val<br>0.5:0.95 | AP<sup>test<br>0.5:0.95 |FPS<sup>3090<br>FP32-bs1 | FLOPs<br><sup>(G) | Params<br><sup>(M) | Weight |
+| Model        | Scale | AP<sup>val<br>0.5:0.95 | AP<sup>test<br>0.5:0.95 | FPS<sup>3090<br>FP32-bs1  | FLOPs<br><sup>(G) | Params<br><sup>(M) | Weight |
 |--------------|-------|------------------------|-------------------------|---------------------------|-------------------|--------------------|--------|
 | FreeYOLOv2-P |  416  |         25.4           |          25.5           |                           |  1.4              |  1.0               | [ckpt](https://github.com/yjh0410/FreeYOLOv2/releases/download/yolo_free_v2_weights/yolo_free_v2_pico_coco.pth) |
 | FreeYOLOv2-N |  640  |         30.8           |          30.8           |                           |  6.9              |  1.7               | [ckpt](https://github.com/yjh0410/FreeYOLOv2/releases/download/yolo_free_v2_weights/yolo_free_v2_nano_coco.pth) |
@@ -80,6 +80,16 @@ python train.py --cuda -d coco -v yolo_free_v2_tiny -bs 16 --max_epoch 300 --wp_
 | FreeYOLOv2-H |  640  |                        |                         |                           |  250.1            |  72.5              |  |
 
 *We use the **imagenet pretrained weight** for the backbone of **FreeYOLOv2-P** for stronger performance, while other models are trained from the scratch.*
+
+| Model        | Scale | AP<sup>val<br>0.5:0.95 | AP<sup>test<br>0.5:0.95 | FPS<sup>3090<br>FP32-bs1  | FLOPs<br><sup>(G) | Params<br><sup>(M) | Weight |
+|--------------|-------|------------------------|-------------------------|---------------------------|-------------------|--------------------|--------|
+| FreeYOLOvx-P |  416  |                        |                         |                           |  1.3              |  0.9               |  |
+| FreeYOLOvx-N |  640  |                        |                         |                           |  6.8              |  1.7               |  |
+| FreeYOLOvx-T |  640  |                        |                         |                           |  16.0             |  4.6               |  |
+| FreeYOLOvx-S |  640  |                        |                         |                           |  28.2             |  8.2               |  |
+| FreeYOLOvx-M |  640  |                        |                         |                           |  72.4             |  21.0              |  |
+| FreeYOLOvx-L |  640  |                        |                         |                           |  144.1            |  41.8              |  |
+| FreeYOLOvx-H |  640  |                        |                         |                           |  250.0            |  72.5              |  |
 
 **P6-Model on COCO:**
 
