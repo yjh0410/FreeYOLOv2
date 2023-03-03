@@ -70,8 +70,8 @@ python train.py --cuda -d coco -v yolo_free_v2_tiny -bs 16 --max_epoch 300 --wp_
 
 | Model        | Scale | AP<sup>val<br>0.5:0.95 | AP<sup>test<br>0.5:0.95 |FPS<sup>3090<br>FP32-bs1 | FLOPs<br><sup>(G) | Params<br><sup>(M) | Weight |
 |--------------|-------|------------------------|-------------------------|---------------------------|-------------------|--------------------|--------|
-| FreeYOLOv2-P |  416  |                        |                         |                           |  1.4              |  1.0               |  |
-| FreeYOLOv2-N |  640  |                        |                         |                           |  6.9              |  1.7               |  |
+| FreeYOLOv2-P |  416  |         25.4           |          25.5           |                           |  1.4              |  1.0               | [ckpt](https://github.com/yjh0410/FreeYOLOv2/releases/download/yolo_free_v2_weights/yolo_free_v2_pico_coco.pth) |
+| FreeYOLOv2-N |  640  |         30.8           |          30.8           |                           |  6.9              |  1.7               | [ckpt](https://github.com/yjh0410/FreeYOLOv2/releases/download/yolo_free_v2_weights/yolo_free_v2_nano_coco.pth) |
 | FreeYOLOv2-T |  640  |         37.6           |          38.0           |           87              |  16.1             |  4.6               | [ckpt](https://github.com/yjh0410/FreeYOLOv2/releases/download/yolo_free_v2_weights/yolo_free_v2_tiny_coco.pth) |
 | FreeYOLOv2-S |  640  |         42.0           |          42.4           |           90              |  28.3             |  8.2               | [ckpt](https://github.com/yjh0410/FreeYOLOv2/releases/download/yolo_free_v2_weights/yolo_free_v2_small_coco.pth) |
 | FreeYOLOv2-M |  640  |         47.0           |          46.8           |           62              |  72.5             |  21.0              | [ckpt](https://github.com/yjh0410/FreeYOLOv2/releases/download/yolo_free_v2_weights/yolo_free_v2_medium_coco.pth) |
