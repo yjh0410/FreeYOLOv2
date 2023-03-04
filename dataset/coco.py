@@ -83,7 +83,11 @@ class COCODataset(Dataset):
         print('use Mosaic Augmentation: {}'.format(self.mosaic_prob))
         print('use Mixup Augmentation: {}'.format(self.mixup_prob))
         print('==============================')
-
+        # segment
+        try:
+            self.use_segment = trans_config['use_segment']
+        except:
+            self.use_segment = False
 
 
     def __len__(self):
@@ -96,71 +100,51 @@ class COCODataset(Dataset):
 
 
     def load_image_target(self, index):
-        anno_ids = self.coco.getAnnIds(imgIds=[int(index)], iscrowd=0)
-        annotations = self.coco.loadAnns(anno_ids)
-
         # load an image
-        img_file = os.path.join(self.data_dir, self.image_set,
-                                '{:012}'.format(index) + '.jpg')
-        image = cv2.imread(img_file)
-        
-        if self.json_file == 'instances_val5k.json' and image is None:
-            img_file = os.path.join(self.data_dir, 'train2017',
-                                    '{:012}'.format(index) + '.jpg')
-            image = cv2.imread(img_file)
-
-        assert image is not None
-
+        image, _ = self.pull_image(index)
         height, width, channels = image.shape
-        
-        #load a target
-        anno = []
-        for label in annotations:
-            if 'bbox' in label and label['area'] > 0:   
-                xmin = np.max((0, label['bbox'][0]))
-                ymin = np.max((0, label['bbox'][1]))
-                xmax = np.min((width - 1, xmin + np.max((0, label['bbox'][2] - 1))))
-                ymax = np.min((height - 1, ymin + np.max((0, label['bbox'][3] - 1))))
-                if xmax > xmin and ymax > ymin:
-                    label_ind = label['category_id']
-                    cls_id = self.class_ids.index(label_ind)
 
-                    anno.append([xmin, ymin, xmax, ymax, cls_id])  # [xmin, ymin, xmax, ymax, label_ind]
-            # else:
-            #     print('No bbox !!!')
+        # load a target        
+        bboxes, labels, segments = self.pull_anno(index)
 
-        # guard against no boxes via resizing
-        anno = np.array(anno).reshape(-1, 5)
-        target = {
-            "boxes": anno[:, :4],
-            "labels": anno[:, 4],
-            "orig_size": [height, width]
-        }
-        
+        if self.use_segment:
+            target = {
+                "boxes": bboxes,
+                "labels": labels,
+                'segments': segments,
+                "orig_size": [height, width]
+            }
+        else:
+            target = {
+                "boxes": bboxes,
+                "labels": labels,
+                "orig_size": [height, width]
+            }
+
         return image, target
 
 
     def load_mosaic(self, index, load_4x=True):
         if load_4x:
             # load 4x mosaic image
-            ids_list_ = self.ids[:index] + self.ids[index+1:]
+            index_list = np.arange(index).tolist() + np.arange(index+1, len(self.ids)).tolist()
             # random sample other indexs
-            id1 = self.ids[index]
-            id2, id3, id4 = random.sample(ids_list_, 3)
-            ids = [id1, id2, id3, id4]
+            id1 = index
+            id2, id3, id4 = random.sample(index_list, 3)
+            indexs = [id1, id2, id3, id4]
 
         else:
             # load 9x mosaic image
-            ids_list_ = self.ids[:index] + self.ids[index+1:]
+            index_list = np.arange(index).tolist() + np.arange(index+1, len(self.ids)).tolist()
             # random sample other indexs
-            id1 = self.ids[index]
-            id2_9 = random.sample(ids_list_, 8)
-            ids = [id1] + id2_9
+            id1 = index
+            id2_9 = random.sample(index_list, 8)
+            indexs = [id1] + id2_9
 
         image_list = []
         target_list = []
-        for id_ in ids:
-            img_i, target_i = self.load_image_target(id_)
+        for index in indexs:
+            img_i, target_i = self.load_image_target(index)
             image_list.append(img_i)
             target_list.append(target_i)
 
@@ -196,8 +180,7 @@ class COCODataset(Dataset):
 
         # load an image and target
         else:
-            img_id = self.ids[index]
-            image, target = self.load_image_target(img_id)
+            image, target = self.load_image_target(index)
 
         # augment
         image, target = self.transform(image, target, mosaic)
@@ -206,41 +189,61 @@ class COCODataset(Dataset):
 
 
     def pull_image(self, index):
-        id_ = self.ids[index]
+        img_id = self.ids[index]
         img_file = os.path.join(self.data_dir, self.image_set,
-                                '{:012}'.format(id_) + '.jpg')
-        img = cv2.imread(img_file)
+                                '{:012}'.format(img_id) + '.jpg')
+        image = cv2.imread(img_file)
 
-        if self.json_file == 'instances_val5k.json' and img is None:
+        if self.json_file == 'instances_val5k.json' and image is None:
             img_file = os.path.join(self.data_dir, 'train2017',
-                                    '{:012}'.format(id_) + '.jpg')
-            img = cv2.imread(img_file)
+                                    '{:012}'.format(img_id) + '.jpg')
+            image = cv2.imread(img_file)
 
-        return img, id_
+        assert image is not None
+
+        return image, img_id
 
 
     def pull_anno(self, index):
-        id_ = self.ids[index]
-
-        anno_ids = self.coco.getAnnIds(imgIds=[int(id_)], iscrowd=None)
+        img_id = self.ids[index]
+        im_ann = self.coco.loadImgs(img_id)[0]
+        anno_ids = self.coco.getAnnIds(imgIds=[int(img_id)], iscrowd=False)
         annotations = self.coco.loadAnns(anno_ids)
-        
-        anno = []
-        for label in annotations:
-            if 'bbox' in label:
-                xmin = np.max((0, label['bbox'][0]))
-                ymin = np.max((0, label['bbox'][1]))
-                xmax = xmin + label['bbox'][2]
-                ymax = ymin + label['bbox'][3]
-                
-                if label['area'] > 0 and xmax >= xmin and ymax >= ymin:
-                    label_ind = label['category_id']
-                    cls_id = self.class_ids.index(label_ind)
 
-                    anno.append([xmin, ymin, xmax, ymax, cls_id])  # [xmin, ymin, xmax, ymax, label_ind]
-            else:
-                print('No bbox !!')
-        return anno
+        # image infor
+        width = im_ann['width']
+        height = im_ann['height']
+        
+        #load a target
+        bboxes = []
+        labels = []
+        segments = []
+        for anno in annotations:
+            if 'bbox' in anno and anno['area'] > 0:
+                # bbox
+                x1 = np.max((0, anno['bbox'][0]))
+                y1 = np.max((0, anno['bbox'][1]))
+                x2 = np.min((width - 1, x1 + np.max((0, anno['bbox'][2] - 1))))
+                y2 = np.min((height - 1, y1 + np.max((0, anno['bbox'][3] - 1))))
+                if x2 < x1 or y2 < y1:
+                    continue
+                # class label
+                cls_id = self.class_ids.index(anno['category_id'])
+                
+                bboxes.append([x1, y1, x2, y2])
+                labels.append(cls_id)
+
+                if self.use_segment:
+                    polygons = anno['segmentation']
+                    polygons = [np.array(poly).reshape(-1, 2) for poly in polygons]
+                    segments.append(polygons)
+
+
+        # guard against no boxes via resizing
+        bboxes = np.array(bboxes).reshape(-1, 4)
+        labels = np.array(labels).reshape(-1)
+        
+        return bboxes, labels, segments
 
 
 if __name__ == "__main__":
@@ -248,7 +251,7 @@ if __name__ == "__main__":
     import argparse
     from transforms import TrainTransforms, ValTransforms
     
-    parser = argparse.ArgumentParser(description='FreeYOLO-Seg')
+    parser = argparse.ArgumentParser(description='FreeYOLO')
 
     # opt
     parser.add_argument('--root', default='D:\\python_work\\object-detection\\dataset\\COCO',
@@ -265,7 +268,8 @@ if __name__ == "__main__":
         'perspective': 0.0,
         'hsv_h': 0.015,
         'hsv_s': 0.7,
-        'hsv_v': 0.4
+        'hsv_v': 0.4,
+        'use_segment': False,
     }
     train_transform = TrainTransforms(
         trans_config=trans_config,
