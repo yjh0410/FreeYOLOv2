@@ -2,7 +2,14 @@ import torch
 import torch.nn as nn
 
 model_urls = {
-    'elannet_nano': "https://github.com/yjh0410/image_classification_pytorch/releases/download/weight/elannet_nano.pth",
+    'elannet_pico': "https://github.com/yjh0410/image_classification_pytorch/releases/download/weight/elannet_nano.pth",
+    'elannet_nano': "https://github.com/yjh0410/image_classification_pytorch/releases/download/weight/elannet_tiny.pth",
+    'elannet_tiny': None,
+    'elannet_small': "https://github.com/yjh0410/image_classification_pytorch/releases/download/weight/elannet_small.pth",
+    'elannet_medium': "https://github.com/yjh0410/image_classification_pytorch/releases/download/weight/elannet_medium.pth",
+    'elannet_large': "https://github.com/yjh0410/image_classification_pytorch/releases/download/weight/elannet_large.pth",
+    'elannet_huge': "https://github.com/yjh0410/image_classification_pytorch/releases/download/weight/elannet_huge.pth",
+
 }
 
 
@@ -334,9 +341,24 @@ def build_elannet(cfg):
             norm_type=cfg['bk_norm'],
             depthwise=cfg['bk_dpw']
             )
+        
         # check whether to load imagenet pretrained weight
-        if cfg['width'] == 0.25 and cfg['depth'] == 0.34 and cfg['bk_dpw']:
-            backbone = load_weight(backbone, model_name='elannet_nano')
+        if cfg['pretrained']:
+            if cfg['width'] == 0.25 and cfg['depth'] == 0.34 and cfg['bk_dpw']:
+                arch = 'elannet_pico'
+            elif cfg['width'] == 0.25 and cfg['depth'] == 0.34 and not cfg['bk_dpw']:
+                arch = 'elannet_nano'
+            elif cfg['width'] == 0.375 and cfg['depth'] == 0.34 and not cfg['bk_dpw']:
+                arch = 'elannet_tiny'
+            elif cfg['width'] == 0.5 and cfg['depth'] == 0.34 and not cfg['bk_dpw']:
+                arch = 'elannet_small'
+            elif cfg['width'] == 0.75 and cfg['depth'] == 0.67 and not cfg['bk_dpw']:
+                arch = 'elannet_medium'
+            elif cfg['width'] == 1.0 and cfg['depth'] == 1.0 and not cfg['bk_dpw']:
+                arch = 'elannet_large'
+            elif cfg['width'] == 1.25 and cfg['depth'] == 1.34 and not cfg['bk_dpw']:
+                arch = 'elannet_huge'
+            backbone = load_weight(backbone, model_name=arch)
 
     feat_dims = backbone.feat_dims
 
@@ -346,7 +368,7 @@ def build_elannet(cfg):
 # load pretrained weight
 def load_weight(model, model_name):
     # load weight
-    print('Loading pretrained weight ...')
+    print('Load pretrained weight {}'.format(model_name))
     url = model_urls[model_name]
     if url is not None:
         checkpoint = torch.hub.load_state_dict_from_url(
@@ -379,11 +401,12 @@ if __name__ == '__main__':
     cfg = {
         'bk_act': 'lrelu',
         'bk_norm': 'BN',
-        'bk_dpw': True,
+        'bk_dpw': False,
         'p6_feat': False,
         'p7_feat': False,
-        'width': 0.25,
-        'depth': 0.34,
+        'width': 1.25,
+        'depth': 1.34,
+        'pretrained': True
     }
     model, feats = build_elannet(cfg)
     x = torch.randn(1, 3, 256, 256)
