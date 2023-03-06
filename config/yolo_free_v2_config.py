@@ -24,6 +24,7 @@ yolo_free_v2_config = {
                           },
         # model
         'backbone': 'elannet',
+        'pretrained': True,
         'bk_act': 'lrelu',
         'bk_norm': 'BN',
         'bk_dpw': True,
@@ -98,6 +99,7 @@ yolo_free_v2_config = {
                           },
         # model
         'backbone': 'elannet',
+        'pretrained': True,
         'bk_act': 'lrelu',
         'bk_norm': 'BN',
         'bk_dpw': False,
@@ -172,6 +174,7 @@ yolo_free_v2_config = {
                           },
         # model
         'backbone': 'elannet',
+        'pretrained': True,
         'bk_act': 'lrelu',
         'bk_norm': 'BN',
         'bk_dpw': False,
@@ -246,6 +249,7 @@ yolo_free_v2_config = {
                           },
         # model
         'backbone': 'elannet',
+        'pretrained': True,
         'bk_act': 'silu',
         'bk_norm': 'BN',
         'bk_dpw': False,
@@ -320,6 +324,7 @@ yolo_free_v2_config = {
                           },
         # model
         'backbone': 'elannet',
+        'pretrained': True,
         'bk_act': 'silu',
         'bk_norm': 'BN',
         'bk_dpw': False,
@@ -394,6 +399,7 @@ yolo_free_v2_config = {
                           },
         # model
         'backbone': 'elannet',
+        'pretrained': True,
         'bk_act': 'silu',
         'bk_norm': 'BN',
         'bk_dpw': False,
@@ -468,6 +474,7 @@ yolo_free_v2_config = {
                           },
         # model
         'backbone': 'elannet',
+        'pretrained': True,
         'bk_act': 'silu',
         'bk_norm': 'BN',
         'bk_dpw': False,
