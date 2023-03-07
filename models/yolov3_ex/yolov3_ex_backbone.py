@@ -2,6 +2,10 @@ import torch
 import torch.nn as nn
 import os
 
+model_urls = {
+    "darknet53": "https://github.com/yjh0410/image_classification_pytorch/releases/download/weight/darknet53_silu.pth",
+}
+
 
 def get_activation(act_type=None):
     if act_type == 'relu':
@@ -189,13 +193,42 @@ class DarkNet53(nn.Module):
         return outputs
 
 
-def build_darknet53(cfg): 
+def build_backbone(cfg): 
     """Constructs a darknet-53 model.
     Args:
         pretrained (bool): If True, returns a model pre-trained on ImageNet
     """
     backbone = DarkNet53(cfg['csp_block'], cfg['bk_act'], cfg['bk_norm'])
     feat_dims = backbone.feat_dims
+
+    if cfg['pretrained']:
+        if cfg['csp_block']:
+            arc = 'cspdarknet53'
+        else:
+            arc = 'darknet53'
+        url = model_urls[arc]
+        if url is not None:
+            print('Loading pretrained weight ...')
+            checkpoint = torch.hub.load_state_dict_from_url(
+                url=url, map_location="cpu", check_hash=True)
+            # checkpoint state dict
+            checkpoint_state_dict = checkpoint.pop("model")
+            # model state dict
+            model_state_dict = backbone.state_dict()
+            # check
+            for k in list(checkpoint_state_dict.keys()):
+                if k in model_state_dict:
+                    shape_model = tuple(model_state_dict[k].shape)
+                    shape_checkpoint = tuple(checkpoint_state_dict[k].shape)
+                    if shape_model != shape_checkpoint:
+                        checkpoint_state_dict.pop(k)
+                else:
+                    checkpoint_state_dict.pop(k)
+                    print(k)
+
+            backbone.load_state_dict(checkpoint_state_dict)
+        else:
+            print('No backbone pretrained: {}'.format(arc))        
 
     return backbone, feat_dims
 
@@ -208,7 +241,7 @@ if __name__ == '__main__':
         'bk_norm': 'BN',
         'csp_block': True,
     }
-    model, feats = build_darknet53(cfg)
+    model, feats = build_backbone(cfg)
     x = torch.randn(1, 3, 224, 224)
     t0 = time.time()
     outputs = model(x)

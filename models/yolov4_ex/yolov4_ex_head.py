@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 
-from ..basic.conv import Conv
+from .yolov4_ex_basic import Conv
 
 
 class DecoupledHead(nn.Module):
@@ -40,3 +40,10 @@ class DecoupledHead(nn.Module):
         reg_feats = self.reg_feats(x)
 
         return cls_feats, reg_feats
+    
+
+# build detection head
+def build_head(cfg, in_dim):
+    head = DecoupledHead(in_dim, cfg) 
+
+    return head

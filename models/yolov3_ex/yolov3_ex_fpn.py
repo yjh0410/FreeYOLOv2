@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from ..basic.conv import Conv, ConvBlocks
+from .yolov3_ex_basic import Conv, ConvBlocks
 
 
 # BasicFPN
@@ -76,3 +76,18 @@ class BasicFPN(nn.Module):
             return out_feats_proj
 
         return out_feats
+
+
+def build_fpn(cfg, in_dims, out_dim=None):
+    model = cfg['fpn']
+    # build neck
+    if model == 'basic_fpn':
+        fpn_net = BasicFPN(in_dims=in_dims,
+                            out_dim=out_dim,
+                            width=cfg['width'],
+                            depth=cfg['depth'],
+                            act_type=cfg['fpn_act'],
+                            norm_type=cfg['fpn_norm']
+                            )
+
+    return fpn_net

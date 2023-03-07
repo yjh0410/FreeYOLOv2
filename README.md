@@ -79,7 +79,8 @@ python train.py --cuda -d coco -v yolo_free_v2_tiny -bs 16 --max_epoch 300 --wp_
 | FreeYOLOv2-L |  640  |                        |                         |                           |  144.2            |  41.8              |  |
 | FreeYOLOv2-H |  640  |                        |                         |                           |  250.1            |  72.5              |  |
 
-*We use the **imagenet pretrained weight** for the backbone of **FreeYOLOv2-P** for stronger performance, while other models are trained from the scratch.*
+*Since I have only 1 GPU (RTX 3090 with 24G memory), which means that I can only set the batch size to 16 (8 for Huge) to prevent OOM, I must load
+ the **imagenet pretrained weight** for the backbone.*
 
 | Model        | Scale | AP<sup>val<br>0.5:0.95 | AP<sup>test<br>0.5:0.95 | FPS<sup>3090<br>FP32-bs1  | FLOPs<br><sup>(G) | Params<br><sup>(M) | Weight |
 |--------------|-------|------------------------|-------------------------|---------------------------|-------------------|--------------------|--------|

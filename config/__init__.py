@@ -1,4 +1,6 @@
 from .yolo_free_v2_config import yolo_free_v2_config
+from .yolov3_ex_config import yolov3_ex_config
+from .yolov4_ex_config import yolov4_ex_config
 
 
 def build_config(args):
@@ -16,5 +18,11 @@ def build_config(args):
                         'yolo_free_v2_huge_p7'   # P7
                         ]:
         cfg = yolo_free_v2_config[args.version]
+
+    elif args.version == 'yolov3_ex':
+        cfg = yolov3_ex_config[args.version]
+
+    elif args.version == 'yolov4_ex':
+        cfg = yolov4_ex_config[args.version]
 
     return cfg

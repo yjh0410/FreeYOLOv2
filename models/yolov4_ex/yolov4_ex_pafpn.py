@@ -1,8 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from ..basic.conv import Conv
-from ..basic.cspblock import CSPBlock
+from .yolov4_ex_basic import Conv, CSPBlock
 
 
 # PaFPN-CSP
@@ -90,3 +89,21 @@ class CSP_PaFPN(nn.Module):
             return out_feats_proj
 
         return out_feats
+
+
+def build_fpn(cfg, in_dims, out_dim=None):
+    model = cfg['fpn']
+    # build neck
+    if model == 'csp_pafpn':
+        fpn_net = CSP_PaFPN(in_dims=in_dims,
+                             out_dim=out_dim,
+                             width=cfg['width'],
+                             depth=cfg['depth'],
+                             act_type=cfg['fpn_act'],
+                             norm_type=cfg['fpn_norm'],
+                             depthwise=cfg['fpn_depthwise']
+                             )
+
+
+    return fpn_net
+

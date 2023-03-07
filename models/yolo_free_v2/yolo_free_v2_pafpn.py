@@ -1,8 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from ..basic.conv import Conv
-from ..basic.elan_block import ELANBlock, DownSample
+from .yolo_free_v2_basic import Conv, ELANBlock, DownSample
 
 
 # PaFPN-ELAN
@@ -441,4 +440,38 @@ class ELAN_PaFPN_P7(nn.Module):
             return out_feats_proj
 
         return out_feats
-        
+
+
+def build_fpn(cfg, in_dims, out_dim=None):
+    model = cfg['fpn']
+    # build neck
+    if model == 'elan_pafpn':
+        fpn_net = ELAN_PaFPN(in_dims=in_dims,
+                             out_dim=out_dim,
+                             width=cfg['width'],
+                             depth=cfg['depth'],
+                             act_type=cfg['fpn_act'],
+                             norm_type=cfg['fpn_norm'],
+                             depthwise=cfg['fpn_depthwise']
+                             )
+    elif model == 'elan_pafpn_p6':
+        fpn_net = ELAN_PaFPN_P6(in_dims=in_dims,
+                                out_dim=out_dim,
+                                width=cfg['width'],
+                                depth=cfg['depth'],
+                                act_type=cfg['fpn_act'],
+                                norm_type=cfg['fpn_norm'],
+                                depthwise=cfg['fpn_depthwise']
+                                )
+    elif model == 'elan_pafpn_p7':
+        fpn_net = ELAN_PaFPN_P7(in_dims=in_dims,
+                                out_dim=out_dim,
+                                width=cfg['width'],
+                                depth=cfg['depth'],
+                                act_type=cfg['fpn_act'],
+                                norm_type=cfg['fpn_norm'],
+                                depthwise=cfg['fpn_depthwise']
+                                )
+
+    return fpn_net
+
