@@ -76,7 +76,7 @@ python train.py --cuda -d coco -v yolo_free_v2_tiny -bs 16 --max_epoch 300 --wp_
 | FreeYOLOv2-T |  640  |         37.6           |          38.0           |           87              |  16.1             |  4.6               | [ckpt](https://github.com/yjh0410/FreeYOLOv2/releases/download/yolo_free_v2_weights/yolo_free_v2_tiny_coco.pth) |
 | FreeYOLOv2-S |  640  |         42.0           |          42.4           |           90              |  28.3             |  8.2               | [ckpt](https://github.com/yjh0410/FreeYOLOv2/releases/download/yolo_free_v2_weights/yolo_free_v2_small_coco.pth) |
 | FreeYOLOv2-M |  640  |         47.0           |          46.8           |           62              |  72.5             |  21.0              | [ckpt](https://github.com/yjh0410/FreeYOLOv2/releases/download/yolo_free_v2_weights/yolo_free_v2_medium_coco.pth) |
-| FreeYOLOv2-L |  640  |                        |                         |                           |  144.2            |  41.8              |  |
+| FreeYOLOv2-L |  640  |         48.6           |                         |                           |  144.2            |  41.8              |  |
 | FreeYOLOv2-H |  640  |                        |                         |                           |  250.1            |  72.5              |  |
 
 *Since I have only 1 GPU (RTX 3090 with 24G memory), which means that I can only set the batch size to 16 (8 for Huge) to prevent OOM, I must load
@@ -84,15 +84,15 @@ python train.py --cuda -d coco -v yolo_free_v2_tiny -bs 16 --max_epoch 300 --wp_
 
 | Model        | Scale | AP<sup>val<br>0.5:0.95 | AP<sup>test<br>0.5:0.95 | FPS<sup>3090<br>FP32-bs1  | FLOPs<br><sup>(G) | Params<br><sup>(M) | Weight |
 |--------------|-------|------------------------|-------------------------|---------------------------|-------------------|--------------------|--------|
-| FreeYOLOvx-P |  416  |                        |                         |                           |  1.3              |  0.9               |  |
-| FreeYOLOvx-N |  640  |                        |                         |                           |  6.8              |  1.7               |  |
-| FreeYOLOvx-T |  640  |                        |                         |                           |  16.0             |  4.6               |  |
-| FreeYOLOvx-S |  640  |                        |                         |                           |  28.2             |  8.2               |  |
-| FreeYOLOvx-M |  640  |                        |                         |                           |  72.4             |  21.0              |  |
-| FreeYOLOvx-L |  640  |                        |                         |                           |  144.1            |  41.8              |  |
-| FreeYOLOvx-H |  640  |                        |                         |                           |  250.0            |  72.5              |  |
+| FreeYOLOvx-P |  416  |                        |                         |                           |  1.4              |  1.0               |  |
+| FreeYOLOvx-N |  640  |                        |                         |                           |                |                 |  |
+| FreeYOLOvx-T |  640  |                        |                         |                           |               |                 |  |
+| FreeYOLOvx-S |  640  |                        |                         |                           |               |                 |  |
+| FreeYOLOvx-M |  640  |                        |                         |                           |               |                |  |
+| FreeYOLOvx-L |  640  |                        |                         |                           |              |                |  |
+| FreeYOLOvx-H |  640  |                        |                         |                           |              |                |  |
 
-**P6-Model on COCO:**
+<!-- **P6-Model on COCO:**
 
 | Model         | Scale | AP<sup>val<br>0.5:0.95 | AP<sup>test<br>0.5:0.95 |FPS<sup>3090<br>FP32-bs1 | FLOPs<br><sup>(G) | Params<br><sup>(M) | Weight |
 |---------------|-------|------------------------|-------------------------|---------------------------|-------------------|--------------------|--------|
@@ -112,7 +112,7 @@ python train.py --cuda -d coco -v yolo_free_v2_tiny -bs 16 --max_epoch 300 --wp_
 | FreeYOLOv2-S7 | 1280  |                        |                         |                           |  104.5            |  16.5              |  |
 | FreeYOLOv2-M7 | 1280  |                        |                         |                           |  275.8            |  45.8              |  |
 | FreeYOLOv2-L7 | 1280  |                        |                         |                           |  564.4            |  97.0              |  |
-| FreeYOLOv2-H7 | 1280  |                        |                         |                           |  998.4            |  176.0             |  |
+| FreeYOLOv2-H7 | 1280  |                        |                         |                           |  998.4            |  176.0             |  | -->
 
 *All FLOPs are measured with a 640x640 or 1280x1280 image size on COCO val2017. The FPS is measured with batch size 1 on 3090 GPU from the model inference to the NMS operation.*
 
