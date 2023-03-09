@@ -78,9 +78,9 @@ python train.py --cuda -d coco -v yolo_free_v2_tiny -bs 16 --max_epoch 300 --wp_
 | FreeYOLOv2-L |  640  |                        |                         |                           |  144.2            |  41.8              |  |
 | FreeYOLOv2-H |  640  |                        |                         |                           |  250.1            |  72.5              |  |
 
-* 训练**FreeYOLOv2-Pico**时，我们使用了**imagenet预训练权重**作为其backbone的初始参数。训练其他模型时，均采用**从头训练**的策略。*
+*由于我只有1个RTX 3090型号的GPU，所以在训练**FreeYOLOv2-L**和**FreeYOLOv2-H**时，使用了ImageNet预训练权重来初始化backbone，对于最小的**FreeYOLOv2-Pico**，我也用了预训练权重，其他模型均采用**从头训练**的策略。*
 
-**P6-Model on COCO:**
+<!-- **P6-Model on COCO:**
 
 | Model         | Scale | AP<sup>val<br>0.5:0.95 | AP<sup>test<br>0.5:0.95 |FPS<sup>3090<br>FP32-bs1 | FLOPs<br><sup>(G) | Params<br><sup>(M) | Weight |
 |---------------|-------|------------------------|-------------------------|---------------------------|-------------------|--------------------|--------|
@@ -102,7 +102,7 @@ python train.py --cuda -d coco -v yolo_free_v2_tiny -bs 16 --max_epoch 300 --wp_
 | FreeYOLOv2-S7 | 1280  |                        |                         |                           |  104.5            |  16.5              |  |
 | FreeYOLOv2-M7 | 1280  |                        |                         |                           |  275.8            |  45.8              |  |
 | FreeYOLOv2-L7 | 1280  |                        |                         |                           |  564.4            |  97.0              |  |
-| FreeYOLOv2-H7 | 1280  |                        |                         |                           |  998.4            |  176.0             |  |
+| FreeYOLOv2-H7 | 1280  |                        |                         |                           |  998.4            |  176.0             |  | -->
 
 *所有的FLOPs都是在COCO-val数据集上以640x640或1280x1280的输入尺寸来测试的。FPS指标是在一张3090型号的GPU上以batch size=1的输入来测试的，请注意，测速的内容包括模型前向推理、后处理以及NMS操作。*
 
