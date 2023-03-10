@@ -79,26 +79,26 @@ class ELAN_CSPNet(nn.Module):
         # stride = 4
         self.layer_2 = nn.Sequential(
             Conv(int(64*width), int(128*width), k=3, p=1, s=2, act_type=act_type, norm_type=norm_type),
-            ELAN_CSP_Block(int(128*width), int(128*width), expand_ratio=0.5, nblocks=int(3*depth),
-                           shortcut=True, act_type=act_type, norm_type=norm_type, depthwise=depthwise)
+            ELAN_CSP_Block(int(128*width), int(128*width), nblocks=int(3*depth), shortcut=True,
+                           act_type=act_type, norm_type=norm_type, depthwise=depthwise)
         )
         # stride = 8
         self.layer_3 = nn.Sequential(
             Conv(int(128*width), int(256*width), k=3, p=1, s=2, act_type=act_type, norm_type=norm_type),
-            ELAN_CSP_Block(int(256*width), int(256*width), expand_ratio=0.5, nblocks=int(6*depth),
-                           shortcut=True, act_type=act_type, norm_type=norm_type, depthwise=depthwise)
+            ELAN_CSP_Block(int(256*width), int(256*width), nblocks=int(9*depth), shortcut=True,
+                           act_type=act_type, norm_type=norm_type, depthwise=depthwise)
         )
         # stride = 16
         self.layer_4 = nn.Sequential(
             Conv(int(256*width), int(512*width), k=3, p=1, s=2, act_type=act_type, norm_type=norm_type),
-            ELAN_CSP_Block(int(512*width), int(512*width), expand_ratio=0.5, nblocks=int(6*depth),
-                           shortcut=True, act_type=act_type, norm_type=norm_type, depthwise=depthwise)
+            ELAN_CSP_Block(int(512*width), int(512*width), nblocks=int(9*depth), shortcut=True,
+                           act_type=act_type, norm_type=norm_type, depthwise=depthwise)
         )
         # stride = 32
         self.layer_5 = nn.Sequential(
             Conv(int(512*width), int(512*width*ratio), k=3, p=1, s=2, act_type=act_type, norm_type=norm_type),
-            ELAN_CSP_Block(int(512*width*ratio), int(512*width*ratio), expand_ratio=0.5, nblocks=int(3*depth),
-                           shortcut=True, act_type=act_type, norm_type=norm_type, depthwise=depthwise)
+            ELAN_CSP_Block(int(512*width*ratio), int(512*width*ratio), nblocks=int(6*depth), shortcut=True,
+                           act_type=act_type, norm_type=norm_type, depthwise=depthwise)
         )
 
 
