@@ -91,7 +91,7 @@ class Bottleneck(nn.Module):
                  norm_type='BN'):
         super(Bottleneck, self).__init__()
         inter_dim = int(out_dim * expand_ratio)  # hidden channels            
-        self.cv1 = Conv(in_dim, inter_dim, k=3, p=1, norm_type=norm_type, act_type=act_type, depthwise=depthwise)
+        self.cv1 = Conv(in_dim, inter_dim, k=1, norm_type=norm_type, act_type=act_type, depthwise=depthwise)
         self.cv2 = Conv(inter_dim, out_dim, k=3, p=1, norm_type=norm_type, act_type=act_type, depthwise=depthwise)
         self.shortcut = shortcut and in_dim == out_dim
 
