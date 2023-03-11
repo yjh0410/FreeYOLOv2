@@ -37,7 +37,7 @@ class FreeYOLOv2(nn.Module):
         self.no_decode = no_decode
         
         # --------- Network Parameters ----------
-        self.proj_conv = nn.Conv2d(self.reg_max + 1, 1, kernel_size=1, bias=False)
+        self.proj_conv = nn.Conv2d(self.reg_max, 1, kernel_size=1, bias=False)
 
         ## backbone
         self.backbone, feats_dim = build_backbone(cfg=cfg)
@@ -62,7 +62,7 @@ class FreeYOLOv2(nn.Module):
                                 for head in self.non_shared_heads
                               ]) 
         self.reg_preds = nn.ModuleList(
-                            [nn.Conv2d(head.reg_out_dim, 4*(cfg['reg_max'] + 1), kernel_size=1) 
+                            [nn.Conv2d(head.reg_out_dim, 4*(cfg['reg_max']), kernel_size=1) 
                                 for head in self.non_shared_heads
                               ])                 
 
@@ -93,8 +93,8 @@ class FreeYOLOv2(nn.Module):
             w.data.fill_(0.)
             reg_pred.weight = torch.nn.Parameter(w, requires_grad=True)
 
-        self.proj = nn.Parameter(torch.linspace(0, self.reg_max, self.reg_max + 1), requires_grad=False)
-        self.proj_conv.weight = nn.Parameter(self.proj.view([1, self.reg_max + 1, 1, 1]).clone().detach(),
+        self.proj = nn.Parameter(torch.linspace(0, self.reg_max, self.reg_max), requires_grad=False)
+        self.proj_conv.weight = nn.Parameter(self.proj.view([1, self.reg_max, 1, 1]).clone().detach(),
                                                    requires_grad=False)
 
 
@@ -117,17 +117,17 @@ class FreeYOLOv2(nn.Module):
         """
         Input:
             anchors:  (List[Tensor]) [1, M, 2]
-            pred_reg: (List[Tensor]) [B, M, 4*(reg_max + 1)]
+            pred_reg: (List[Tensor]) [B, M, 4*(reg_max)]
         Output:
             pred_box: (Tensor) [B, M, 4]
         """
         if self.use_dfl:
             B, M = pred_regs.shape[:2]
-            # [B, M, 4*(reg_max + 1)] -> [B, M, 4, reg_max + 1] -> [B, 4, M, reg_max + 1]
-            pred_regs = pred_regs.reshape([B, M, 4, self.reg_max + 1])
-            # [B, M, 4, reg_max + 1] -> [B, reg_max + 1, 4, M]
+            # [B, M, 4*(reg_max)] -> [B, M, 4, reg_max] -> [B, 4, M, reg_max]
+            pred_regs = pred_regs.reshape([B, M, 4, self.reg_max])
+            # [B, M, 4, reg_max] -> [B, reg_max, 4, M]
             pred_regs = pred_regs.permute(0, 3, 2, 1).contiguous()
-            # [B, reg_max + 1, 4, M] -> [B, 1, 4, M]
+            # [B, reg_max, 4, M] -> [B, 1, 4, M]
             pred_regs = self.proj_conv(F.softmax(pred_regs, dim=1))
             # [B, 1, 4, M] -> [B, 4, M] -> [B, M, 4]
             pred_regs = pred_regs.view(B, 4, M).permute(0, 2, 1).contiguous()
@@ -144,7 +144,7 @@ class FreeYOLOv2(nn.Module):
         """
         Input:
             cls_preds: List(Tensor) [[B, H x W, C], ...]
-            reg_preds: List(Tensor) [[B, H x W, 4*(reg_max + 1)], ...]
+            reg_preds: List(Tensor) [[B, H x W, 4*(reg_max)], ...]
             anchors:   List(Tensor) [[H x W, 2], ...]
         """
         all_scores = []
@@ -224,7 +224,7 @@ class FreeYOLOv2(nn.Module):
 
             # pred
             cls_pred = self.cls_preds[level](cls_feat)  # [B, C, H, W]
-            reg_pred = self.reg_preds[level](reg_feat)  # [B, 4*(reg_max + 1), H, W]
+            reg_pred = self.reg_preds[level](reg_feat)  # [B, 4*(reg_max), H, W]
 
             if self.no_decode:
                 anchors = None
@@ -236,7 +236,7 @@ class FreeYOLOv2(nn.Module):
 
             # [B, C, H, W] -> [B, H, W, C] -> [B, M, C]
             cls_pred = cls_pred.permute(0, 2, 3, 1).contiguous().view(B, -1, self.num_classes)
-            reg_pred = reg_pred.permute(0, 2, 3, 1).contiguous().view(B, -1, 4*(self.reg_max + 1))
+            reg_pred = reg_pred.permute(0, 2, 3, 1).contiguous().view(B, -1, 4*self.reg_max)
 
             all_cls_preds.append(cls_pred)
             all_reg_preds.append(reg_pred)
@@ -246,14 +246,14 @@ class FreeYOLOv2(nn.Module):
             B, M = cls_pred.shape[:2]
             # no post process
             cls_preds = torch.cat(all_cls_preds, dim=1)  # [B, M, C]
-            reg_preds = torch.cat(all_reg_preds, dim=1)  # [B, M, 4*(reg_max + 1)]
+            reg_preds = torch.cat(all_reg_preds, dim=1)  # [B, M, 4*(reg_max)]
 
             if self.use_dfl:
-                # [B, M, 4*(reg_max + 1)] -> [B, M, 4, reg_max + 1] -> [B, 4, M, reg_max + 1]
-                reg_preds = reg_preds.reshape([B, M, 4, self.reg_max + 1])
-                # [B, M, 4, reg_max + 1] -> [B, reg_max + 1, 4, M]
+                # [B, M, 4*(reg_max)] -> [B, M, 4, reg_max] -> [B, 4, M, reg_max]
+                reg_preds = reg_preds.reshape([B, M, 4, self.reg_max])
+                # [B, M, 4, reg_max] -> [B, reg_max, 4, M]
                 reg_preds = reg_preds.permute(0, 3, 2, 1).contiguous()
-                # [B, reg_max + 1, 4, M] -> [B, 1, 4, M]
+                # [B, reg_max, 4, M] -> [B, 1, 4, M]
                 reg_preds = self.proj_conv(F.softmax(reg_preds, dim=1))
                 # [B, 1, 4, M] -> [B, 4, M] -> [B, M, 4]
                 reg_preds = reg_preds.view(B, 4, M).permute(0, 2, 1).contiguous()
@@ -301,7 +301,7 @@ class FreeYOLOv2(nn.Module):
 
                 # pred
                 cls_pred = self.cls_preds[level](cls_feat)  # [B, C, H, W]
-                reg_pred = self.reg_preds[level](reg_feat)  # [B, 4*(reg_max + 1), H, W]
+                reg_pred = self.reg_preds[level](reg_feat)  # [B, 4*(reg_max), H, W]
 
                 B, _, H, W = cls_pred.size()
                 fmp_size = [H, W]
@@ -310,7 +310,7 @@ class FreeYOLOv2(nn.Module):
                 
                 # [B, C, H, W] -> [B, H, W, C] -> [B, M, C]
                 cls_pred = cls_pred.permute(0, 2, 3, 1).contiguous().view(B, -1, self.num_classes)
-                reg_pred = reg_pred.permute(0, 2, 3, 1).contiguous().view(B, -1, 4*(self.reg_max + 1))
+                reg_pred = reg_pred.permute(0, 2, 3, 1).contiguous().view(B, -1, 4*self.reg_max)
 
                 # decode box: [B, M, 4]
                 box_pred = self.decode_boxes(anchors, reg_pred, self.stride[level])
@@ -326,7 +326,7 @@ class FreeYOLOv2(nn.Module):
             
             # output dict
             outputs = {"pred_cls": all_cls_preds,        # List(Tensor) [B, M, C]
-                       "pred_reg": all_reg_preds,        # List(Tensor) [B, M, 4*(reg_max + 1)]
+                       "pred_reg": all_reg_preds,        # List(Tensor) [B, M, 4*(reg_max)]
                        "pred_box": all_box_preds,        # List(Tensor) [B, M, 4]
                        "anchors": all_anchors,           # List(Tensor) [M, 2]
                        "strides": self.stride,           # List(Int) = [8, 16, 32]
