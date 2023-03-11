@@ -7,9 +7,8 @@ except:
 
 
 class DecoupledHead(nn.Module):
-    def __init__(self, cfg, in_dim, out_dim):
+    def __init__(self, cfg, in_dim, fpn_dims, num_classes=80):
         super().__init__()
-
         print('==============================')
         print('Head: Decoupled Head')
         self.in_dim = in_dim
@@ -18,34 +17,39 @@ class DecoupledHead(nn.Module):
         self.act_type=cfg['head_act']
         self.norm_type=cfg['head_norm']
 
+        # cls head
         cls_feats = []
+        self.cls_out_dim = max(fpn_dims[0], num_classes)
         for i in range(cfg['num_cls_head']):
             if i == 0:
                 cls_feats.append(
-                    Conv(in_dim, out_dim, k=3, p=1, s=1, 
+                    Conv(in_dim, self.cls_out_dim, k=3, p=1, s=1, 
                         act_type=self.act_type,
                         norm_type=self.norm_type,
                         depthwise=cfg['head_depthwise'])
                         )
             else:
                 cls_feats.append(
-                    Conv(out_dim, out_dim, k=3, p=1, s=1, 
+                    Conv(self.cls_out_dim, self.cls_out_dim, k=3, p=1, s=1, 
                         act_type=self.act_type,
                         norm_type=self.norm_type,
                         depthwise=cfg['head_depthwise'])
                         )
+                
+        # reg head
         reg_feats = []
+        self.reg_out_dim = max(16, fpn_dims[0]//4, 4*(cfg['reg_max'] + 1))
         for i in range(cfg['num_reg_head']):
             if i == 0:
                 reg_feats.append(
-                    Conv(in_dim, out_dim, k=3, p=1, s=1, 
+                    Conv(in_dim, self.reg_out_dim, k=3, p=1, s=1, 
                         act_type=self.act_type,
                         norm_type=self.norm_type,
                         depthwise=cfg['head_depthwise'])
                         )
             else:
                 reg_feats.append(
-                    Conv(out_dim, out_dim, k=3, p=1, s=1, 
+                    Conv(self.reg_out_dim, self.reg_out_dim, k=3, p=1, s=1, 
                         act_type=self.act_type,
                         norm_type=self.norm_type,
                         depthwise=cfg['head_depthwise'])
@@ -66,8 +70,8 @@ class DecoupledHead(nn.Module):
     
 
 # build detection head
-def build_head(cfg, in_dim, out_dim):
-    head = DecoupledHead(cfg, in_dim, out_dim) 
+def build_head(cfg, in_dim, max_dim, num_classes=80):
+    head = DecoupledHead(cfg, in_dim, max_dim, num_classes) 
 
     return head
 
@@ -76,22 +80,23 @@ if __name__ == '__main__':
     import time
     from thop import profile
     cfg = {
-        'head_dim': 256,
         'num_cls_head': 2,
         'num_reg_head': 2,
         'head_act': 'silu',
         'head_norm': 'BN',
-        'head_depthwise': False
+        'head_depthwise': False,
+        'reg_max': 16,
     }
+    fpn_dims = [256, 512, 512]
     # Head-1
-    model = build_head(cfg, in_dim=256, out_dim=cfg['head_dim'])
+    model = build_head(cfg, 256, fpn_dims, num_classes=80)
     x = torch.randn(1, 256, 80, 80)
     t0 = time.time()
     outputs = model(x)
     t1 = time.time()
     print('Time: ', t1 - t0)
-    for out in outputs:
-        print(out.shape)
+    # for out in outputs:
+    #     print(out.shape)
 
     print('==============================')
     flops, params = profile(model, inputs=(x, ), verbose=False)
@@ -100,14 +105,14 @@ if __name__ == '__main__':
     print('Head-1: Params : {:.2f} M'.format(params / 1e6))
 
     # Head-2
-    model = build_head(cfg, in_dim=512, out_dim=cfg['head_dim'])
+    model = build_head(cfg, 512, fpn_dims, num_classes=80)
     x = torch.randn(1, 512, 40, 40)
     t0 = time.time()
     outputs = model(x)
     t1 = time.time()
     print('Time: ', t1 - t0)
-    for out in outputs:
-        print(out.shape)
+    # for out in outputs:
+    #     print(out.shape)
 
     print('==============================')
     flops, params = profile(model, inputs=(x, ), verbose=False)
@@ -116,14 +121,14 @@ if __name__ == '__main__':
     print('Head-2: Params : {:.2f} M'.format(params / 1e6))
 
     # Head-3
-    model = build_head(cfg, in_dim=512, out_dim=cfg['head_dim'])
+    model = build_head(cfg, 512, fpn_dims, num_classes=80)
     x = torch.randn(1, 512, 20, 20)
     t0 = time.time()
     outputs = model(x)
     t1 = time.time()
     print('Time: ', t1 - t0)
-    for out in outputs:
-        print(out.shape)
+    # for out in outputs:
+    #     print(out.shape)
 
     print('==============================')
     flops, params = profile(model, inputs=(x, ), verbose=False)
