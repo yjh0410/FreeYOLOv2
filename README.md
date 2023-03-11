@@ -87,8 +87,8 @@ python train.py --cuda -d coco -v yolo_free_v2_tiny -bs 16 --max_epoch 300 --wp_
 | FreeYOLOv2-T |  640  |  ×   |                        |                         |                          |                   |                    |  |
 | FreeYOLOv2-S |  640  |  ×   |                        |                         |                          |                   |                    |  |
 | FreeYOLOv2-M |  640  |  ×   |                        |                         |                          |                   |                    |  |
-| FreeYOLOv2-L |  640  |  ×   |                        |                         |                          |  153.4            |  49.2              |  |
-| FreeYOLOv2-H |  640  |  ×   |                        |                         |                          |                   |                    |  |
+| FreeYOLOv2-L |  640  |  ×   |                        |                         |                          |  163.9            |  44.4              |  |
+| FreeYOLOv2-H |  640  |  ×   |                        |                         |                          |  255.8            |  69.4              |  |
 
 <!-- **P6-Model on COCO:**
 

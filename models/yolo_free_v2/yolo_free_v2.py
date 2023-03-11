@@ -42,23 +42,24 @@ class FreeYOLOv2(nn.Module):
         
         ## fpn
         self.fpn = build_fpn(cfg=cfg, in_dims=feats_dim)
-        self.head_dim = self.fpn.out_dim
+        fpn_feats_dim = self.fpn.out_dim
 
         ## non-shared heads
+        head_dim = int(256 * cfg['width'])
         self.non_shared_heads = nn.ModuleList(
-            [build_head(cfg, in_dim=head_dim) 
-            for head_dim in self.head_dim
+            [build_head(cfg, in_dim=feat_dim, out_dim=head_dim) 
+            for feat_dim in fpn_feats_dim
             ])
 
         ## pred
         self.cls_preds = nn.ModuleList(
                             [nn.Conv2d(head_dim, self.num_classes, kernel_size=1) 
-                                for head_dim in self.head_dim
+                                for _ in range(len(self.stride))
                               ]) 
         self.reg_preds = nn.ModuleList(
                             [nn.Conv2d(head_dim, 4, kernel_size=1) 
-                                for head_dim in self.head_dim
-                              ])                 
+                                for _ in range(len(self.stride))
+                              ]) 
 
         # --------- Network Initialization ----------
         # init bias

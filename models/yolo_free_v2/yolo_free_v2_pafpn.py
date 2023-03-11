@@ -1,13 +1,16 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from .yolo_free_v2_basic import Conv, ELAN_CSP_Block
+try:
+    from .yolo_free_v2_basic import Conv, ELAN_CSP_Block
+except:
+    from yolo_free_v2_basic import Conv, ELAN_CSP_Block
 
 
 # PaFPN-ELAN
 class ELAN_CSP_PaFPN(nn.Module):
     def __init__(self, 
-                 in_dims=[128, 256, 512],
+                 in_dims=[256, 512, 512],
                  width=1.0,
                  depth=1.0,
                  act_type='silu',
@@ -118,5 +121,32 @@ def build_fpn(cfg, in_dims):
                              norm_type=cfg['fpn_norm'],
                              depthwise=cfg['fpn_depthwise']
                              )
-
     return fpn_net
+
+
+if __name__ == '__main__':
+    import time
+    from thop import profile
+    cfg = {
+        'fpn': 'elan_csp_pafpn',
+        'fpn_act': 'silu',
+        'fpn_norm': 'BN',
+        'fpn_depthwise': False,
+        'width': 1.0,
+        'depth': 1.0,
+        'ratio': 1.0,
+    }
+    model = build_fpn(cfg, in_dims=[256, 512, 512])
+    pyramid_feats = [torch.randn(1, 256, 80, 80), torch.randn(1, 512, 40, 40), torch.randn(1, 512, 20, 20)]
+    t0 = time.time()
+    outputs = model(pyramid_feats)
+    t1 = time.time()
+    print('Time: ', t1 - t0)
+    for out in outputs:
+        print(out.shape)
+
+    print('==============================')
+    flops, params = profile(model, inputs=(pyramid_feats, ), verbose=False)
+    print('==============================')
+    print('GFLOPs : {:.2f}'.format(flops / 1e9 * 2))
+    print('Params : {:.2f} M'.format(params / 1e6))

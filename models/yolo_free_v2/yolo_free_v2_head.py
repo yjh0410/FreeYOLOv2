@@ -1,11 +1,13 @@
 import torch
 import torch.nn as nn
-
-from .yolo_free_v2_basic import Conv
+try:
+    from .yolo_free_v2_basic import Conv
+except:
+    from yolo_free_v2_basic import Conv
 
 
 class DecoupledHead(nn.Module):
-    def __init__(self, in_dim, cfg):
+    def __init__(self, cfg, in_dim, out_dim):
         super().__init__()
 
         print('==============================')
@@ -16,20 +18,41 @@ class DecoupledHead(nn.Module):
         self.act_type=cfg['head_act']
         self.norm_type=cfg['head_norm']
 
-        self.cls_feats = nn.Sequential(*[
-            Conv(in_dim, in_dim, k=3, p=1, s=1, 
-                 act_type=self.act_type,
-                 norm_type=self.norm_type,
-                 depthwise=cfg['head_depthwise'])
-                 for _ in range(self.num_cls_head)]
-                 )
-        self.reg_feats = nn.Sequential(*[
-            Conv(in_dim, in_dim, k=3, p=1, s=1, 
-                 act_type=self.act_type,
-                 norm_type=self.norm_type,
-                 depthwise=cfg['head_depthwise'])
-                 for _ in range(self.num_reg_head)]
-                 )
+        cls_feats = []
+        for i in range(cfg['num_cls_head']):
+            if i == 0:
+                cls_feats.append(
+                    Conv(in_dim, out_dim, k=3, p=1, s=1, 
+                        act_type=self.act_type,
+                        norm_type=self.norm_type,
+                        depthwise=cfg['head_depthwise'])
+                        )
+            else:
+                cls_feats.append(
+                    Conv(out_dim, out_dim, k=3, p=1, s=1, 
+                        act_type=self.act_type,
+                        norm_type=self.norm_type,
+                        depthwise=cfg['head_depthwise'])
+                        )
+        reg_feats = []
+        for i in range(cfg['num_reg_head']):
+            if i == 0:
+                reg_feats.append(
+                    Conv(in_dim, out_dim, k=3, p=1, s=1, 
+                        act_type=self.act_type,
+                        norm_type=self.norm_type,
+                        depthwise=cfg['head_depthwise'])
+                        )
+            else:
+                reg_feats.append(
+                    Conv(out_dim, out_dim, k=3, p=1, s=1, 
+                        act_type=self.act_type,
+                        norm_type=self.norm_type,
+                        depthwise=cfg['head_depthwise'])
+                        )
+
+        self.cls_feats = nn.Sequential(*cls_feats)
+        self.reg_feats = nn.Sequential(*reg_feats)
 
 
     def forward(self, x):
@@ -43,7 +66,67 @@ class DecoupledHead(nn.Module):
     
 
 # build detection head
-def build_head(cfg, in_dim):
-    head = DecoupledHead(in_dim, cfg) 
+def build_head(cfg, in_dim, out_dim):
+    head = DecoupledHead(cfg, in_dim, out_dim) 
 
     return head
+
+
+if __name__ == '__main__':
+    import time
+    from thop import profile
+    cfg = {
+        'head_dim': 256,
+        'num_cls_head': 2,
+        'num_reg_head': 2,
+        'head_act': 'silu',
+        'head_norm': 'BN',
+        'head_depthwise': False
+    }
+    # Head-1
+    model = build_head(cfg, in_dim=256, out_dim=cfg['head_dim'])
+    x = torch.randn(1, 256, 80, 80)
+    t0 = time.time()
+    outputs = model(x)
+    t1 = time.time()
+    print('Time: ', t1 - t0)
+    for out in outputs:
+        print(out.shape)
+
+    print('==============================')
+    flops, params = profile(model, inputs=(x, ), verbose=False)
+    print('==============================')
+    print('Head-1: GFLOPs : {:.2f}'.format(flops / 1e9 * 2))
+    print('Head-1: Params : {:.2f} M'.format(params / 1e6))
+
+    # Head-2
+    model = build_head(cfg, in_dim=512, out_dim=cfg['head_dim'])
+    x = torch.randn(1, 512, 40, 40)
+    t0 = time.time()
+    outputs = model(x)
+    t1 = time.time()
+    print('Time: ', t1 - t0)
+    for out in outputs:
+        print(out.shape)
+
+    print('==============================')
+    flops, params = profile(model, inputs=(x, ), verbose=False)
+    print('==============================')
+    print('Head-2: GFLOPs : {:.2f}'.format(flops / 1e9 * 2))
+    print('Head-2: Params : {:.2f} M'.format(params / 1e6))
+
+    # Head-3
+    model = build_head(cfg, in_dim=512, out_dim=cfg['head_dim'])
+    x = torch.randn(1, 512, 20, 20)
+    t0 = time.time()
+    outputs = model(x)
+    t1 = time.time()
+    print('Time: ', t1 - t0)
+    for out in outputs:
+        print(out.shape)
+
+    print('==============================')
+    flops, params = profile(model, inputs=(x, ), verbose=False)
+    print('==============================')
+    print('Head-3: GFLOPs : {:.2f}'.format(flops / 1e9 * 2))
+    print('Head-3: Params : {:.2f} M'.format(params / 1e6))
