@@ -7,7 +7,7 @@ from .yolo_free_v2_basic import Conv, ELAN_CSP_Block
 # PaFPN-ELAN
 class ELAN_CSP_PaFPN(nn.Module):
     def __init__(self, 
-                 in_dims=[256, 512, 1024],
+                 in_dims=[128, 256, 512],
                  width=1.0,
                  depth=1.0,
                  act_type='silu',

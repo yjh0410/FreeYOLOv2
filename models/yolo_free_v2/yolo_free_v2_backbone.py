@@ -74,7 +74,10 @@ class ELAN_CSPNet(nn.Module):
         self.feat_dims = [int(256 * width), int(512 * width), int(512 * width * ratio)]
         
         # stride = 2
-        self.layer_1 = Conv(3, int(64*width), k=3, p=1, s=2, act_type=act_type, norm_type=norm_type)
+        self.layer_1 = nn.Sequential(
+            Conv(3, int(64*width), k=3, p=1, s=2, act_type=act_type, norm_type=norm_type),
+            Conv(int(64*width), int(64*width), k=3, p=1, s=1, act_type=act_type, norm_type=norm_type),
+        )
         
         # stride = 4
         self.layer_2 = nn.Sequential(

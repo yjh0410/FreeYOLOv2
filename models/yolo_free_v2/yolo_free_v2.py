@@ -1,6 +1,5 @@
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 
 from .yolo_free_v2_backbone import build_backbone
 from .yolo_free_v2_neck import build_neck
