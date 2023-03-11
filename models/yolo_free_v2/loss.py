@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from .matcher import TaskAlignedAssigner
-from utils.box_ops import get_ious, bbox2dist, bbox_iou
+from utils.box_ops import bbox2dist, bbox_iou
 
 
 
@@ -15,7 +15,7 @@ class Criterion(object):
         self.device = device
         self.num_classes = num_classes
         self.reg_max = cfg['reg_max']
-        self.use_dfl = cfg['reg_max'] > 0
+        self.use_dfl = cfg['reg_max'] > 1
         # loss
         self.cls_lossf = ClassificationLoss(cfg, reduction='none')
         self.reg_lossf = RegressionLoss(num_classes, cfg['reg_max'] - 1, self.use_dfl)
@@ -114,7 +114,7 @@ class Criterion(object):
         anchors = anchors[None].repeat(bs, 1, 1).view(-1, 2)                           # [BM, 2]
         strides = torch.cat(strides, dim=0).unsqueeze(0).repeat(bs, 1, 1).view(-1, 1)  # [BM, 1]
         bbox_weight = gt_score_targets[fg_masks].sum(-1, keepdim=True)                 # [BM, 1]
-        reg_preds = reg_preds.view(-1, 4*self.reg_max)                           # [BM, 4*(reg_max + 1)]
+        reg_preds = reg_preds.view(-1, 4*self.reg_max)                                 # [BM, 4*(reg_max + 1)]
         box_preds = box_preds.view(-1, 4)                                              # [BM, 4]
         loss_iou, loss_dfl = self.reg_lossf(
             pred_regs = reg_preds,

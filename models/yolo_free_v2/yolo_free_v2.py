@@ -28,7 +28,7 @@ class FreeYOLOv2(nn.Module):
         self.stride = cfg['stride']
         self.stride = cfg['stride']
         self.reg_max = cfg['reg_max']
-        self.use_dfl = cfg['reg_max'] > 0
+        self.use_dfl = cfg['reg_max'] > 1
         self.num_classes = num_classes
         self.trainable = trainable
         self.conf_thresh = conf_thresh
