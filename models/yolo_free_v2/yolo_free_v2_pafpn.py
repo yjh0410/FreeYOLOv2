@@ -49,7 +49,6 @@ class ELAN_CSP_PaFPN(nn.Module):
                                           act_type=act_type
                                           )
 
-
         # bottom up
         # P3 -> P4
         self.mp1 = Conv(int(128*width), int(128*width), k=3, p=1, s=2,
