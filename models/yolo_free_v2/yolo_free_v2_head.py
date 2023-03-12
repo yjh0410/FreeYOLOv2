@@ -7,7 +7,7 @@ except:
 
 
 class DecoupledHead(nn.Module):
-    def __init__(self, cfg, in_dim, fpn_dims, num_classes=80):
+    def __init__(self, cfg, in_dim, out_dim):
         super().__init__()
         print('==============================')
         print('Head: Decoupled Head')
@@ -19,18 +19,17 @@ class DecoupledHead(nn.Module):
 
         # cls head
         cls_feats = []
-        self.cls_out_dim = max(fpn_dims[0], num_classes)
         for i in range(cfg['num_cls_head']):
             if i == 0:
                 cls_feats.append(
-                    Conv(in_dim, self.cls_out_dim, k=3, p=1, s=1, 
+                    Conv(in_dim, out_dim, k=3, p=1, s=1, 
                         act_type=self.act_type,
                         norm_type=self.norm_type,
                         depthwise=cfg['head_depthwise'])
                         )
             else:
                 cls_feats.append(
-                    Conv(self.cls_out_dim, self.cls_out_dim, k=3, p=1, s=1, 
+                    Conv(out_dim, out_dim, k=3, p=1, s=1, 
                         act_type=self.act_type,
                         norm_type=self.norm_type,
                         depthwise=cfg['head_depthwise'])
@@ -38,18 +37,17 @@ class DecoupledHead(nn.Module):
                 
         # reg head
         reg_feats = []
-        self.reg_out_dim = max(16, fpn_dims[0]//4, 4*cfg['reg_max'])
         for i in range(cfg['num_reg_head']):
             if i == 0:
                 reg_feats.append(
-                    Conv(in_dim, self.reg_out_dim, k=3, p=1, s=1, 
+                    Conv(in_dim, out_dim, k=3, p=1, s=1, 
                         act_type=self.act_type,
                         norm_type=self.norm_type,
                         depthwise=cfg['head_depthwise'])
                         )
             else:
                 reg_feats.append(
-                    Conv(self.reg_out_dim, self.reg_out_dim, k=3, p=1, s=1, 
+                    Conv(out_dim, out_dim, k=3, p=1, s=1, 
                         act_type=self.act_type,
                         norm_type=self.norm_type,
                         depthwise=cfg['head_depthwise'])
@@ -70,8 +68,8 @@ class DecoupledHead(nn.Module):
     
 
 # build detection head
-def build_head(cfg, in_dim, max_dim, num_classes=80):
-    head = DecoupledHead(cfg, in_dim, max_dim, num_classes) 
+def build_head(cfg, in_dim, out_dim):
+    head = DecoupledHead(cfg, in_dim, out_dim) 
 
     return head
 
@@ -89,7 +87,7 @@ if __name__ == '__main__':
     }
     fpn_dims = [256, 512, 512]
     # Head-1
-    model = build_head(cfg, 256, fpn_dims, num_classes=80)
+    model = build_head(cfg, 256, 256)
     x = torch.randn(1, 256, 80, 80)
     t0 = time.time()
     outputs = model(x)
@@ -105,7 +103,7 @@ if __name__ == '__main__':
     print('Head-1: Params : {:.2f} M'.format(params / 1e6))
 
     # Head-2
-    model = build_head(cfg, 512, fpn_dims, num_classes=80)
+    model = build_head(cfg, 512, 256)
     x = torch.randn(1, 512, 40, 40)
     t0 = time.time()
     outputs = model(x)
@@ -121,7 +119,7 @@ if __name__ == '__main__':
     print('Head-2: Params : {:.2f} M'.format(params / 1e6))
 
     # Head-3
-    model = build_head(cfg, 512, fpn_dims, num_classes=80)
+    model = build_head(cfg, 512, 256)
     x = torch.randn(1, 512, 20, 20)
     t0 = time.time()
     outputs = model(x)

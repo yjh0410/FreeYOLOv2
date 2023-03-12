@@ -81,6 +81,9 @@ def train_one_epoch(epoch,
         # visualize train targets
         if args.vis_tgt:
             vis_data(images, targets)
+
+        # normalize image
+        images = images / 255.
             
         # inference
         with torch.cuda.amp.autocast(enabled=args.fp16):

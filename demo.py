@@ -84,7 +84,7 @@ def detect(args,
 
                 # prepare
                 x = transform(frame)[0]
-                x = x.unsqueeze(0).to(device)
+                x = x.unsqueeze(0).to(device) / 255.
                 # inference
                 t0 = time.time()
                 bboxes, scores, labels = net(x)
@@ -117,7 +117,7 @@ def detect(args,
 
             # prepare
             x = transform(image)[0]
-            x = x.unsqueeze(0).to(device)
+            x = x.unsqueeze(0).to(device) / 255.
 
             # inference
             t0 = time.time()
@@ -161,7 +161,7 @@ def detect(args,
 
                 # prepare
                 x = transform(frame)[0]
-                x = x.unsqueeze(0).to(device)
+                x = x.unsqueeze(0).to(device) / 255.
 
                 # inference
                 t0 = time.time()
