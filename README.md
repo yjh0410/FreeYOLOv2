@@ -83,35 +83,13 @@ python train.py --cuda -d coco -v yolo_free_v2_tiny -bs 16 --max_epoch 300 --wp_
 
 | Model        | Scale |  IP  | AP<sup>val<br>0.5:0.95 | AP<sup>test<br>0.5:0.95 | FPS<sup>3090<br>FP32-bs1 | FLOPs<br><sup>(G) | Params<br><sup>(M) | Weight |
 |--------------|-------|------|------------------------|-------------------------|--------------------------|-------------------|--------------------|--------|
-| FreeYOLOv2-N |  640  |  ×   |                        |                         |                          |  8.8              |  3.2               |  |
+| FreeYOLOv2-N |  640  |  ×   |                        |                         |                          |  6.4              |  2.4               |  |
 | FreeYOLOv2-S |  640  |  ×   |                        |                         |                          |                   |                    |  |
 | FreeYOLOv2-M |  640  |  ×   |                        |                         |                          |                   |                    |  |
 | FreeYOLOv2-L |  640  |  ×   |                        |                         |                          |  165.4            |  43.7              |  |
 | FreeYOLOv2-H |  640  |  ×   |                        |                         |                          |  255.8            |  69.4              |  |
 
-<!-- **P6-Model on COCO:**
-
-| Model         | Scale |  IP  | AP<sup>val<br>0.5:0.95 | AP<sup>test<br>0.5:0.95 |FPS<sup>3090<br>FP32-bs1 | FLOPs<br><sup>(G) | Params<br><sup>(M) | Weight |
-|---------------|-------|------|------------------------|-------------------------|-------------------------|-------------------|--------------------|--------|
-| FreeYOLOv2-N6 | 1280  |  ×   |                        |                         |                         |  26.4             |  2.8               |  |
-| FreeYOLOv2-T6 | 1280  |  ×   |                        |                         |                         |  59.0             |  7.1               |  |
-| FreeYOLOv2-S6 | 1280  |  ×   |                        |                         |                         |  104.0            |  12.6              |  |
-| FreeYOLOv2-M6 | 1280  |  ×   |                        |                         |                         |  274.2            |  35.0              |  |
-| FreeYOLOv2-L6 | 1280  |  ×   |                        |                         |                         |  560.1            |  74.3              |  |
-| FreeYOLOv2-H6 | 1280  |  ×   |                        |                         |                         |  973.8            |  135.1             |  |
-
-**P7-Model on COCO:**
-
-| Model         | Scale |  IP  | AP<sup>val<br>0.5:0.95 | AP<sup>test<br>0.5:0.95 |FPS<sup>3090<br>FP32-bs1 | FLOPs<br><sup>(G) | Params<br><sup>(M) | Weight |
-|---------------|-------|------|------------------------|-------------------------|-------------------------|-------------------|--------------------|--------|
-| FreeYOLOv2-N7 | 1280  |  ×   |                        |                         |                         |  26.9             |  3.8               |  |
-| FreeYOLOv2-T7 | 1280  |  ×   |                        |                         |                         |  59.3             |  9.3               |  |
-| FreeYOLOv2-S7 | 1280  |  ×   |                        |                         |                         |  104.5            |  16.5              |  |
-| FreeYOLOv2-M7 | 1280  |  ×   |                        |                         |                         |  275.8            |  45.8              |  |
-| FreeYOLOv2-L7 | 1280  |  ×   |                        |                         |                         |  564.4            |  97.0              |  |
-| FreeYOLOv2-H7 | 1280  |  ×   |                        |                         |                         |  998.4            |  176.0             |  | -->
-
-*All FLOPs are measured with a 640x640 or 1280x1280 image size on COCO val2017. The FPS is measured with batch size 1 on 3090 GPU from the model inference to the NMS operation.*
+*All FLOPs are measured with a 640x640 image size on COCO val2017. The FPS is measured with batch size 1 on 3090 GPU from the model inference to the NMS operation.*
 
 ### WiderFace
 - Download [WiderFace](http://shuoyang1213.me/WIDERFACE/).
