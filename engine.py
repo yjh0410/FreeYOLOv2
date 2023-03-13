@@ -92,8 +92,12 @@ def train_one_epoch(epoch,
             loss_dict = criterion(outputs=outputs, targets=targets)
             losses = loss_dict['losses']
 
-        # reduce            
-        loss_dict_reduced = distributed_utils.reduce_dict(loss_dict)
+            # reduce            
+            loss_dict_reduced = distributed_utils.reduce_dict(loss_dict)
+
+            if args.distributed:
+                # gradient averaged between devices in DDP mode
+                losses *= distributed_utils.get_world_size()
 
         # check loss
         try:
@@ -103,16 +107,13 @@ def train_one_epoch(epoch,
         except:
             print(loss_dict)
 
-        if args.distributed:
-            # gradient averaged between devices in DDP mode
-            losses *= distributed_utils.get_world_size()
-
         # backward
         scaler.scale(losses).backward()
 
         # Optimize
         if ni - last_opt_step >= accumulate:
             scaler.unscale_(optimizer)  # unscale gradients
+            torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=10.0)  # clip gradients
             scaler.step(optimizer)  # optimizer.step
             scaler.update()
             optimizer.zero_grad()
