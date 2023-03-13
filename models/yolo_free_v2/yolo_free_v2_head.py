@@ -7,7 +7,7 @@ except:
 
 
 class DecoupledHead(nn.Module):
-    def __init__(self, cfg, in_dim, out_dim):
+    def __init__(self, cfg, in_dim, out_dim, num_classes):
         super().__init__()
         print('==============================')
         print('Head: Decoupled Head')
@@ -19,17 +19,18 @@ class DecoupledHead(nn.Module):
 
         # cls head
         cls_feats = []
+        self.cls_out_dim = max(out_dim, num_classes)
         for i in range(cfg['num_cls_head']):
             if i == 0:
                 cls_feats.append(
-                    Conv(in_dim, out_dim, k=3, p=1, s=1, 
+                    Conv(in_dim, self.cls_out_dim, k=3, p=1, s=1, 
                         act_type=self.act_type,
                         norm_type=self.norm_type,
                         depthwise=cfg['head_depthwise'])
                         )
             else:
                 cls_feats.append(
-                    Conv(out_dim, out_dim, k=3, p=1, s=1, 
+                    Conv(self.cls_out_dim, self.cls_out_dim, k=3, p=1, s=1, 
                         act_type=self.act_type,
                         norm_type=self.norm_type,
                         depthwise=cfg['head_depthwise'])
@@ -37,17 +38,18 @@ class DecoupledHead(nn.Module):
                 
         # reg head
         reg_feats = []
+        self.reg_out_dim = out_dim
         for i in range(cfg['num_reg_head']):
             if i == 0:
                 reg_feats.append(
-                    Conv(in_dim, out_dim, k=3, p=1, s=1, 
+                    Conv(in_dim, self.reg_out_dim, k=3, p=1, s=1, 
                         act_type=self.act_type,
                         norm_type=self.norm_type,
                         depthwise=cfg['head_depthwise'])
                         )
             else:
                 reg_feats.append(
-                    Conv(out_dim, out_dim, k=3, p=1, s=1, 
+                    Conv(self.reg_out_dim, self.reg_out_dim, k=3, p=1, s=1, 
                         act_type=self.act_type,
                         norm_type=self.norm_type,
                         depthwise=cfg['head_depthwise'])
@@ -68,8 +70,8 @@ class DecoupledHead(nn.Module):
     
 
 # build detection head
-def build_head(cfg, in_dim, out_dim):
-    head = DecoupledHead(cfg, in_dim, out_dim) 
+def build_head(cfg, in_dim, out_dim, num_classes):
+    head = DecoupledHead(cfg, in_dim, out_dim, num_classes) 
 
     return head
 
