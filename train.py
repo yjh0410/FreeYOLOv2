@@ -27,6 +27,8 @@ def parse_args():
     # basic
     parser.add_argument('--cuda', action='store_true', default=False,
                         help='use cuda.')
+    parser.add_argument('-size', '--img_size', default=640, type=int, 
+                        help='input image size')
     parser.add_argument('--num_workers', default=4, type=int, 
                         help='Number of workers used in dataloading')
     parser.add_argument('--tfboard', action='store_true', default=False,
@@ -75,6 +77,8 @@ def parse_args():
                         help='coco, voc, widerface, crowdhuman')
     
     # train trick
+    parser.add_argument('-ms', '--multi_scale', action='store_true', default=False,
+                        help='Multi scale')
     parser.add_argument('--ema', action='store_true', default=False,
                         help='Model EMA')
     parser.add_argument('--min_box_size', default=8.0, type=float,
@@ -162,7 +166,7 @@ def train():
         model_copy.trainable = False
         model_copy.eval()
         FLOPs_and_Params(model=model_copy, 
-                         img_size=cfg['test_size'], 
+                         img_size=args.img_size, 
                          device=device)
         del model_copy
     if args.distributed:

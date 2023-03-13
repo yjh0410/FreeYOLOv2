@@ -31,10 +31,10 @@ def build_dataset(cfg, args, device, is_train=False):
     print('TrainTransforms: {}'.format(cfg['trans_config']))
     train_transform = TrainTransforms(
         trans_config=cfg['trans_config'],
-        img_size=cfg['train_size'],
+        img_size=args.img_size,
         min_box_size=args.min_box_size
         )
-    val_transform = ValTransforms(img_size=cfg['test_size'])
+    val_transform = ValTransforms(img_size=args.img_size)
     
     # dataset params
     transform = train_transform if is_train else None
@@ -61,7 +61,7 @@ def build_dataset(cfg, args, device, is_train=False):
 
         # dataset
         dataset = VOCDetection(
-            img_size=cfg['train_size'],
+            img_size=args.img_size,
             data_dir=data_dir,
             image_sets=[('2007', 'trainval'), ('2012', 'trainval')] if is_train else [('2007', 'test')],
             transform=transform,
@@ -86,7 +86,7 @@ def build_dataset(cfg, args, device, is_train=False):
 
         # dataset
         dataset = COCODataset(
-            img_size=cfg['train_size'],
+            img_size=args.img_size,
             data_dir=data_dir,
             image_set='train2017' if is_train else 'val2017',
             transform=transform,
@@ -113,7 +113,7 @@ def build_dataset(cfg, args, device, is_train=False):
         # dataset
         dataset = WiderFaceDataset(
             data_dir=data_dir,
-            img_size=cfg['train_size'],
+            img_size=args.img_size,
             image_set='train' if is_train else 'val',
             transform=transform,
             mosaic_prob=mosaic_prob,
@@ -140,7 +140,7 @@ def build_dataset(cfg, args, device, is_train=False):
         # dataset
         dataset = CrowdHumanDataset(
             data_dir=data_dir,
-            img_size=cfg['train_size'],
+            img_size=args.img_size,
             image_set='train' if is_train else 'val',
             transform=transform,
             mosaic_prob=mosaic_prob,
@@ -167,7 +167,7 @@ def build_dataset(cfg, args, device, is_train=False):
         # dataset
         dataset = MOT17Dataset(
             data_dir=data_dir,
-            img_size=cfg['train_size'],
+            img_size=args.img_size,
             image_set='train',
             json_file='train_half.json' if is_train else 'val_half.json',
             transform=transform,
@@ -195,7 +195,7 @@ def build_dataset(cfg, args, device, is_train=False):
         # dataset
         dataset = MOT17Dataset(
             data_dir=data_dir,
-            img_size=cfg['train_size'],
+            img_size=args.img_size,
             image_set='train',
             json_file='train.json',
             transform=transform,
@@ -230,7 +230,7 @@ def build_dataset(cfg, args, device, is_train=False):
         # dataset
         dataset = MOT20Dataset(
             data_dir=data_dir,
-            img_size=cfg['train_size'],
+            img_size=args.img_size,
             image_set='train',
             json_file='train_half.json' if is_train else 'val_half.json',
             transform=transform,
@@ -258,7 +258,7 @@ def build_dataset(cfg, args, device, is_train=False):
         # dataset
         dataset = MOT20Dataset(
             data_dir=data_dir,
-            img_size=cfg['train_size'],
+            img_size=args.img_size,
             image_set='train',
             json_file='train.json',
             transform=transform,
@@ -293,7 +293,7 @@ def build_dataset(cfg, args, device, is_train=False):
         # dataset
         dataset = OurDataset(
             data_dir=data_dir,
-            img_size=cfg['train_size'],
+            img_size=args.img_size,
             image_set='train' if is_train else 'val',
             transform=transform,
             mosaic_prob=mosaic_prob,

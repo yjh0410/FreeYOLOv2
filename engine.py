@@ -4,40 +4,43 @@ import torch.distributed as dist
 import time
 import os
 import numpy as np
+import random
 
 from utils import distributed_utils
 from utils.vis_tools import vis_data
 
 
-def rescale_image_targets(images, targets, img_size, min_box_size):
+def rescale_image_targets(images, targets, max_stride, min_box_size):
     """
         Deployed for Multi scale trick.
     """
     # During training phase, the shape of input image is square.
     old_img_size = images.shape[-1]
-    # interpolate
-    images = torch.nn.functional.interpolate(
-                        input=images, 
-                        size=img_size, 
-                        mode='bilinear', 
-                        align_corners=False)
-    # rescale targets
-    for tgt in targets:
-        boxes = tgt["boxes"].clone()
-        labels = tgt["labels"].clone()
-        boxes = torch.clamp(boxes, 0, old_img_size)
-        # rescale box
-        boxes[:, [0, 2]] = boxes[:, [0, 2]] / old_img_size * img_size
-        boxes[:, [1, 3]] = boxes[:, [1, 3]] / old_img_size * img_size
-        # refine tgt
-        tgt_boxes_wh = boxes[..., 2:] - boxes[..., :2]
-        min_tgt_size = torch.min(tgt_boxes_wh, dim=-1)[0]
-        keep = (min_tgt_size > min_box_size)
+    new_img_size = random.randrange(old_img_size * 0.5, old_img_size * 1.4 + max_stride) // max_stride * max_stride  # size
+    if new_img_size / old_img_size != 1:
+        # interpolate
+        images = torch.nn.functional.interpolate(
+                            input=images, 
+                            size=new_img_size, 
+                            mode='bilinear', 
+                            align_corners=False)
+        # rescale targets
+        for tgt in targets:
+            boxes = tgt["boxes"].clone()
+            labels = tgt["labels"].clone()
+            boxes = torch.clamp(boxes, 0, old_img_size)
+            # rescale box
+            boxes[:, [0, 2]] = boxes[:, [0, 2]] / old_img_size * new_img_size
+            boxes[:, [1, 3]] = boxes[:, [1, 3]] / old_img_size * new_img_size
+            # refine tgt
+            tgt_boxes_wh = boxes[..., 2:] - boxes[..., :2]
+            min_tgt_size = torch.min(tgt_boxes_wh, dim=-1)[0]
+            keep = (min_tgt_size > min_box_size)
 
-        tgt["boxes"] = boxes[keep]
-        tgt["labels"] = labels[keep]
+            tgt["boxes"] = boxes[keep]
+            tgt["labels"] = labels[keep]
 
-    return images, targets
+    return images, targets, new_img_size
 
 
 def train_one_epoch(epoch,
@@ -54,8 +57,8 @@ def train_one_epoch(epoch,
                     scaler,
                     last_opt_step):
     epoch_size = len(dataloader)
-    img_size = cfg['train_size']
     t0 = time.time()
+    img_size = args.img_size
     accumulate = max(1, round(64 / args.batch_size))
     # train one epoch
     for iter_i, (images, targets) in enumerate(dataloader):
@@ -70,13 +73,9 @@ def train_one_epoch(epoch,
 
         # multi scale
         # # choose a new image size
-        if ni % 10 == 0 and cfg['random_size']:
-            idx = np.random.randint(len(cfg['random_size']))
-            img_size = cfg['random_size'][idx]
-        # # rescale data with new image size
-        if cfg['random_size']:
-            images, targets = rescale_image_targets(
-                images, targets, img_size, args.min_box_size)
+        if args.multi_scale:
+            images, targets, img_size = rescale_image_targets(
+                images, targets, max(model.stride), args.min_box_size)
 
         # visualize train targets
         if args.vis_tgt:
@@ -112,8 +111,6 @@ def train_one_epoch(epoch,
 
         # Optimize
         if ni - last_opt_step >= accumulate:
-            scaler.unscale_(optimizer)  # unscale gradients
-            torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=10.0)  # clip gradients
             scaler.step(optimizer)  # optimizer.step
             scaler.update()
             optimizer.zero_grad()

@@ -5,13 +5,6 @@ yolo_free_v2_config = {
     # P5
     'yolo_free_v2_nano': {
         # input
-        'train_size': 800,
-        'test_size': 640,
-        'random_size': [320, 352, 384, 416,
-                        448, 480, 512, 544,
-                        576, 608, 640, 672,
-                        704, 736, 768, 800,
-                        832, 864],
         'mosaic_prob': 1.0,
         'mixup_prob': 0.0,
         'format': 'RGB',
@@ -81,13 +74,6 @@ yolo_free_v2_config = {
 
     'yolo_free_v2_small': {
         # input
-        'train_size': 800,
-        'test_size': 640,
-        'random_size': [320, 352, 384, 416,
-                        448, 480, 512, 544,
-                        576, 608, 640, 672,
-                        704, 736, 768, 800,
-                        832, 864],
         'mosaic_prob': 1.0,
         'mixup_prob': 0.0,
         'format': 'RGB',
@@ -157,13 +143,6 @@ yolo_free_v2_config = {
 
     'yolo_free_v2_medium': {
         # input
-        'train_size': 800,
-        'test_size': 640,
-        'random_size': [320, 352, 384, 416,
-                        448, 480, 512, 544,
-                        576, 608, 640, 672,
-                        704, 736, 768, 800,
-                        832, 864],
         'mosaic_prob': 1.0,
         'mixup_prob': 0.1,
         'format': 'RGB',
@@ -233,13 +212,6 @@ yolo_free_v2_config = {
 
     'yolo_free_v2_large': {
         # input
-        'train_size': 800,
-        'test_size': 640,
-        'random_size': [320, 352, 384, 416,
-                        448, 480, 512, 544,
-                        576, 608, 640, 672,
-                        704, 736, 768, 800,
-                        832, 864],
         'mosaic_prob': 1.0,
         'mixup_prob': 0.15,
         'format': 'RGB',
@@ -309,13 +281,6 @@ yolo_free_v2_config = {
 
     'yolo_free_v2_huge': {
         # input
-        'train_size': 800,
-        'test_size': 640,
-        'random_size': [320, 352, 384, 416,
-                        448, 480, 512, 544,
-                        576, 608, 640, 672,
-                        704, 736, 768, 800,
-                        832, 864],
         'mosaic_prob': 1.0,
         'mixup_prob': 0.15,
         'format': 'RGB',
