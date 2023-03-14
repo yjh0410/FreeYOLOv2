@@ -311,7 +311,6 @@ def mixup_augment(origin_image, origin_target, new_image, new_target):
     return mixup_image, mixup_target
     
 
-
 # TrainTransform
 class TrainTransforms(object):
     def __init__(self, 
@@ -435,8 +434,8 @@ class ValTransforms(object):
             pad_img_h = (img_h0 // 32 + 1) * 32
             pad_img_w = self.img_size
         else:
-            pad_img_h = self.img_size
-            pad_img_w = self.img_size
+            pad_img_h = img_h0
+            pad_img_w = img_w0
         pad_image = torch.ones([img_tensor.size(0), pad_img_h, pad_img_w]).float() * 114.
         pad_image[:, :img_h0, :img_w0] = img_tensor
 

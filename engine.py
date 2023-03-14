@@ -63,14 +63,13 @@ def train_one_epoch(epoch,
     t0 = time.time()
     nw = epoch_size * args.wp_epoch
     accumulate = accumulate = max(1, round(64 / args.batch_size))
-    
+
     # train one epoch
     for iter_i, (images, targets) in enumerate(dataloader):
         ni = iter_i + epoch * epoch_size
         # Warmup
         if ni <= nw:
             xi = [0, nw]  # x interp
-            # compute_loss.gr = np.interp(ni, xi, [0.0, 1.0])  # iou loss ratio (obj_loss = 1.0 or iou)
             accumulate = max(1, np.interp(ni, xi, [1, 64 / args.batch_size]).round())
             for k, param in enumerate(optimizer.param_groups):
                 warmup_bias_lr = cfg['warmup_bias_lr'] if k == 2 else 0.0

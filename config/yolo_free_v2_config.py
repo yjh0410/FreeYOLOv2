@@ -62,7 +62,7 @@ yolo_free_v2_config = {
         'no_aug_epoch': 10,
         # optimizer
         'optimizer': 'sgd',
-        'momentum': 0.9,
+        'momentum': 0.937,
         'weight_decay': 5e-4,
         # lr schedule
         'scheduler': 'linear',
@@ -131,7 +131,7 @@ yolo_free_v2_config = {
         'no_aug_epoch': 10,
         # optimizer
         'optimizer': 'sgd',
-        'momentum': 0.9,
+        'momentum': 0.937,
         'weight_decay': 5e-4,
         # lr schedule
         'scheduler': 'linear',
@@ -200,7 +200,7 @@ yolo_free_v2_config = {
         'no_aug_epoch': 10,
         # optimizer
         'optimizer': 'sgd',
-        'momentum': 0.9,
+        'momentum': 0.937,
         'weight_decay': 5e-4,
         # lr schedule
         'scheduler': 'linear',
@@ -269,7 +269,7 @@ yolo_free_v2_config = {
         'no_aug_epoch': 10,
         # optimizer
         'optimizer': 'sgd',
-        'momentum': 0.9,
+        'momentum': 0.937,
         'weight_decay': 5e-4,
         # lr schedule
         'scheduler': 'linear',
@@ -338,7 +338,7 @@ yolo_free_v2_config = {
         'no_aug_epoch': 10,
         # optimizer
         'optimizer': 'sgd',
-        'momentum': 0.9,
+        'momentum': 0.937,
         'weight_decay': 5e-4,
         # lr schedule
         'scheduler': 'linear',
