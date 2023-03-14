@@ -12,6 +12,7 @@ python train.py \
         --ema \
         --fp16 \
         --multi_scale \
+        --eval_first
         # --resume weights/coco/yolo_free_v2_nano/yolo_free_v2_nano_epoch_31_21.34.pth \
         # --pretrained weights/coco/yolo_free_medium/yolo_free_medium_39.46.pth \
 
