@@ -29,7 +29,7 @@ def build_optimizer(cfg, model, base_lr=0.01, resume=None):
         raise NotImplementedError('Optimizer {} not implemented.'.format(cfg['optimizer']))
 
     optimizer.add_param_group({'params': g[0], 'weight_decay': cfg['weight_decay']})  # add g0 with weight_decay
-    optimizer.add_param_group({'params': g[1], 'weight_decay': 0.0})                  # add g1 (BatchNorm2d weights)
+    optimizer.add_param_group({'params': g[1], 'weight_decay': 0.0})  # add g1 (BatchNorm2d weights)
 
     start_epoch = 0
     if resume is not None:
