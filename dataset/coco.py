@@ -89,6 +89,9 @@ class COCODataset(Dataset):
         except:
             self.use_segment = False
 
+        # load cache
+        self.targets = self.load_cache()
+
 
     def __len__(self):
         return len(self.ids)
@@ -99,19 +102,41 @@ class COCODataset(Dataset):
         return image, target
 
 
+    def load_cache(self):
+        try:
+            # load coco targets from existing .npy file
+            targets = np.load("dataset/coco_{}_targets.npy".format(self.image_set), allow_pickle=True)
+        except:
+            # read coco targets
+            targets = []
+            print('caching the coco targets ...')
+            for index in range(len(self.ids)):
+                if index % 5000 == 0:
+                    print('loading {}/{}'.format(index, len(self.ids)))
+                bboxes, labels, segments = self.pull_anno(index)
+                target = np.concatenate([bboxes, labels[..., None]], axis=-1)  # [N, 5]
+                targets.append(target)
+            print('load done !')
+            np.save('dataset/coco_{}_targets.npy'.format(self.image_set), targets)
+            
+        return targets
+
+
     def load_image_target(self, index):
         # load an image
         image, _ = self.pull_image(index)
         height, width, channels = image.shape
 
-        # load a target        
-        bboxes, labels, segments = self.pull_anno(index)
+        # load a target
+        target = self.targets[index]
+        bboxes = target[..., :4]
+        labels = target[..., 4]
 
         if self.use_segment:
             target = {
                 "boxes": bboxes,
                 "labels": labels,
-                'segments': segments,
+                'segments': None,
                 "orig_size": [height, width]
             }
         else:
