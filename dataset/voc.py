@@ -94,7 +94,8 @@ class VOCDetection(data.Dataset):
                  transform=None, 
                  mosaic_prob=0.0,
                  mixup_prob=0.0,
-                 trans_config=None):
+                 trans_config=None,
+                 is_train=False):
         self.root = data_dir
         self.img_size = img_size
         self.image_set = image_sets
@@ -102,6 +103,7 @@ class VOCDetection(data.Dataset):
         self._annopath = osp.join('%s', 'Annotations', '%s.xml')
         self._imgpath = osp.join('%s', 'JPEGImages', '%s.jpg')
         self.ids = list()
+        self.is_train = is_train
         for (year, name) in image_sets:
             rootpath = osp.join(self.root, 'VOC' + year)
             for line in open(osp.join(rootpath, 'ImageSets', 'Main', name + '.txt')):
@@ -173,10 +175,10 @@ class VOCDetection(data.Dataset):
 
         if load_4x:
             image, target = mosaic_x4_augment(
-                image_list, target_list, self.img_size, self.trans_config)
+                image_list, target_list, self.img_size, self.trans_config, self.is_train)
         else:
             image, target = mosaic_x9_augment(
-                image_list, target_list, self.img_size, self.trans_config)
+                image_list, target_list, self.img_size, self.trans_config, self.is_train)
 
         return image, target
 
@@ -186,13 +188,13 @@ class VOCDetection(data.Dataset):
         mosaic = False
         if random.random() < self.mosaic_prob:
             mosaic = True
-            if random.random() < 0.8:
+            if random.random() < 1.0:
                 image, target = self.load_mosaic(index, True)
             else:
                 image, target = self.load_mosaic(index, False)
             # MixUp
             if random.random() < self.mixup_prob:
-                if random.random() < 0.8:
+                if random.random() < 1.0:
                     new_index = np.random.randint(0, len(self.ids))
                     new_image, new_target = self.load_mosaic(new_index, True)
                 else:

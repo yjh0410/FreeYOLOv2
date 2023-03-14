@@ -94,7 +94,7 @@ def augment_hsv(img, hgain=0.5, sgain=0.5, vgain=0.5):
 
 
 # mosaic augment
-def mosaic_x4_augment(image_list, target_list, img_size, affine_params=None):
+def mosaic_x4_augment(image_list, target_list, img_size, affine_params=None, is_train=False):
     assert len(image_list) == 4
 
     mosaic_img = np.ones([img_size*2, img_size*2, image_list[0].shape[2]], dtype=np.uint8) * 114
@@ -112,13 +112,10 @@ def mosaic_x4_augment(image_list, target_list, img_size, affine_params=None):
         orig_h, orig_w, _ = img_i.shape
 
         # resize
-        if np.random.randint(2):
-            # keep aspect ratio
-            r = img_size / max(orig_h, orig_w)
-            if r != 1: 
-                img_i = cv2.resize(img_i, (int(orig_w * r), int(orig_h * r)))
-        else:
-            img_i = cv2.resize(img_i, (int(img_size), int(img_size)))
+        r = img_size / max(orig_h, orig_w)
+        if r != 1: 
+            interp = cv2.INTER_LINEAR if (is_train or r > 1) else cv2.INTER_AREA
+            img_i = cv2.resize(img_i, (int(orig_w * r), int(orig_h * r)), interpolation=interp)
         h, w, _ = img_i.shape
 
         # place img in img4
@@ -184,7 +181,7 @@ def mosaic_x4_augment(image_list, target_list, img_size, affine_params=None):
     return mosaic_img, mosaic_target
 
 
-def mosaic_x9_augment(image_list, target_list, img_size, affine_params=None):
+def mosaic_x9_augment(image_list, target_list, img_size, affine_params=None, is_train=False):
     assert len(image_list) == 9
 
     s = img_size
@@ -200,13 +197,10 @@ def mosaic_x9_augment(image_list, target_list, img_size, affine_params=None):
         orig_h, orig_w, _ = img_i.shape
 
         # resize
-        if np.random.randint(2):
-            # keep aspect ratio
-            r = img_size / max(orig_h, orig_w)
-            if r != 1: 
-                img_i = cv2.resize(img_i, (int(orig_w * r), int(orig_h * r)))
-        else:
-            img_i = cv2.resize(img_i, (int(img_size), int(img_size)))
+        r = img_size / max(orig_h, orig_w)
+        if r != 1: 
+            interp = cv2.INTER_LINEAR if (is_train or r > 1) else cv2.INTER_AREA
+            img_i = cv2.resize(img_i, (int(orig_w * r), int(orig_h * r)), interpolation=interp)
         h, w, _ = img_i.shape
 
         # place img in img9
@@ -328,7 +322,9 @@ class TrainTransforms(object):
 
         r = self.img_size / max(img_h0, img_w0)
         if r != 1: 
-            img = cv2.resize(image, (int(img_w0 * r), int(img_h0 * r)))
+            interp = cv2.INTER_LINEAR
+            new_shape = (int(round(img_w0 * r)), int(round(img_h0 * r)))
+            img = cv2.resize(image, new_shape, interpolation=interp)
         else:
             img = image
 
@@ -401,8 +397,9 @@ class ValTransforms(object):
         r = self.img_size / max(img_h0, img_w0)
         r = min(r, 1.0) # only scale down, do not scale up (for better val mAP)
         if r != 1: 
+            interp = cv2.INTER_LINEAR if r > 1 else cv2.INTER_AREA
             new_shape = (int(round(img_w0 * r)), int(round(img_h0 * r)))
-            img = cv2.resize(image, new_shape)
+            img = cv2.resize(image, new_shape, interpolation=interp)
         else:
             img = image
 

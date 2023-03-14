@@ -51,7 +51,8 @@ class COCODataset(Dataset):
                  mosaic_prob=0.,
                  mixup_prob=0.0,
                  trans_config=None,
-                 data_cache=False):
+                 data_cache=False,
+                 is_train=False):
         """
         COCO dataset initialization. Annotation data are read into memory by COCO API.
         Args:
@@ -72,6 +73,7 @@ class COCODataset(Dataset):
         self.coco = COCO(os.path.join(self.data_dir, 'annotations', self.json_file))
         self.ids = self.coco.getImgIds()
         self.class_ids = sorted(self.coco.getCatIds())
+        self.is_train = is_train
         # augmentation
         self.transform = transform
         self.mosaic_prob = mosaic_prob
@@ -181,10 +183,10 @@ class COCODataset(Dataset):
 
         if load_4x:
             image, target = mosaic_x4_augment(
-                image_list, target_list, self.img_size, self.trans_config)
+                image_list, target_list, self.img_size, self.trans_config, self.is_train)
         else:
             image, target = mosaic_x9_augment(
-                image_list, target_list, self.img_size, self.trans_config)
+                image_list, target_list, self.img_size, self.trans_config, self.is_train)
 
         return image, target
 
@@ -194,13 +196,13 @@ class COCODataset(Dataset):
         mosaic = False
         if random.random() < self.mosaic_prob:
             mosaic = True
-            if random.random() < 0.8:
+            if random.random() < 1.0:
                 image, target = self.load_mosaic(index, True)
             else:
                 image, target = self.load_mosaic(index, False)
             # MixUp
             if random.random() < self.mixup_prob:
-                if random.random() < 0.8:
+                if random.random() < 1.0:
                     new_index = np.random.randint(0, len(self.ids))
                     new_image, new_target = self.load_mosaic(new_index, True)
                 else:
