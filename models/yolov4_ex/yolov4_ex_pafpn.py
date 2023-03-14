@@ -20,25 +20,25 @@ class CSP_PaFPN(nn.Module):
         c3, c4, c5 = in_dims
 
         self.head_conv_0 = Conv(c5, int(512*width), k=1, norm_type=norm_type, act_type=act_type)  # 10
-        self.head_csp_0 = CSPBlock(c4 + int(512*width), int(512*width), expand_ratio=0.5, kernel=[1, 3],
+        self.head_csp_0 = CSPBlock(c4 + int(512*width), int(512*width), expand_ratio=0.5,
                                    nblocks=int(3*depth), shortcut=False, depthwise=depthwise,
                                    norm_type=norm_type, act_type=act_type)
 
         # P3/8-small
         self.head_conv_1 = Conv(c4, int(256*width), k=1, norm_type=norm_type, act_type=act_type)  # 14
-        self.head_csp_1 = CSPBlock(c3 + int(256*width), int(256*width), expand_ratio=0.5, kernel=[1, 3],
+        self.head_csp_1 = CSPBlock(c3 + int(256*width), int(256*width), expand_ratio=0.5,
                                    nblocks=int(3*depth), shortcut=False, depthwise=depthwise,
                                    norm_type=norm_type, act_type=act_type)
 
         # P4/16-medium
         self.head_conv_2 = Conv(int(256*width), int(256*width), k=3, p=1, s=2, depthwise=depthwise, norm_type=norm_type, act_type=act_type)
-        self.head_csp_2 = CSPBlock(int(256*width) + int(256*width), int(512*width), expand_ratio=0.5, kernel=[1, 3],
+        self.head_csp_2 = CSPBlock(int(256*width) + int(256*width), int(512*width), expand_ratio=0.5,
                                    nblocks=int(3*depth), shortcut=False, depthwise=depthwise,
                                    norm_type=norm_type, act_type=act_type)
 
         # P8/32-large
         self.head_conv_3 = Conv(int(512*width), int(512*width), k=3, p=1, s=2, depthwise=depthwise, norm_type=norm_type, act_type=act_type)
-        self.head_csp_3 = CSPBlock(int(512*width) + int(512*width), int(1024*width), expand_ratio=0.5, kernel=[1, 3],
+        self.head_csp_3 = CSPBlock(int(512*width) + int(512*width), int(1024*width), expand_ratio=0.5,
                                    nblocks=int(3*depth), shortcut=False, depthwise=depthwise,
                                    norm_type=norm_type, act_type=act_type)
 
