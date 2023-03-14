@@ -71,11 +71,12 @@ def train_one_epoch(epoch,
         if ni <= nw:
             xi = [0, nw]  # x interp
             accumulate = max(1, np.interp(ni, xi, [1, 64 / args.batch_size]).round())
-            for k, param in enumerate(optimizer.param_groups):
-                warmup_bias_lr = cfg['warmup_bias_lr'] if k == 2 else 0.0
-                param['lr'] = np.interp(ni, [0, nw], [warmup_bias_lr, param['initial_lr'] * lf(epoch)])
-                if 'momentum' in param:
-                    param['momentum'] = np.interp(ni, [0, nw], [cfg['warmup_momentum'], cfg['momentum']])
+            for j, x in enumerate(optimizer.param_groups):
+                # bias lr falls from 0.1 to lr0, all other lrs rise from 0.0 to lr0
+                x['lr'] = np.interp(
+                    ni, xi, [cfg['warmup_bias_lr'] if j == 0 else 0.0, x['initial_lr'] * lf(epoch)])
+                if 'momentum' in x:
+                    x['momentum'] = np.interp(ni, xi, [cfg['warmup_momentum'], cfg['momentum']])
                             
         # visualize train targets
         if args.vis_tgt:
