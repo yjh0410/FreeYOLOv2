@@ -50,7 +50,8 @@ class COCODataset(Dataset):
                  transform=None,
                  mosaic_prob=0.,
                  mixup_prob=0.0,
-                 trans_config=None):
+                 trans_config=None,
+                 data_cache=False):
         """
         COCO dataset initialization. Annotation data are read into memory by COCO API.
         Args:
@@ -90,7 +91,9 @@ class COCODataset(Dataset):
             self.use_segment = False
 
         # load cache
-        self.targets = self.load_cache()
+        self.data_cache = data_cache
+        if data_cache:
+            self.targets = self.load_cache()
 
 
     def __len__(self):
@@ -128,9 +131,12 @@ class COCODataset(Dataset):
         height, width, channels = image.shape
 
         # load a target
-        target = self.targets[index]
-        bboxes = target[..., :4]
-        labels = target[..., 4]
+        if self.data_cache:
+            target = self.targets[index]
+            bboxes = target[..., :4]
+            labels = target[..., 4]
+        else:
+            bboxes, labels, segments = self.pull_anno(index)
 
         if self.use_segment:
             target = {

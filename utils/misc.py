@@ -92,7 +92,8 @@ def build_dataset(cfg, args, device, is_train=False):
             transform=transform,
             mosaic_prob=mosaic_prob,
             mixup_prob=mixup_prob,
-            trans_config=trans_config
+            trans_config=trans_config,
+            data_cache=is_train
             )
         # evaluator
         if is_train:
