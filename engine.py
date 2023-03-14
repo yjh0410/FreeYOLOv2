@@ -16,7 +16,7 @@ def rescale_image_targets(images, targets, max_stride, min_box_size):
     """
     # During training phase, the shape of input image is square.
     old_img_size = images.shape[-1]
-    new_img_size = random.randrange(old_img_size * 0.5, old_img_size * 1.4 + max_stride) // max_stride * max_stride  # size
+    new_img_size = random.randrange(old_img_size * 0.5, old_img_size * 1.5 + max_stride) // max_stride * max_stride  # size
     if new_img_size / old_img_size != 1:
         # interpolate
         images = torch.nn.functional.interpolate(
@@ -35,7 +35,7 @@ def rescale_image_targets(images, targets, max_stride, min_box_size):
             # refine tgt
             tgt_boxes_wh = boxes[..., 2:] - boxes[..., :2]
             min_tgt_size = torch.min(tgt_boxes_wh, dim=-1)[0]
-            keep = (min_tgt_size > min_box_size)
+            keep = (min_tgt_size >= min_box_size)
 
             tgt["boxes"] = boxes[keep]
             tgt["labels"] = labels[keep]
