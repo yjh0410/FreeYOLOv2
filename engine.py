@@ -53,36 +53,39 @@ def train_one_epoch(epoch,
                     cfg, 
                     dataloader, 
                     optimizer,
-                    warmup_scheduler,
+                    scheduler,
+                    lf,
                     scaler,
                     last_opt_step):
     epoch_size = len(dataloader)
-    t0 = time.time()
     img_size = args.img_size
-    accumulate = max(1, round(64 / args.batch_size))
+    t0 = time.time()
+    nw = epoch_size * args.wp_epoch
     # train one epoch
     for iter_i, (images, targets) in enumerate(dataloader):
         ni = iter_i + epoch * epoch_size
-
-        # check warmup
-        if warmup_scheduler is not None:
-            warmup_scheduler.warmup(ni, optimizer)
-        
-        # to device
-        images = images.to(device, non_blocking=True).float()
-
-        # multi scale
-        # # choose a new image size
-        if args.multi_scale:
-            images, targets, img_size = rescale_image_targets(
-                images, targets, max(model.stride), args.min_box_size)
-
+        # Warmup
+        if ni <= nw:
+            xi = [0, nw]  # x interp
+            # compute_loss.gr = np.interp(ni, xi, [0.0, 1.0])  # iou loss ratio (obj_loss = 1.0 or iou)
+            accumulate = max(1, np.interp(ni, xi, [1, 64 / args.batch_size]).round())
+            for k, param in enumerate(optimizer.param_groups):
+                warmup_bias_lr = cfg['warmup_bias_lr'] if k == 2 else 0.0
+                param['lr'] = np.interp(ni, [0, nw], [warmup_bias_lr, param['initial_lr'] * lf(epoch)])
+                if 'momentum' in param:
+                    param['momentum'] = np.interp(ni, [0, nw], [cfg['warmup_momentum'], cfg['momentum']])
+                            
         # visualize train targets
         if args.vis_tgt:
             vis_data(images, targets)
 
-        # normalize image
-        images = images / 255.
+        # to device
+        images = images.to(device, non_blocking=True).float() / 255.
+
+        # multi scale
+        if args.multi_scale:
+            images, targets, img_size = rescale_image_targets(
+                images, targets, max(model.stride), args.min_box_size)
             
         # inference
         with torch.cuda.amp.autocast(enabled=args.fp16):
@@ -111,14 +114,14 @@ def train_one_epoch(epoch,
 
         # Optimize
         if ni - last_opt_step >= accumulate:
+            scaler.unscale_(optimizer)  # unscale gradients
+            torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=10.0)  # clip gradients
             scaler.step(optimizer)  # optimizer.step
             scaler.update()
             optimizer.zero_grad()
-
             # ema
             if ema:
                 ema.update(model)
-
             last_opt_step = ni
 
         # display
@@ -146,6 +149,8 @@ def train_one_epoch(epoch,
             
             t0 = time.time()
     
+    scheduler.step()
+
     return last_opt_step
 
 

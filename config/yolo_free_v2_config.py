@@ -70,6 +70,8 @@ yolo_free_v2_config = {
         'scheduler': 'cosine',
         'lr0': 0.01,
         'lrf': 0.01,
+        'warmup_momentum': 0.8,
+        'warmup_bias_lr': 0.1,
         },
 
     'yolo_free_v2_small': {
@@ -139,6 +141,8 @@ yolo_free_v2_config = {
         'scheduler': 'cosine',
         'lr0': 0.01,
         'lrf': 0.01,
+        'warmup_momentum': 0.8,
+        'warmup_bias_lr': 0.1,
         },
 
     'yolo_free_v2_medium': {
@@ -208,6 +212,8 @@ yolo_free_v2_config = {
         'scheduler': 'cosine',
         'lr0': 0.01,
         'lrf': 0.01,
+        'warmup_momentum': 0.8,
+        'warmup_bias_lr': 0.1,
         },
 
     'yolo_free_v2_large': {
@@ -277,6 +283,8 @@ yolo_free_v2_config = {
         'scheduler': 'cosine',
         'lr0': 0.01,
         'lrf': 0.01,
+        'warmup_momentum': 0.8,
+        'warmup_bias_lr': 0.1,
         },
 
     'yolo_free_v2_huge': {
@@ -346,6 +354,8 @@ yolo_free_v2_config = {
         'scheduler': 'cosine',
         'lr0': 0.01,
         'lrf': 0.01,
+        'warmup_momentum': 0.8,
+        'warmup_bias_lr': 0.1,
         },
 
 }

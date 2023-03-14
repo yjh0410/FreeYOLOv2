@@ -182,9 +182,8 @@ def train():
     cfg['weight_decay'] *= total_bs * accumulate / 64
     optimizer, start_epoch = build_optimizer(cfg, model_without_ddp, cfg['lr0'], args.resume)
 
-    # warmup scheduler
-    wp_iter = len(dataloader) * args.wp_epoch
-    warmup_scheduler = build_warmup(cfg=cfg, base_lr=cfg['lr0'], wp_iter=wp_iter)
+    # Scheduler
+    scheduler, lf = build_lr_scheduler(cfg, optimizer, args.max_epoch)
 
     # EMA
     if args.ema and distributed_utils.get_rank() in [-1, 0]:
@@ -196,11 +195,8 @@ def train():
     # start training loop
     best_map = -1.0
     last_opt_step = -1
-    total_epochs = args.wp_epoch + args.max_epoch
-    T_max = total_epochs - cfg['no_aug_epoch'] - 1
+    total_epochs = args.wp_epoch
     heavy_eval = False
-    lr_schedule = True
-    min_lr = cfg['lr0'] * cfg['lrf']
     optimizer.zero_grad()
     
     # eval before training
@@ -216,36 +212,6 @@ def train():
         if args.distributed:
             dataloader.batch_sampler.sampler.set_epoch(epoch)
 
-        # check whether it is warmup stage
-        if epoch >= args.wp_epoch and warmup_scheduler is not None:
-            print("Warmup is Over.")
-            warmup_scheduler.set_lr(optimizer, cfg['lr0'])
-            warmup_scheduler = None
-
-        if warmup_scheduler is None:
-            # warmup has been over
-            if epoch >= T_max and lr_schedule:
-                # close Cosine scheduler
-                print('CLose Cosine annealing.')
-                lr_schedule = False
-                for param_group in optimizer.param_groups:
-                    param_group['lr'] = min_lr
-                # close mosaic augmentation
-                if dataloader.dataset.mosaic_prob > 0.:
-                    print('close Mosaic Augmentation ...')
-                    dataloader.dataset.mosaic_prob = 0.
-                    heavy_eval = True
-                # close mixup augmentation
-                if dataloader.dataset.mixup_prob > 0.:
-                    print('close Mixup Augmentation ...')
-                    dataloader.dataset.mixup_prob = 0.
-                    heavy_eval = True
-
-            if lr_schedule:
-                tmp_lr = min_lr + 0.5*(cfg['lr0'] - min_lr)*(1 + math.cos(math.pi*epoch / T_max))
-                for param_group in optimizer.param_groups:
-                    param_group['lr'] = tmp_lr
-                        
         # train one epoch
         last_opt_step = train_one_epoch(
             epoch=epoch,
@@ -258,7 +224,8 @@ def train():
             cfg=cfg, 
             dataloader=dataloader, 
             optimizer=optimizer,
-            warmup_scheduler=warmup_scheduler,
+            scheduler=scheduler,
+            lf=lf,
             scaler=scaler,
             last_opt_step=last_opt_step)
 
