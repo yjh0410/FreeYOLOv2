@@ -6,7 +6,7 @@ python train.py \
         -v yolo_free_v2_nano \
         -bs 16 \
         -size 640 \
-        --wp_epoch 3 \
+        --wp_epoch 1 \
         --max_epoch 300 \
         --eval_epoch 10 \
         --ema \
