@@ -400,8 +400,10 @@ class ValTransforms(object):
         img_h0, img_w0 = image.shape[:2]
 
         r = self.img_size / max(img_h0, img_w0)
+        r = min(r, 1.0) # only scale down, do not scale up (for better val mAP)
         if r != 1: 
-            img = cv2.resize(image, (int(img_w0 * r), int(img_h0 * r)))
+            new_shape = (int(round(img_w0 * r)), int(round(img_h0 * r)))
+            img = cv2.resize(image, new_shape)
         else:
             img = image
 

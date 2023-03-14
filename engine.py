@@ -62,6 +62,8 @@ def train_one_epoch(epoch,
     img_size = args.img_size
     t0 = time.time()
     nw = epoch_size * args.wp_epoch
+    accumulate = accumulate = max(1, round(64 / args.batch_size))
+    
     # train one epoch
     for iter_i, (images, targets) in enumerate(dataloader):
         ni = iter_i + epoch * epoch_size
