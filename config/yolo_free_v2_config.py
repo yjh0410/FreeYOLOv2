@@ -68,7 +68,7 @@ yolo_free_v2_config = {
         'ema_decay': 0.9998,   # 0.9999 for sgd, 0.9998 for adamw
         'ema_tau': 2000,
         # lr schedule
-        'scheduler': 'linear',
+        'scheduler': 'cosine',
         'lr0': 0.004,
         'lrf': 0.01,
         'warmup_momentum': 0.8,
