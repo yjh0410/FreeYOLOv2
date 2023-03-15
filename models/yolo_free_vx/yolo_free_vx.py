@@ -53,12 +53,12 @@ class FreeYOLOvx(nn.Module):
 
         ## pred
         self.cls_preds = nn.ModuleList(
-                            [nn.Conv2d(head_dim, self.num_classes, kernel_size=1) 
-                                for head_dim in self.head_dim
+                            [nn.Conv2d(head.cls_out_dim, self.num_classes, kernel_size=1) 
+                                for head in self.non_shared_heads
                               ]) 
         self.reg_preds = nn.ModuleList(
-                            [nn.Conv2d(head_dim, 4, kernel_size=1) 
-                                for head_dim in self.head_dim
+                            [nn.Conv2d(head.reg_out_dim, 4, kernel_size=1) 
+                                for head in self.non_shared_heads
                               ])                 
 
         # --------- Network Initialization ----------
