@@ -21,7 +21,7 @@ def build_yolo_free_v2(args, cfg, device, num_classes=80, trainable=False):
         trainable=trainable,
         conf_thresh=args.conf_thresh,
         nms_thresh=args.nms_thresh,
-        max_det=args.topk,
+        topk=args.topk,
         no_decode=args.no_decode
         )
 
