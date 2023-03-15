@@ -45,13 +45,6 @@ class AlignSimOTA(object):
         box_preds_ = pred_box[fg_mask]   # [Mp, 4]
         num_in_boxes_anchor = box_preds_.shape[0]
 
-        # ---------------------------- ctr cost ----------------------------
-        gt_center = self.get_box_center(tgt_bboxes)
-        anchors_fg = anchors[fg_mask]
-        strides_fg = strides[fg_mask]
-        distance = (anchors_fg[None] - gt_center[:, None, :]).pow(2).sum(-1).sqrt() / strides_fg[None]
-        soft_center_prior = torch.pow(10, distance - self.soft_center_radius)
-
         # ---------------------------- reg cost ----------------------------
         # iou [N, Mp]
         pair_wise_ious, _ = box_iou(tgt_bboxes, box_preds_)
@@ -80,8 +73,7 @@ class AlignSimOTA(object):
 
         cost = (
             pair_wise_cls_loss
-            + pair_wise_ious_loss
-            + soft_center_prior
+            + 3.0 * pair_wise_ious_loss
             + 100000.0 * (~is_in_boxes_and_center)
         ) # [N, Mp]
 
