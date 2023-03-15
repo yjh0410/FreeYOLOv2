@@ -188,7 +188,7 @@ def train():
     # EMA
     if args.ema and distributed_utils.get_rank() in [-1, 0]:
         print('Build ModelEMA ...')
-        ema = ModelEMA(model, updates=start_epoch * len(dataloader))
+        ema = ModelEMA(model, decay=cfg['ema_decay'], tau=cfg['ema_tau'], updates=start_epoch * len(dataloader))
     else:
         ema = None
 

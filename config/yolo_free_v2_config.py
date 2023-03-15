@@ -61,9 +61,12 @@ yolo_free_v2_config = {
         # training configuration
         'no_aug_epoch': 10,
         # optimizer
-        'optimizer': 'sgd',
+        'optimizer': 'adamw',  # optional: sgd, adamw
         'momentum': 0.937,
-        'weight_decay': 5e-4,
+        'weight_decay': 5e-2,  # 5e-4 for sgd, 5e-2 for adamw
+        # model EMA
+        'ema_decay': 0.9998,   # 0.9999 for sgd, 0.9998 for adamw
+        'ema_tau': 2000,
         # lr schedule
         'scheduler': 'linear',
         'lr0': 0.01,
@@ -133,6 +136,9 @@ yolo_free_v2_config = {
         'optimizer': 'sgd',
         'momentum': 0.937,
         'weight_decay': 5e-4,
+        # model EMA
+        'ema_decay': 0.9999,
+        'ema_tau': 2000,
         # lr schedule
         'scheduler': 'linear',
         'lr0': 0.01,
@@ -202,6 +208,9 @@ yolo_free_v2_config = {
         'optimizer': 'sgd',
         'momentum': 0.937,
         'weight_decay': 5e-4,
+        # model EMA
+        'ema_decay': 0.9999,
+        'ema_tau': 2000,
         # lr schedule
         'scheduler': 'linear',
         'lr0': 0.01,
@@ -271,6 +280,9 @@ yolo_free_v2_config = {
         'optimizer': 'sgd',
         'momentum': 0.937,
         'weight_decay': 5e-4,
+        # model EMA
+        'ema_decay': 0.9999,
+        'ema_tau': 2000,
         # lr schedule
         'scheduler': 'linear',
         'lr0': 0.01,
@@ -340,6 +352,9 @@ yolo_free_v2_config = {
         'optimizer': 'sgd',
         'momentum': 0.937,
         'weight_decay': 5e-4,
+        # model EMA
+        'ema_decay': 0.9999,
+        'ema_tau': 2000,
         # lr schedule
         'scheduler': 'linear',
         'lr0': 0.01,
