@@ -51,7 +51,7 @@ yolo_free_vx_config = {
         'matcher': {'center_sampling_radius': 2.5,
                     'topk_candicate': 10},
         # loss weight
-        'cls_loss': 'qfl', # vfl (optional)
+        'cls_loss': 'bce', # optional: bce, qfl, vfl
         'loss_cls_weight': 1.0,
         'loss_reg_weight': 2.0,
         # training configuration

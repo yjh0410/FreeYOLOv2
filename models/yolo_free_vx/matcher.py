@@ -72,12 +72,10 @@ class AlignSimOTA(object):
         with torch.cuda.amp.autocast(enabled=False):
             # [N, Mp, C]
             score_preds = cls_preds_.float().unsqueeze(0).repeat(num_gt, 1, 1).sigmoid_()
-            scale_factor = score_preds - soft_gt_cls
             # cls cost
             pair_wise_cls_loss = F.binary_cross_entropy(
                 score_preds, soft_gt_cls, reduction="none"
-            ) * scale_factor.abs().pow(2.0)
-            pair_wise_cls_loss = pair_wise_cls_loss.sum(-1) # [N, Mp]
+            ).sum(-1) # [N, Mp]
         del score_preds
 
         cost = (
