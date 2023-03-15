@@ -120,8 +120,8 @@ class VOCDetection(data.Dataset):
 
 
     def __getitem__(self, index):
-        image, target = self.pull_item(index)
-        return image, target
+        image, target, deltas = self.pull_item(index)
+        return image, target, deltas
 
 
     def __len__(self):
@@ -209,9 +209,9 @@ class VOCDetection(data.Dataset):
             image, target = self.load_image_target(img_id)
 
         # augment
-        image, target = self.transform(image, target, mosaic)
+        image, target, deltas = self.transform(image, target, mosaic)
 
-        return image, target
+        return image, target, deltas
 
 
     def pull_image(self, index):
@@ -293,7 +293,7 @@ if __name__ == "__main__":
     print('Data length: ', len(dataset))
 
     for i in range(1000):
-        image, target= dataset.pull_item(i)
+        image, target, deltas = dataset.pull_item(i)
         # to numpy
         image = image.permute(1, 2, 0).numpy()
         image = image.astype(np.uint8)
