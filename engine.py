@@ -117,9 +117,13 @@ def train_one_epoch(epoch,
 
         # Optimize
         if ni - last_opt_step >= accumulate:
-            scaler.unscale_(optimizer)  # unscale gradients
-            torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=10.0)  # clip gradients
-            scaler.step(optimizer)  # optimizer.step
+            if cfg['clip_grad'] > 0:
+                # unscale gradients
+                scaler.unscale_(optimizer)
+                # clip gradients
+                torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=cfg['clip_grad'])
+            # optimizer.step
+            scaler.step(optimizer)
             scaler.update()
             optimizer.zero_grad()
             # ema

@@ -319,8 +319,8 @@ if __name__ == "__main__":
         img_size=img_size,
         data_dir=args.root,
         image_set='val2017',
-        transform=val_transform,
-        mosaic_prob=0.,
+        transform=train_transform,
+        mosaic_prob=0.5,
         mixup_prob=0.15,
         trans_config=trans_config
         )

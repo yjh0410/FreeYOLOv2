@@ -332,6 +332,11 @@ class TrainTransforms(object):
         if target is not None:
             img_h, img_w = img.shape[:2]
 
+        # hsv augment
+        augment_hsv(img, hgain=self.trans_config['hsv_h'], 
+                    sgain=self.trans_config['hsv_s'], 
+                    vgain=self.trans_config['hsv_v'])
+        
         if not mosaic:
             # rescale bbox
             boxes_ = target["boxes"].copy()
@@ -353,11 +358,6 @@ class TrainTransforms(object):
             target['boxes'] = target_[..., 1:]
             target['labels'] = target_[..., 0]
         
-        # hsv augment
-        augment_hsv(img, hgain=self.trans_config['hsv_h'], 
-                    sgain=self.trans_config['hsv_s'], 
-                    vgain=self.trans_config['hsv_v'])
-
         # random flip
         if random.random() < 0.5:
             w = img.shape[1]

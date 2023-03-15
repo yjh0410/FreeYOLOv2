@@ -21,7 +21,7 @@ yolo_free_v2_config = {
         'backbone': 'elannet',
         'pretrained': False,
         'bk_act': 'lrelu',
-        'bk_norm': 'BN',  # BN (optional)
+        'bk_norm': 'BN',
         'bk_dpw': False,
         'p6_feat': False,
         'p7_feat': False,
@@ -34,17 +34,17 @@ yolo_free_v2_config = {
         'expand_ratio': 0.5,
         'pooling_size': 5,
         'neck_act': 'lrelu',
-        'neck_norm': 'BN',  # BN (optional)
+        'neck_norm': 'BN',
         'neck_depthwise': False,
         # fpn
         'fpn': 'elan_csp_pafpn',
         'fpn_act': 'lrelu',
-        'fpn_norm': 'BN',  # BN (optional)
+        'fpn_norm': 'BN',
         'fpn_depthwise': False,
         # head
         'head': 'decoupled_head',
         'head_act': 'lrelu',
-        'head_norm': 'BN',  # BN (optional)
+        'head_norm': 'BN',
         'num_cls_head': 2,
         'num_reg_head': 2,
         'head_depthwise': False,
@@ -54,23 +54,24 @@ yolo_free_v2_config = {
                     'alpha': 0.5,
                     'beta': 6.0},
         # loss weight
-        'cls_loss': 'bce', # vfl (optional)
+        'cls_loss': 'bce',         # optional: bce, vfl
         'loss_cls_weight': 0.5,
         'loss_iou_weight': 7.5,
         'loss_dfl_weight': 1.5,
         # training configuration
-        'no_aug_epoch': 10,
+        'no_aug_epoch': 20,
         # optimizer
-        'optimizer': 'adamw',  # optional: sgd, adamw
-        'momentum': 0.937,
-        'weight_decay': 5e-2,  # 5e-4 for sgd, 5e-2 for adamw
+        'optimizer': 'sgd',      # optional: sgd, adamw
+        'momentum': 0.937,         # SGD: 0.937;    AdamW: invalid
+        'weight_decay': 5e-4,      # SGD: 5e-4;     AdamW: 5e-2
+        'clip_grad': 10,           # SGD: 10.0;     AdamW: -1
         # model EMA
-        'ema_decay': 0.9998,   # 0.9999 for sgd, 0.9998 for adamw
+        'ema_decay': 0.9999,       # SGD: 0.9999;   AdamW: 0.9998
         'ema_tau': 2000,
         # lr schedule
-        'scheduler': 'cosine',
-        'lr0': 0.004,
-        'lrf': 0.01,
+        'scheduler': 'linear',
+        'lr0': 0.01,              # SGD: 0.01;     AdamW: 0.004
+        'lrf': 0.01,               # SGD: 0.01;     AdamW: 0.05
         'warmup_momentum': 0.8,
         'warmup_bias_lr': 0.1,
         },
@@ -93,7 +94,7 @@ yolo_free_v2_config = {
         'backbone': 'elannet',
         'pretrained': False,
         'bk_act': 'silu',
-        'bk_norm': 'BN',  # BN (optional)
+        'bk_norm': 'BN',
         'bk_dpw': False,
         'p6_feat': False,
         'p7_feat': False,
@@ -106,17 +107,17 @@ yolo_free_v2_config = {
         'expand_ratio': 0.5,
         'pooling_size': 5,
         'neck_act': 'silu',
-        'neck_norm': 'BN',  # BN (optional)
+        'neck_norm': 'BN',
         'neck_depthwise': False,
         # fpn
         'fpn': 'elan_csp_pafpn',
         'fpn_act': 'silu',
-        'fpn_norm': 'BN',  # BN (optional)
+        'fpn_norm': 'BN',
         'fpn_depthwise': False,
         # head
         'head': 'decoupled_head',
         'head_act': 'silu',
-        'head_norm': 'BN',  # BN (optional)
+        'head_norm': 'BN',
         'num_cls_head': 2,
         'num_reg_head': 2,
         'head_depthwise': False,
@@ -131,18 +132,19 @@ yolo_free_v2_config = {
         'loss_iou_weight': 7.5,
         'loss_dfl_weight': 1.5,
         # training configuration
-        'no_aug_epoch': 10,
+        'no_aug_epoch': 20,
         # optimizer
-        'optimizer': 'sgd',
-        'momentum': 0.937,
-        'weight_decay': 5e-4,
+        'optimizer': 'sgd',      # optional: sgd, adamw
+        'momentum': 0.937,         # SGD: 0.937;    AdamW: invalid
+        'weight_decay': 5e-4,      # SGD: 5e-4;     AdamW: 5e-2
+        'clip_grad': 10,           # SGD: 10.0;     AdamW: -1
         # model EMA
-        'ema_decay': 0.9999,
+        'ema_decay': 0.9999,       # SGD: 0.9999;   AdamW: 0.9998
         'ema_tau': 2000,
         # lr schedule
         'scheduler': 'linear',
-        'lr0': 0.01,
-        'lrf': 0.01,
+        'lr0': 0.01,              # SGD: 0.01;     AdamW: 0.004
+        'lrf': 0.01,               # SGD: 0.01;     AdamW: 0.05
         'warmup_momentum': 0.8,
         'warmup_bias_lr': 0.1,
         },
@@ -165,7 +167,7 @@ yolo_free_v2_config = {
         'backbone': 'elannet',
         'pretrained': False,
         'bk_act': 'silu',
-        'bk_norm': 'BN',  # BN (optional)
+        'bk_norm': 'BN',
         'bk_dpw': False,
         'p6_feat': False,
         'p7_feat': False,
@@ -178,17 +180,17 @@ yolo_free_v2_config = {
         'expand_ratio': 0.5,
         'pooling_size': 5,
         'neck_act': 'silu',
-        'neck_norm': 'BN',  # BN (optional)
+        'neck_norm': 'BN',
         'neck_depthwise': False,
         # fpn
         'fpn': 'elan_csp_pafpn',
         'fpn_act': 'silu',
-        'fpn_norm': 'BN',  # BN (optional)
+        'fpn_norm': 'BN',
         'fpn_depthwise': False,
         # head
         'head': 'decoupled_head',
         'head_act': 'silu',
-        'head_norm': 'BN',  # BN (optional)
+        'head_norm': 'BN',
         'num_cls_head': 2,
         'num_reg_head': 2,
         'head_depthwise': False,
@@ -203,18 +205,19 @@ yolo_free_v2_config = {
         'loss_iou_weight': 7.5,
         'loss_dfl_weight': 1.5,
         # training configuration
-        'no_aug_epoch': 10,
+        'no_aug_epoch': 20,
         # optimizer
-        'optimizer': 'sgd',
-        'momentum': 0.937,
-        'weight_decay': 5e-4,
+        'optimizer': 'sgd',      # optional: sgd, adamw
+        'momentum': 0.937,         # SGD: 0.937;    AdamW: invalid
+        'weight_decay': 5e-4,      # SGD: 5e-4;     AdamW: 5e-2
+        'clip_grad': 10,           # SGD: 10.0;     AdamW: -1
         # model EMA
-        'ema_decay': 0.9999,
+        'ema_decay': 0.9999,       # SGD: 0.9999;   AdamW: 0.9998
         'ema_tau': 2000,
         # lr schedule
         'scheduler': 'linear',
-        'lr0': 0.01,
-        'lrf': 0.01,
+        'lr0': 0.01,              # SGD: 0.01;     AdamW: 0.004
+        'lrf': 0.01,               # SGD: 0.01;     AdamW: 0.05
         'warmup_momentum': 0.8,
         'warmup_bias_lr': 0.1,
         },
@@ -237,7 +240,7 @@ yolo_free_v2_config = {
         'backbone': 'elannet',
         'pretrained': False,
         'bk_act': 'silu',
-        'bk_norm': 'BN',  # BN (optional)
+        'bk_norm': 'BN',
         'bk_dpw': False,
         'p6_feat': False,
         'p7_feat': False,
@@ -250,17 +253,17 @@ yolo_free_v2_config = {
         'expand_ratio': 0.5,
         'pooling_size': 5,
         'neck_act': 'silu',
-        'neck_norm': 'BN',  # BN (optional)
+        'neck_norm': 'BN',
         'neck_depthwise': False,
         # fpn
         'fpn': 'elan_csp_pafpn',
         'fpn_act': 'silu',
-        'fpn_norm': 'BN',  # BN (optional)
+        'fpn_norm': 'BN',
         'fpn_depthwise': False,
         # head
         'head': 'decoupled_head',
         'head_act': 'silu',
-        'head_norm': 'BN',  # BN (optional)
+        'head_norm': 'BN',
         'num_cls_head': 2,
         'num_reg_head': 2,
         'head_depthwise': False,
@@ -275,18 +278,19 @@ yolo_free_v2_config = {
         'loss_iou_weight': 7.5,
         'loss_dfl_weight': 1.5,
         # training configuration
-        'no_aug_epoch': 10,
+        'no_aug_epoch': 20,
         # optimizer
-        'optimizer': 'sgd',
-        'momentum': 0.937,
-        'weight_decay': 5e-4,
+        'optimizer': 'sgd',      # optional: sgd, adamw
+        'momentum': 0.937,         # SGD: 0.937;    AdamW: invalid
+        'weight_decay': 5e-4,      # SGD: 5e-4;     AdamW: 5e-2
+        'clip_grad': 10,           # SGD: 10.0;     AdamW: -1
         # model EMA
-        'ema_decay': 0.9999,
+        'ema_decay': 0.9999,       # SGD: 0.9999;   AdamW: 0.9998
         'ema_tau': 2000,
         # lr schedule
         'scheduler': 'linear',
-        'lr0': 0.01,
-        'lrf': 0.01,
+        'lr0': 0.01,              # SGD: 0.01;     AdamW: 0.004
+        'lrf': 0.01,               # SGD: 0.01;     AdamW: 0.05
         'warmup_momentum': 0.8,
         'warmup_bias_lr': 0.1,
         },
@@ -309,7 +313,7 @@ yolo_free_v2_config = {
         'backbone': 'elannet',
         'pretrained': False,
         'bk_act': 'silu',
-        'bk_norm': 'BN',  # BN (optional)
+        'bk_norm': 'BN',
         'bk_dpw': False,
         'p6_feat': False,
         'p7_feat': False,
@@ -322,17 +326,17 @@ yolo_free_v2_config = {
         'expand_ratio': 0.5,
         'pooling_size': 5,
         'neck_act': 'silu',
-        'neck_norm': 'BN',  # BN (optional)
+        'neck_norm': 'BN',
         'neck_depthwise': False,
         # fpn
         'fpn': 'elan_csp_pafpn',
         'fpn_act': 'silu',
-        'fpn_norm': 'BN',  # BN (optional)
+        'fpn_norm': 'BN',
         'fpn_depthwise': False,
         # head
         'head': 'decoupled_head',
         'head_act': 'silu',
-        'head_norm': 'BN',  # BN (optional)
+        'head_norm': 'BN',
         'num_cls_head': 2,
         'num_reg_head': 2,
         'head_depthwise': False,
@@ -347,18 +351,19 @@ yolo_free_v2_config = {
         'loss_iou_weight': 7.5,
         'loss_dfl_weight': 1.5,
         # training configuration
-        'no_aug_epoch': 10,
+        'no_aug_epoch': 20,
         # optimizer
-        'optimizer': 'sgd',
-        'momentum': 0.937,
-        'weight_decay': 5e-4,
+        'optimizer': 'sgd',      # optional: sgd, adamw
+        'momentum': 0.937,         # SGD: 0.937;    AdamW: invalid
+        'weight_decay': 5e-4,      # SGD: 5e-4;     AdamW: 5e-2
+        'clip_grad': 10,           # SGD: 10.0;     AdamW: -1
         # model EMA
-        'ema_decay': 0.9999,
+        'ema_decay': 0.9999,       # SGD: 0.9999;   AdamW: 0.9998
         'ema_tau': 2000,
         # lr schedule
         'scheduler': 'linear',
-        'lr0': 0.01,
-        'lrf': 0.01,
+        'lr0': 0.01,              # SGD: 0.01;     AdamW: 0.004
+        'lrf': 0.01,               # SGD: 0.01;     AdamW: 0.05
         'warmup_momentum': 0.8,
         'warmup_bias_lr': 0.1,
         },

@@ -55,18 +55,19 @@ yolo_free_vx_config = {
         'loss_cls_weight': 1.0,
         'loss_reg_weight': 2.0,
         # training configuration
-        'no_aug_epoch': 10,
+        'no_aug_epoch': 20,
         # optimizer
-        'optimizer': 'adamw',  # optional: sgd, adamw
-        'momentum': 0.937,
-        'weight_decay': 5e-2,  # 5e-4 for sgd, 5e-2 for adamw
+        'optimizer': 'sgd',      # optional: sgd, adamw
+        'momentum': 0.937,         # SGD: 0.937;    AdamW: invalid
+        'weight_decay': 5e-4,      # SGD: 5e-4;     AdamW: 5e-2
+        'clip_grad': 10,           # SGD: 10.0;     AdamW: -1
         # model EMA
-        'ema_decay': 0.9998,   # 0.9999 for sgd, 0.9998 for adamw
+        'ema_decay': 0.9999,       # SGD: 0.9999;   AdamW: 0.9998
         'ema_tau': 2000,
         # lr schedule
-        'scheduler': 'cosine',
-        'lr0': 0.004,
-        'lrf': 0.01,
+        'scheduler': 'linear',
+        'lr0': 0.01,              # SGD: 0.01;     AdamW: 0.004
+        'lrf': 0.01,               # SGD: 0.01;     AdamW: 0.05
         'warmup_momentum': 0.8,
         'warmup_bias_lr': 0.1,
         },
@@ -123,18 +124,19 @@ yolo_free_vx_config = {
         'loss_cls_weight': 1.0,
         'loss_reg_weight': 2.0,
         # training configuration
-        'no_aug_epoch': 10,
+        'no_aug_epoch': 20,
         # optimizer
-        'optimizer': 'adamw',  # optional: sgd, adamw
-        'momentum': 0.937,
-        'weight_decay': 5e-2,  # 5e-4 for sgd, 5e-2 for adamw
+        'optimizer': 'sgd',      # optional: sgd, adamw
+        'momentum': 0.937,         # SGD: 0.937;    AdamW: invalid
+        'weight_decay': 5e-4,      # SGD: 5e-4;     AdamW: 5e-2
+        'clip_grad': 10,           # SGD: 10.0;     AdamW: -1
         # model EMA
-        'ema_decay': 0.9998,   # 0.9999 for sgd, 0.9998 for adamw
+        'ema_decay': 0.9999,       # SGD: 0.9999;   AdamW: 0.9998
         'ema_tau': 2000,
         # lr schedule
-        'scheduler': 'cosine',
-        'lr0': 0.004,
-        'lrf': 0.01,
+        'scheduler': 'linear',
+        'lr0': 0.01,              # SGD: 0.01;     AdamW: 0.004
+        'lrf': 0.01,               # SGD: 0.01;     AdamW: 0.05
         'warmup_momentum': 0.8,
         'warmup_bias_lr': 0.1,
         },
@@ -191,18 +193,19 @@ yolo_free_vx_config = {
         'loss_cls_weight': 1.0,
         'loss_reg_weight': 2.0,
         # training configuration
-        'no_aug_epoch': 10,
+        'no_aug_epoch': 20,
         # optimizer
-        'optimizer': 'adamw',  # optional: sgd, adamw
-        'momentum': 0.937,
-        'weight_decay': 5e-2,  # 5e-4 for sgd, 5e-2 for adamw
+        'optimizer': 'sgd',      # optional: sgd, adamw
+        'momentum': 0.937,         # SGD: 0.937;    AdamW: invalid
+        'weight_decay': 5e-4,      # SGD: 5e-4;     AdamW: 5e-2
+        'clip_grad': 10,           # SGD: 10.0;     AdamW: -1
         # model EMA
-        'ema_decay': 0.9998,   # 0.9999 for sgd, 0.9998 for adamw
+        'ema_decay': 0.9999,       # SGD: 0.9999;   AdamW: 0.9998
         'ema_tau': 2000,
         # lr schedule
-        'scheduler': 'cosine',
-        'lr0': 0.004,
-        'lrf': 0.01,
+        'scheduler': 'linear',
+        'lr0': 0.01,              # SGD: 0.01;     AdamW: 0.004
+        'lrf': 0.01,               # SGD: 0.01;     AdamW: 0.05
         'warmup_momentum': 0.8,
         'warmup_bias_lr': 0.1,
         },
@@ -259,18 +262,19 @@ yolo_free_vx_config = {
         'loss_cls_weight': 1.0,
         'loss_reg_weight': 2.0,
         # training configuration
-        'no_aug_epoch': 10,
+        'no_aug_epoch': 20,
         # optimizer
-        'optimizer': 'adamw',  # optional: sgd, adamw
-        'momentum': 0.937,
-        'weight_decay': 5e-2,  # 5e-4 for sgd, 5e-2 for adamw
+        'optimizer': 'sgd',      # optional: sgd, adamw
+        'momentum': 0.937,         # SGD: 0.937;    AdamW: invalid
+        'weight_decay': 5e-4,      # SGD: 5e-4;     AdamW: 5e-2
+        'clip_grad': 10,           # SGD: 10.0;     AdamW: -1
         # model EMA
-        'ema_decay': 0.9998,   # 0.9999 for sgd, 0.9998 for adamw
+        'ema_decay': 0.9999,       # SGD: 0.9999;   AdamW: 0.9998
         'ema_tau': 2000,
         # lr schedule
-        'scheduler': 'cosine',
-        'lr0': 0.004,
-        'lrf': 0.01,
+        'scheduler': 'linear',
+        'lr0': 0.01,              # SGD: 0.01;     AdamW: 0.004
+        'lrf': 0.01,               # SGD: 0.01;     AdamW: 0.05
         'warmup_momentum': 0.8,
         'warmup_bias_lr': 0.1,
         },
@@ -298,7 +302,7 @@ yolo_free_vx_config = {
         'p6_feat': False,
         'p7_feat': False,
         'width': 1.25,
-        'depth': 1.34,
+        'depth': 1.0,
         'stride': [8, 16, 32],  # P3, P4, P5
         # neck
         'neck': 'sppf',
@@ -327,18 +331,19 @@ yolo_free_vx_config = {
         'loss_cls_weight': 1.0,
         'loss_reg_weight': 2.0,
         # training configuration
-        'no_aug_epoch': 10,
+        'no_aug_epoch': 20,
         # optimizer
-        'optimizer': 'adamw',  # optional: sgd, adamw
-        'momentum': 0.937,
-        'weight_decay': 5e-2,  # 5e-4 for sgd, 5e-2 for adamw
+        'optimizer': 'sgd',      # optional: sgd, adamw
+        'momentum': 0.937,         # SGD: 0.937;    AdamW: invalid
+        'weight_decay': 5e-4,      # SGD: 5e-4;     AdamW: 5e-2
+        'clip_grad': 10,           # SGD: 10.0;     AdamW: -1
         # model EMA
-        'ema_decay': 0.9998,   # 0.9999 for sgd, 0.9998 for adamw
+        'ema_decay': 0.9999,       # SGD: 0.9999;   AdamW: 0.9998
         'ema_tau': 2000,
         # lr schedule
-        'scheduler': 'cosine',
-        'lr0': 0.004,
-        'lrf': 0.01,
+        'scheduler': 'linear',
+        'lr0': 0.01,              # SGD: 0.01;     AdamW: 0.004
+        'lrf': 0.01,               # SGD: 0.01;     AdamW: 0.05
         'warmup_momentum': 0.8,
         'warmup_bias_lr': 0.1,
         },
