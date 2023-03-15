@@ -379,15 +379,17 @@ class TrainTransforms(object):
 
         pad_image = torch.ones([img_tensor.size(0), self.img_size, self.img_size]).float() * 114.
         pad_image[:, :img_h0, :img_w0] = img_tensor
+        dh = self.img_size - img_h0
+        dw = self.img_size - img_w0
 
-        return pad_image, target
+        return pad_image, target, [dh, dw]
 
 
 # ValTransform
 class ValTransforms(object):
-    def __init__(self, 
-                 img_size=640):
-        self.img_size =img_size
+    def __init__(self, img_size=640, max_stride=32):
+        self.img_size = img_size
+        self.max_stride = max_stride
 
 
     def __call__(self, image, target=None, mosaic=False):
@@ -397,9 +399,8 @@ class ValTransforms(object):
         r = self.img_size / max(img_h0, img_w0)
         r = min(r, 1.0) # only scale down, do not scale up (for better val mAP)
         if r != 1: 
-            interp = cv2.INTER_LINEAR if r > 1 else cv2.INTER_AREA
             new_shape = (int(round(img_w0 * r)), int(round(img_h0 * r)))
-            img = cv2.resize(image, new_shape, interpolation=interp)
+            img = cv2.resize(image, new_shape, interpolation=cv2.INTER_LINEAR)
         else:
             img = image
 
@@ -422,19 +423,12 @@ class ValTransforms(object):
 
         # pad img
         img_h0, img_w0 = img_tensor.shape[1:]
-        assert max(img_h0, img_w0) <= self.img_size
+        dh = img_h0 % self.max_stride
+        dw = img_w0 % self.max_stride
 
-        if img_h0 > img_w0:
-            pad_img_h = self.img_size
-            pad_img_w = (img_w0 // 32 + 1) * 32
-        elif img_h0 < img_w0:
-            pad_img_h = (img_h0 // 32 + 1) * 32
-            pad_img_w = self.img_size
-        else:
-            pad_img_h = (img_h0 // 32 + 1) * 32
-            pad_img_w = (img_w0 // 32 + 1) * 32
+        pad_img_h = img_h0 + dh
+        pad_img_w = img_w0 + dw
         pad_image = torch.ones([img_tensor.size(0), pad_img_h, pad_img_w]).float() * 114.
         pad_image[:, :img_h0, :img_w0] = img_tensor
 
-        return pad_image, target
-
+        return pad_image, target, [dh, dw]

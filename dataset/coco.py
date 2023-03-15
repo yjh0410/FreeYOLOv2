@@ -103,8 +103,9 @@ class COCODataset(Dataset):
 
 
     def __getitem__(self, index):
-        image, target = self.pull_item(index)
-        return image, target
+        image, target, deltas = self.pull_item(index)
+
+        return image, target, deltas
 
 
     def load_cache(self):
@@ -216,9 +217,9 @@ class COCODataset(Dataset):
             image, target = self.load_image_target(index)
 
         # augment
-        image, target = self.transform(image, target, mosaic)
+        image, target, deltas = self.transform(image, target, mosaic)
 
-        return image, target
+        return image, target, deltas
 
 
     def pull_image(self, index):
@@ -318,8 +319,8 @@ if __name__ == "__main__":
         img_size=img_size,
         data_dir=args.root,
         image_set='val2017',
-        transform=train_transform,
-        mosaic_prob=0.5,
+        transform=val_transform,
+        mosaic_prob=0.,
         mixup_prob=0.15,
         trans_config=trans_config
         )
@@ -332,7 +333,7 @@ if __name__ == "__main__":
 
     for i in range(1000):
         t0 = time.time()
-        image, target = dataset.pull_item(i)
+        image, target, deltas = dataset.pull_item(i)
         print('load data time: {:6f}'.format((time.time() - t0)*1000))
         
         # to numpy
