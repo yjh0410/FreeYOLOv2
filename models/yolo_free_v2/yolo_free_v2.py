@@ -193,7 +193,7 @@ class FreeYOLOv2(nn.Module):
                 reg_preds = reg_preds.view(B, 4, M).permute(0, 2, 1).contiguous()
 
             # [B, M, 4 + C]
-            preds = torch.cat([reg_preds, cls_preds.sigmoid()], dim=-1)
+            preds = torch.cat([cls_preds.sigmoid(), reg_preds], dim=-1)
             # NMS
             outputs = non_max_suppression(
                 preds, self.conf_thresh, self.nms_thresh, classes=None, agnostic=False, max_det=self.max_det)
