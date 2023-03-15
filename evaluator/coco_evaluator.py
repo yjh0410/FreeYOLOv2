@@ -74,7 +74,7 @@ class COCOAPIEvaluator():
             orig_h, orig_w, _ = img.shape
 
             # preprocess
-            x = self.transform(img)[0]
+            x, _, deltas = self.transform(image)
             x = x.unsqueeze(0).to(self.device) / 255.
             
             id_ = int(id_)
@@ -85,8 +85,9 @@ class COCOAPIEvaluator():
             bboxes, scores, cls_inds = outputs
 
             # rescale
-            bboxes *= max(orig_h, orig_w)
-
+            img_h, img_w = x.shape[-2:]
+            bboxes[..., [0, 2]] = bboxes[..., [0, 2]] / (img_w - deltas[0]) * orig_w
+            bboxes[..., [1, 3]] = bboxes[..., [1, 3]] / (img_h - deltas[1]) * orig_h
             # clip bboxes
             bboxes[..., [0, 2]] = np.clip(bboxes[..., [0, 2]], a_min=0., a_max=orig_w)
             bboxes[..., [1, 3]] = np.clip(bboxes[..., [1, 3]], a_min=0., a_max=orig_h)
