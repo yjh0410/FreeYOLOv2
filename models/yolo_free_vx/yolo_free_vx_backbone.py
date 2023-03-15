@@ -254,7 +254,7 @@ def build_backbone(cfg):
             backbone = load_weight(backbone, model_name='elannet_medium')
         elif cfg['width'] == 1.0 and cfg['depth'] == 1.0 and not cfg['bk_dpw']:
             backbone = load_weight(backbone, model_name='elannet_large')
-        elif cfg['width'] == 1.25 and cfg['depth'] == 1.0 and not cfg['bk_dpw']:
+        elif cfg['width'] == 1.25 and cfg['depth'] == 1.34 and not cfg['bk_dpw']:
             backbone = load_weight(backbone, model_name='elannet_huge')
     feat_dims = backbone.feat_dims
 
