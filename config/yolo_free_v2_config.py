@@ -69,7 +69,7 @@ yolo_free_v2_config = {
         'ema_tau': 2000,
         # lr schedule
         'scheduler': 'linear',
-        'lr0': 0.01,
+        'lr0': 0.004,
         'lrf': 0.01,
         'warmup_momentum': 0.8,
         'warmup_bias_lr': 0.1,
