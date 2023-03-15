@@ -105,7 +105,7 @@ class FreeYOLOv2(nn.Module):
         fmp_h, fmp_w = fmp_size
         anchor_y, anchor_x = torch.meshgrid([torch.arange(fmp_h), torch.arange(fmp_w)])
         # [H, W, 2] -> [HW, 2]
-        anchor_xy = torch.stack([anchor_x, anchor_y], dim=-1).float().view(-1, 2)
+        anchor_xy = torch.stack([anchor_x, anchor_y], dim=-1).float().view(-1, 2) + 0.5
         anchor_xy *= self.stride[level]
         anchors = anchor_xy.to(self.device)
 
