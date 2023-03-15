@@ -53,7 +53,7 @@ yolo_free_vx_config = {
         # loss weight
         'cls_loss': 'bce', # vfl (optional)
         'loss_cls_weight': 1.0,
-        'loss_reg_weight': 2.0,
+        'loss_reg_weight': 5.0,
         # training configuration
         'no_aug_epoch': 20,
         # optimizer
@@ -122,7 +122,7 @@ yolo_free_vx_config = {
         # loss weight
         'cls_loss': 'bce', # vfl (optional)
         'loss_cls_weight': 1.0,
-        'loss_reg_weight': 2.0,
+        'loss_reg_weight': 5.0,
         # training configuration
         'no_aug_epoch': 20,
         # optimizer
@@ -191,7 +191,7 @@ yolo_free_vx_config = {
         # loss weight
         'cls_loss': 'bce', # vfl (optional)
         'loss_cls_weight': 1.0,
-        'loss_reg_weight': 2.0,
+        'loss_reg_weight': 5.0,
         # training configuration
         'no_aug_epoch': 20,
         # optimizer
@@ -260,7 +260,7 @@ yolo_free_vx_config = {
         # loss weight
         'cls_loss': 'bce', # vfl (optional)
         'loss_cls_weight': 1.0,
-        'loss_reg_weight': 2.0,
+        'loss_reg_weight': 5.0,
         # training configuration
         'no_aug_epoch': 20,
         # optimizer
@@ -329,7 +329,7 @@ yolo_free_vx_config = {
         # loss weight
         'cls_loss': 'bce', # vfl (optional)
         'loss_cls_weight': 1.0,
-        'loss_reg_weight': 2.0,
+        'loss_reg_weight': 5.0,
         # training configuration
         'no_aug_epoch': 20,
         # optimizer

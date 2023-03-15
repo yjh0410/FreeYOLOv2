@@ -69,7 +69,7 @@ class AlignSimOTA(object):
 
         cost = (
             pair_wise_cls_loss
-            + pair_wise_ious_loss
+            + 3.0 * pair_wise_ious_loss
             + 100000.0 * (~is_in_boxes_and_center)
         ) # [N, Mp]
 
