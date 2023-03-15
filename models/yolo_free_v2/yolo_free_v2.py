@@ -7,7 +7,7 @@ from .yolo_free_v2_neck import build_neck
 from .yolo_free_v2_pafpn import build_fpn
 from .yolo_free_v2_head import build_head
 
-from utils.nms import multiclass_nms
+from utils.nms import non_max_suppression
 
 
 # Anchor-free YOLO
@@ -19,7 +19,7 @@ class FreeYOLOv2(nn.Module):
                  conf_thresh = 0.05,
                  nms_thresh = 0.6,
                  trainable = False, 
-                 topk = 1000,
+                 max_det = 1000,
                  no_decode = False):
         super(FreeYOLOv2, self).__init__()
         # --------- Basic Parameters ----------
@@ -32,7 +32,7 @@ class FreeYOLOv2(nn.Module):
         self.trainable = trainable
         self.conf_thresh = conf_thresh
         self.nms_thresh = nms_thresh
-        self.topk = topk
+        self.max_det = max_det
         self.no_decode = no_decode
         
         # --------- Network Parameters ----------
@@ -139,72 +139,8 @@ class FreeYOLOv2(nn.Module):
         return pred_box
 
 
-    def post_process(self, cls_preds, reg_preds, anchors):
-        """
-        Input:
-            cls_preds: List(Tensor) [[B, H x W, C], ...]
-            reg_preds: List(Tensor) [[B, H x W, 4*(reg_max)], ...]
-            anchors:   List(Tensor) [[H x W, 2], ...]
-        """
-        all_scores = []
-        all_labels = []
-        all_bboxes = []
-        
-        for level, (cls_pred_i, reg_pred_i, anchors_i) in enumerate(zip(cls_preds, reg_preds, anchors)):
-            # [B, M, C] -> [M, C]
-            cur_cls_pred_i = cls_pred_i[0]
-            cur_reg_pred_i = reg_pred_i[0]
-            # [MC,]
-            scores_i = cur_cls_pred_i.sigmoid().flatten()
-
-            # Keep top k top scoring indices only.
-            num_topk = min(self.topk, cur_reg_pred_i.size(0))
-
-            # torch.sort is actually faster than .topk (at least on GPUs)
-            predicted_prob, topk_idxs = scores_i.sort(descending=True)
-            scores = predicted_prob[:num_topk]
-            topk_idxs = topk_idxs[:num_topk]
-
-            anchor_idxs = torch.div(topk_idxs, self.num_classes, rounding_mode='floor')
-            labels = topk_idxs % self.num_classes
-
-            cur_reg_pred_i = cur_reg_pred_i[anchor_idxs]
-            anchors_i = anchors_i[anchor_idxs]
-
-            # decode box: [M, 4]
-            box_pred_i = self.decode_boxes(
-                anchors_i[None], cur_reg_pred_i[None], self.stride[level])
-            bboxes = box_pred_i[0]
-
-            all_scores.append(scores)
-            all_labels.append(labels)
-            all_bboxes.append(bboxes)
-
-        scores = torch.cat(all_scores)
-        labels = torch.cat(all_labels)
-        bboxes = torch.cat(all_bboxes)
-
-        # threshold
-        keep_idxs = scores.gt(self.conf_thresh)
-        scores = scores[keep_idxs]
-        labels = labels[keep_idxs]
-        bboxes = bboxes[keep_idxs]
-
-        # to cpu & numpy
-        scores = scores.cpu().numpy()
-        labels = labels.cpu().numpy()
-        bboxes = bboxes.cpu().numpy()
-
-        # nms
-        scores, labels, bboxes = multiclass_nms(
-            scores, labels, bboxes, self.nms_thresh, self.num_classes, False)
-
-        return bboxes, scores, labels
-
-
     @torch.no_grad()
     def inference_single_image(self, x):
-        img_h, img_w = x.shape[2:]
         # backbone
         pyramid_feats = self.backbone(x)
 
@@ -241,7 +177,6 @@ class FreeYOLOv2(nn.Module):
             all_reg_preds.append(reg_pred)
             all_anchors.append(anchors)
 
-        if self.no_decode:
             B, M = cls_pred.shape[:2]
             # no post process
             cls_preds = torch.cat(all_cls_preds, dim=1)  # [B, M, C]
@@ -259,8 +194,11 @@ class FreeYOLOv2(nn.Module):
 
             # [B, M, 4 + C]
             preds = torch.cat([reg_preds, cls_preds.sigmoid()], dim=-1)
-            # [M, 4 + C]
-            outputs = preds[0]
+            # NMS
+            outputs = non_max_suppression(
+                preds, self.conf_thresh, self.nms_thresh, classes=None, agnostic=False, max_det=self.max_det)
+            
+            print(outputs[0].shape)
 
             return outputs
 
