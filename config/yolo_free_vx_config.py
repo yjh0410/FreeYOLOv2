@@ -19,8 +19,8 @@ yolo_free_vx_config = {
                           },
         # model
         'backbone': 'elannet',
-        'pretrained': False,
-        'bk_act': 'lrelu',
+        'pretrained': True,
+        'bk_act': 'silu',
         'bk_norm': 'BN',
         'bk_dpw': False,
         'p6_feat': False,
@@ -32,17 +32,17 @@ yolo_free_vx_config = {
         'neck': 'sppf',
         'expand_ratio': 0.5,
         'pooling_size': 5,
-        'neck_act': 'lrelu',
+        'neck_act': 'silu',
         'neck_norm': 'BN',
         'neck_depthwise': False,
         # fpn
         'fpn': 'elan_pafpn',
-        'fpn_act': 'lrelu',
+        'fpn_act': 'silu',
         'fpn_norm': 'BN',
         'fpn_depthwise': False,
         # head
         'head': 'decoupled_head',
-        'head_act': 'lrelu',
+        'head_act': 'silu',
         'head_norm': 'BN',
         'num_cls_head': 2,
         'num_reg_head': 2,
@@ -88,7 +88,7 @@ yolo_free_vx_config = {
                           },
         # model
         'backbone': 'elannet',
-        'pretrained': False,
+        'pretrained': True,
         'bk_act': 'silu',
         'bk_norm': 'BN',
         'bk_dpw': False,
@@ -157,7 +157,7 @@ yolo_free_vx_config = {
                           },
         # model
         'backbone': 'elannet',
-        'pretrained': False,
+        'pretrained': True,
         'bk_act': 'silu',
         'bk_norm': 'BN',
         'bk_dpw': False,
@@ -226,7 +226,7 @@ yolo_free_vx_config = {
                           },
         # model
         'backbone': 'elannet',
-        'pretrained': False,
+        'pretrained': True,
         'bk_act': 'silu',
         'bk_norm': 'BN',
         'bk_dpw': False,
@@ -295,7 +295,7 @@ yolo_free_vx_config = {
                           },
         # model
         'backbone': 'elannet',
-        'pretrained': False,
+        'pretrained': True,
         'bk_act': 'silu',
         'bk_norm': 'BN',
         'bk_dpw': False,
