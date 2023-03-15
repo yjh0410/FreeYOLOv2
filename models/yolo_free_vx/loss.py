@@ -132,7 +132,27 @@ class ClassificationLoss(nn.Module):
         self.gamma = 2.0
 
 
-    def varifocalloss(self, pred_logits, gt_score, gt_label, alpha=0.75, gamma=2.0):
+    def quality_focal_loss(self, pred_logits, cls_targets, beta=2.0):
+        """
+            pred (torch.Tensor): 用形状（N，C）联合表示预测分类和质量（IoU），C是类的数量。
+            target (tuple([torch.Tensor])): 目标类别标签的形状为（N，），目标质量标签的形状是（N，，）。
+            beta (float): 计算比例因子的 β 参数.
+        """
+    
+        # cross entropy
+        ce_loss = F.binary_cross_entropy_with_logits(pred_logits, cls_targets)
+        scale_factor = (pred_logits.sigmoid() - cls_targets).abs().pow(beta)
+        loss = ce_loss * scale_factor
+
+        if self.reduction == 'sum':
+            loss = loss.sum()
+        elif self.reduction == 'mean':
+            loss = loss.mean()
+
+        return loss
+
+
+    def vari_focal_loss(self, pred_logits, gt_score, gt_label, alpha=0.75, gamma=2.0):
         focal_weight = alpha * pred_logits.sigmoid().pow(gamma) * (1 - gt_label) + gt_score * gt_label
         with torch.cuda.amp.autocast(enabled=False):
             bce_loss = F.binary_cross_entropy_with_logits(
@@ -161,7 +181,9 @@ class ClassificationLoss(nn.Module):
 
     def forward(self, pred_logits, gt_score, gt_label=None):
         if self.cfg['cls_loss'] == 'vfl':
-            return self.varifocalloss(pred_logits, gt_score, gt_label, self.alpha, self.gamma)
+            return self.vari_focal_loss(pred_logits, gt_score, gt_label, self.alpha, self.gamma)
+        elif self.cfg['cls_loss'] == 'qfl':
+            return self.quality_focal_loss(pred_logits, gt_score, beta=2.0)
         elif self.cfg['cls_loss'] == 'bce':
             return self.binary_cross_entropy(pred_logits, gt_score)
 

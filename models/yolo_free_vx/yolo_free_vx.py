@@ -248,7 +248,6 @@ class FreeYOLOvx(nn.Module):
 
             # non-shared heads
             all_anchors = []
-            all_obj_preds = []
             all_cls_preds = []
             all_box_preds = []
             for level, (feat, head) in enumerate(zip(pyramid_feats, self.non_shared_heads)):

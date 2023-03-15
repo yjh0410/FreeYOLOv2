@@ -8,7 +8,12 @@ except:
 
 
 model_urls = {
+    'elannet_pico': "https://github.com/yjh0410/image_classification_pytorch/releases/download/weight/elannet_pico.pth",
     'elannet_nano': "https://github.com/yjh0410/image_classification_pytorch/releases/download/weight/elannet_nano.pth",
+    'elannet_small': "https://github.com/yjh0410/image_classification_pytorch/releases/download/weight/elannet_small.pth",
+    'elannet_medium': "https://github.com/yjh0410/image_classification_pytorch/releases/download/weight/elannet_meidum.pth",
+    'elannet_large': "https://github.com/yjh0410/image_classification_pytorch/releases/download/weight/elannet_large.pth",
+    'elannet_huge': "https://github.com/yjh0410/image_classification_pytorch/releases/download/weight/elannet_huge.pth",
 }
 
 
@@ -240,8 +245,17 @@ def build_backbone(cfg):
     # check whether to load imagenet pretrained weight
     if cfg['pretrained']:
         if cfg['width'] == 0.25 and cfg['depth'] == 0.34 and cfg['bk_dpw']:
+            backbone = load_weight(backbone, model_name='elannet_pico')
+        elif cfg['width'] == 0.25 and cfg['depth'] == 0.34 and not cfg['bk_dpw']:
             backbone = load_weight(backbone, model_name='elannet_nano')
-
+        elif cfg['width'] == 0.5 and cfg['depth'] == 0.34 and not cfg['bk_dpw']:
+            backbone = load_weight(backbone, model_name='elannet_small')
+        elif cfg['width'] == 0.75 and cfg['depth'] == 0.67 and not cfg['bk_dpw']:
+            backbone = load_weight(backbone, model_name='elannet_medium')
+        elif cfg['width'] == 1.0 and cfg['depth'] == 1.0 and not cfg['bk_dpw']:
+            backbone = load_weight(backbone, model_name='elannet_large')
+        elif cfg['width'] == 1.25 and cfg['depth'] == 1.0 and not cfg['bk_dpw']:
+            backbone = load_weight(backbone, model_name='elannet_huge')
     feat_dims = backbone.feat_dims
 
     return backbone, feat_dims
@@ -251,6 +265,7 @@ if __name__ == '__main__':
     import time
     from thop import profile
     cfg = {
+        'pretrained': True,
         'bk_act': 'lrelu',
         'bk_norm': 'BN',
         'bk_dpw': True,

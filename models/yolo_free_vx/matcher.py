@@ -7,11 +7,13 @@ class AlignSimOTA(object):
     def __init__(self, 
                  num_classes,
                  center_sampling_radius,
-                 topk_candidate
+                 topk_candidate,
+                 soft_center_radius = 3.0
                  ) -> None:
         self.num_classes = num_classes
         self.center_sampling_radius = center_sampling_radius
         self.topk_candidate = topk_candidate
+        self.soft_center_radius = soft_center_radius
 
 
     @torch.no_grad()
@@ -43,11 +45,20 @@ class AlignSimOTA(object):
         box_preds_ = pred_box[fg_mask]   # [Mp, 4]
         num_in_boxes_anchor = box_preds_.shape[0]
 
+        # ---------------------------- ctr cost ----------------------------
+        gt_center = self.get_box_center(tgt_bboxes)
+        anchors_fg = anchors[fg_mask]
+        strides_fg = strides[fg_mask]
+        distance = (anchors_fg[None] - gt_center[:, None, :]).pow(2).sum(-1).sqrt() / strides_fg[None]
+        soft_center_prior = torch.pow(10, distance - self.soft_center_radius)
+
+        # ---------------------------- reg cost ----------------------------
         # iou [N, Mp]
         pair_wise_ious, _ = box_iou(tgt_bboxes, box_preds_)
         # ioui cost [N, Mp]
         pair_wise_ious_loss = -torch.log(pair_wise_ious + 1e-8)
 
+        # ---------------------------- cls cost ----------------------------
         # [N, C] -> [N, Mp, C]
         gt_cls = (
             F.one_hot(tgt_labels.long(), self.num_classes)
@@ -61,15 +72,18 @@ class AlignSimOTA(object):
         with torch.cuda.amp.autocast(enabled=False):
             # [N, Mp, C]
             score_preds = cls_preds_.float().unsqueeze(0).repeat(num_gt, 1, 1).sigmoid_()
+            scale_factor = score_preds - soft_gt_cls
             # cls cost
             pair_wise_cls_loss = F.binary_cross_entropy(
                 score_preds, soft_gt_cls, reduction="none"
-            ).sum(-1) # [N, Mp]
+            ) * scale_factor.abs().pow(2.0)
+            pair_wise_cls_loss = pair_wise_cls_loss.sum(-1) # [N, Mp]
         del score_preds
 
         cost = (
             pair_wise_cls_loss
-            + 3.0 * pair_wise_ious_loss
+            + pair_wise_ious_loss
+            + soft_center_prior
             + 100000.0 * (~is_in_boxes_and_center)
         ) # [N, Mp]
 
@@ -94,6 +108,27 @@ class AlignSimOTA(object):
                 matched_gt_inds,
                 num_fg,
         )
+
+
+    def get_box_center(self, boxes, box_dim: int = 4):
+        """Return a tensor representing the centers of boxes.
+
+        Args:
+            boxes (Tensor): Boxes tensor. Has shape of (b, n, box_dim)
+            box_dim (int): The dimension of box. 4 means horizontal box and
+                5 means rotated box. Defaults to 4.
+
+        Returns:
+            Tensor: Centers have shape of (b, n, 2)
+        """
+        if box_dim == 4:
+            # Horizontal Boxes, (x1, y1, x2, y2)
+            return (boxes[..., :2] + boxes[..., 2:]) / 2.0
+        elif box_dim == 5:
+            # Rotated Boxes, (x, y, w, h, a)
+            return boxes[..., :2]
+        else:
+            raise NotImplementedError(f'Unsupported box_dim:{box_dim}')
 
 
     def get_in_boxes_info(
