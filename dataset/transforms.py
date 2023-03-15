@@ -382,7 +382,7 @@ class TrainTransforms(object):
         dh = self.img_size - img_h0
         dw = self.img_size - img_w0
 
-        return pad_image, target, [dh, dw]
+        return pad_image, target, [dw, dh]
 
 
 # ValTransform
@@ -425,10 +425,12 @@ class ValTransforms(object):
         img_h0, img_w0 = img_tensor.shape[1:]
         dh = img_h0 % self.max_stride
         dw = img_w0 % self.max_stride
-
+        dh = dh if dh == 0 else self.max_stride - dh
+        dw = dw if dw == 0 else self.max_stride - dw
+        
         pad_img_h = img_h0 + dh
         pad_img_w = img_w0 + dw
         pad_image = torch.ones([img_tensor.size(0), pad_img_h, pad_img_w]).float() * 114.
         pad_image[:, :img_h0, :img_w0] = img_tensor
 
-        return pad_image, target, [dh, dw]
+        return pad_image, target, [dw, dh]

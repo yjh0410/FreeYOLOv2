@@ -34,7 +34,10 @@ def build_dataset(cfg, args, device, is_train=False):
         img_size=args.img_size,
         min_box_size=args.min_box_size
         )
-    val_transform = ValTransforms(img_size=args.img_size)
+    val_transform = ValTransforms(
+        img_size=args.img_size,
+        max_stride=max(cfg['stride'])
+        )
     
     # dataset params
     transform = train_transform if is_train else None

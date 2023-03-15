@@ -142,8 +142,8 @@ def test(args,
         
         # rescale
         img_h, img_w = x.shape[:-2]
-        bboxes[..., [0, 2]] /= (img_w - deltas[1]) * orig_w
-        bboxes[..., [1, 3]] /= (img_h - deltas[0]) * orig_h
+        bboxes[..., [0, 2]] /= (img_w - deltas[0]) * orig_w
+        bboxes[..., [1, 3]] /= (img_h - deltas[1]) * orig_h
         bboxes[..., [0, 2]] = np.clip(bboxes[..., [0, 2]], a_min=0., a_max=orig_w)
         bboxes[..., [1, 3]] = np.clip(bboxes[..., [1, 3]], a_min=0., a_max=orig_h)
 
@@ -224,7 +224,7 @@ if __name__ == '__main__':
         model = fuse_conv_bn.fuse_conv_bn(model)
 
     # transform
-    transform = ValTransforms(img_size=args.img_size)
+    transform = ValTransforms(img_size=args.img_size, max_stride=max(cfg['stride']))
 
     print("================= DETECT =================")
     
