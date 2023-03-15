@@ -198,7 +198,7 @@ class FreeYOLOv2(nn.Module):
             outputs = non_max_suppression(
                 preds, self.conf_thresh, self.nms_thresh, classes=None, agnostic=False, max_det=self.max_det)
             
-            print(outputs[0].shape)
+            print(outputs[0])
 
             return outputs
 
