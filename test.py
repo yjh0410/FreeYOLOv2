@@ -141,10 +141,9 @@ def test(args,
         print("detection time used ", time.time() - t0, "s")
         
         # rescale
-        img_h, img_w = x.shape[:-2]
+        img_h, img_w = x.shape[-2:]
         bboxes[..., [0, 2]] = bboxes[..., [0, 2]] / (img_w - deltas[0]) * orig_w
         bboxes[..., [1, 3]] = bboxes[..., [1, 3]] / (img_h - deltas[1]) * orig_h
-        print(bboxes)
         bboxes[..., [0, 2]] = np.clip(bboxes[..., [0, 2]], a_min=0., a_max=orig_w)
         bboxes[..., [1, 3]] = np.clip(bboxes[..., [1, 3]], a_min=0., a_max=orig_h)
 
