@@ -66,8 +66,8 @@ class OurDataset(Dataset):
 
 
     def __getitem__(self, index):
-        image, target = self.pull_item(index)
-        return image, target
+        image, target, deltas = self.pull_item(index)
+        return image, target, deltas
 
 
     def load_image_target(self, index):
@@ -149,13 +149,13 @@ class OurDataset(Dataset):
         mosaic = False
         if random.random() < self.mosaic_prob:
             mosaic = True
-            if random.random() < 0.8:
+            if random.random() < 1.0:
                 image, target = self.load_mosaic(index, True)
             else:
                 image, target = self.load_mosaic(index, False)
             # MixUp
             if random.random() < self.mixup_prob:
-                if random.random() < 0.8:
+                if random.random() < 1.0:
                     new_index = np.random.randint(0, len(self.ids))
                     new_image, new_target = self.load_mosaic(new_index, True)
                 else:
@@ -170,9 +170,9 @@ class OurDataset(Dataset):
             image, target = self.load_image_target(img_id)
 
         # augment
-        image, target = self.transform(image, target, mosaic)
+        image, target, deltas = self.transform(image, target, mosaic)
 
-        return image, target
+        return image, target, deltas
 
 
     def pull_image(self, index):
@@ -263,7 +263,7 @@ if __name__ == "__main__":
     print('Data length: ', len(dataset))
 
     for i in range(1000):
-        image, target = dataset.pull_item(i)
+        image, target, deltas = dataset.pull_item(i)
         # to numpy
         image = image.permute(1, 2, 0).numpy()
         image = image.astype(np.uint8)
