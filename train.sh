@@ -16,7 +16,6 @@ python train.py \
         # --pretrained weights/coco/yolo_free_medium/yolo_free_medium_39.46.pth \
         # --eval_first
 
-
 # # Debug FreeYOLO on VOC
 # python train.py \
 #         --cuda \
