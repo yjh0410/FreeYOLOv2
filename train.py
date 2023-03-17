@@ -212,6 +212,19 @@ def train():
         if args.distributed:
             dataloader.batch_sampler.sampler.set_epoch(epoch)
 
+        # check second stage
+        if epoch >= (total_epochs - cfg['no_aug_epoch']):
+            # close mosaic augmentation
+            if dataloader.dataset.mosaic_prob > 0.:
+                print('close Mosaic Augmentation ...')
+                dataloader.dataset.mosaic_prob = 0.
+                heavy_eval = True
+            # close mixup augmentation
+            if dataloader.dataset.mixup_prob > 0.:
+                print('close Mixup Augmentation ...')
+                dataloader.dataset.mixup_prob = 0.
+                heavy_eval = True
+                
         # train one epoch
         last_opt_step = train_one_epoch(
             epoch=epoch,
