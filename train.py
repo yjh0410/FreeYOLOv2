@@ -185,7 +185,8 @@ def train():
     # Scheduler
     scheduler, lf = build_lr_scheduler(cfg, optimizer, args.max_epoch)
     scheduler.last_epoch = start_epoch - 1  # do not move
-    scheduler.step()
+    if args.resume:
+        scheduler.step()
 
     # EMA
     if args.ema and distributed_utils.get_rank() in [-1, 0]:
