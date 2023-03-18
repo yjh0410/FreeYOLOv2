@@ -1,9 +1,9 @@
 # yolo-free config
 
 
-yolo_free_vx_config = {
+yolo_free_v2_config = {
     # P5
-    'yolo_free_vx_nano': {
+    'yolo_free_v2_nano': {
         # input
         'mosaic_prob': 1.0,
         'mixup_prob': 0.0,
@@ -72,7 +72,7 @@ yolo_free_vx_config = {
         'warmup_bias_lr': 0.1,
         },
 
-    'yolo_free_vx_small': {
+    'yolo_free_v2_small': {
         # input
         'mosaic_prob': 1.0,
         'mixup_prob': 0.0,
@@ -141,7 +141,7 @@ yolo_free_vx_config = {
         'warmup_bias_lr': 0.1,
         },
 
-    'yolo_free_vx_medium': {
+    'yolo_free_v2_medium': {
         # input
         'mosaic_prob': 1.0,
         'mixup_prob': 0.1,
@@ -210,7 +210,7 @@ yolo_free_vx_config = {
         'warmup_bias_lr': 0.1,
         },
 
-    'yolo_free_vx_large': {
+    'yolo_free_v2_large': {
         # input
         'mosaic_prob': 1.0,
         'mixup_prob': 0.15,
@@ -279,7 +279,7 @@ yolo_free_vx_config = {
         'warmup_bias_lr': 0.1,
         },
 
-    'yolo_free_vx_huge': {
+    'yolo_free_v2_huge': {
         # input
         'mosaic_prob': 1.0,
         'mixup_prob': 0.15,

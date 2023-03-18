@@ -1,9 +1,9 @@
 import torch
 import torch.nn as nn
 try:
-    from .yolo_free_vx_basic import Conv
+    from .yolo_free_v2_basic import Conv
 except:
-    from yolo_free_vx_basic import Conv
+    from yolo_free_v2_basic import Conv
 
 
 class DecoupledHead(nn.Module):

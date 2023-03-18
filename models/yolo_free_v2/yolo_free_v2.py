@@ -1,17 +1,16 @@
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 
-from .yolo_free_vx_backbone import build_backbone
-from .yolo_free_vx_neck import build_neck
-from .yolo_free_vx_pafpn import build_fpn
-from .yolo_free_vx_head import build_head
+from .yolo_free_v2_backbone import build_backbone
+from .yolo_free_v2_neck import build_neck
+from .yolo_free_v2_pafpn import build_fpn
+from .yolo_free_v2_head import build_head
 
 from utils.nms import multiclass_nms
 
 
 # Anchor-free YOLO
-class FreeYOLOvx(nn.Module):
+class FreeYOLOv2(nn.Module):
     def __init__(self, 
                  cfg,
                  device, 
@@ -21,7 +20,7 @@ class FreeYOLOvx(nn.Module):
                  trainable = False, 
                  topk = 1000,
                  no_decode = False):
-        super(FreeYOLOvx, self).__init__()
+        super(FreeYOLOv2, self).__init__()
         # --------- Basic Parameters ----------
         self.cfg = cfg
         self.device = device

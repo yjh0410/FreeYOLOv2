@@ -1,9 +1,9 @@
 import torch
 import torch.nn as nn
 try:
-    from .yolo_free_vx_basic import ELANBlock, DownSample
+    from .yolo_free_v2_basic import ELANBlock, DownSample
 except:
-    from yolo_free_vx_basic import ELANBlock, DownSample
+    from yolo_free_v2_basic import ELANBlock, DownSample
 
 
 
