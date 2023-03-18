@@ -2,9 +2,9 @@ import torch
 import torch.nn as nn
 
 try:
-    from .yolo_free_v2_basic import ELAN_CSP_Block
+    from .yolov8_basic import ELAN_CSP_Block
 except:
-    from yolo_free_v2_basic import ELAN_CSP_Block
+    from yolov8_basic import ELAN_CSP_Block
 
 
 def get_activation(act_type=None):

@@ -3,18 +3,18 @@
 
 import torch
 from .loss import build_criterion
-from .yolo_free_v2 import FreeYOLOv2
+from .yolov8 import YOLOv8
 
 
 # build object detector
-def build_yolo_free_v2(args, cfg, device, num_classes=80, trainable=False):
+def build_yolov8(args, cfg, device, num_classes=80, trainable=False):
     print('==============================')
     print('Build {} ...'.format(args.version.upper()))
     
     print('==============================')
     print('Model Configuration: \n', cfg)
     
-    model = FreeYOLOv2(
+    model = YOLOv8(
         cfg=cfg,
         device=device, 
         num_classes=num_classes,

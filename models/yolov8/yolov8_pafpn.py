@@ -2,9 +2,9 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 try:
-    from .yolo_free_v2_basic import Conv, ELAN_CSP_Block
+    from .yolov8_basic import Conv, ELAN_CSP_Block
 except:
-    from yolo_free_v2_basic import Conv, ELAN_CSP_Block
+    from yolov8_basic import Conv, ELAN_CSP_Block
 
 
 # PaFPN-ELAN
