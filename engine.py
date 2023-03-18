@@ -96,6 +96,7 @@ def train_one_epoch(epoch,
             # loss
             loss_dict = criterion(outputs=outputs, targets=targets)
             losses = loss_dict['losses']
+            losses *= images.shape[0]  # loss * bs
 
             # reduce            
             loss_dict_reduced = distributed_utils.reduce_dict(loss_dict)

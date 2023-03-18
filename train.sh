@@ -3,7 +3,7 @@ python train.py \
         --cuda \
         -d coco \
         --root /mnt/share/ssd2/dataset/ \
-        -v yolo_free_vx_pico \
+        -v yolo_free_vx_nano \
         -bs 16 \
         -size 640 \
         --wp_epoch 3 \
@@ -12,7 +12,7 @@ python train.py \
         --ema \
         --fp16 \
         --multi_scale \
-        --resume weights/coco/yolo_free_vx_pico/yolo_free_vx_pico_epoch_41_20.46.pth \
+        # --resume weights/coco/yolo_free_vx_pico/yolo_free_vx_pico_epoch_41_20.46.pth \
         # --pretrained weights/coco/yolo_free_medium/yolo_free_medium_39.46.pth \
         # --eval_first
 
