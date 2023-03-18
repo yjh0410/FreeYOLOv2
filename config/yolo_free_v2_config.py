@@ -47,13 +47,16 @@ yolo_free_v2_config = {
         'num_cls_head': 2,
         'num_reg_head': 2,
         'head_depthwise': False,
+        'reg_max': 16,
         # matcher
-        'matcher': {'center_sampling_radius': 2.5,
-                    'topk_candicate': 10},
+        'matcher': {'topk': 10,
+                    'alpha': 0.5,
+                    'beta': 6.0},
         # loss weight
-        'cls_loss': 'bce', # optional: bce, qfl, vfl
-        'loss_cls_weight': 1.0,
-        'loss_reg_weight': 5.0,
+        'cls_loss': 'bce', # vfl (optional)
+        'loss_cls_weight': 0.5,
+        'loss_iou_weight': 7.5,
+        'loss_dfl_weight': 1.5,
         # training configuration
         'no_aug_epoch': 20,
         # optimizer
@@ -116,13 +119,16 @@ yolo_free_v2_config = {
         'num_cls_head': 2,
         'num_reg_head': 2,
         'head_depthwise': False,
+        'reg_max': 16,
         # matcher
-        'matcher': {'center_sampling_radius': 2.5,
-                    'topk_candicate': 10},
+        'matcher': {'topk': 10,
+                    'alpha': 0.5,
+                    'beta': 6.0},
         # loss weight
         'cls_loss': 'bce', # vfl (optional)
-        'loss_cls_weight': 1.0,
-        'loss_reg_weight': 5.0,
+        'loss_cls_weight': 0.5,
+        'loss_iou_weight': 7.5,
+        'loss_dfl_weight': 1.5,
         # training configuration
         'no_aug_epoch': 20,
         # optimizer
@@ -185,13 +191,16 @@ yolo_free_v2_config = {
         'num_cls_head': 2,
         'num_reg_head': 2,
         'head_depthwise': False,
+        'reg_max': 16,
         # matcher
-        'matcher': {'center_sampling_radius': 2.5,
-                    'topk_candicate': 10},
+        'matcher': {'topk': 10,
+                    'alpha': 0.5,
+                    'beta': 6.0},
         # loss weight
         'cls_loss': 'bce', # vfl (optional)
-        'loss_cls_weight': 1.0,
-        'loss_reg_weight': 5.0,
+        'loss_cls_weight': 0.5,
+        'loss_iou_weight': 7.5,
+        'loss_dfl_weight': 1.5,
         # training configuration
         'no_aug_epoch': 20,
         # optimizer
@@ -254,13 +263,16 @@ yolo_free_v2_config = {
         'num_cls_head': 2,
         'num_reg_head': 2,
         'head_depthwise': False,
+        'reg_max': 16,
         # matcher
-        'matcher': {'center_sampling_radius': 2.5,
-                    'topk_candicate': 10},
+        'matcher': {'topk': 10,
+                    'alpha': 0.5,
+                    'beta': 6.0},
         # loss weight
         'cls_loss': 'bce', # vfl (optional)
-        'loss_cls_weight': 1.0,
-        'loss_reg_weight': 5.0,
+        'loss_cls_weight': 0.5,
+        'loss_iou_weight': 7.5,
+        'loss_dfl_weight': 1.5,
         # training configuration
         'no_aug_epoch': 20,
         # optimizer
@@ -323,13 +335,16 @@ yolo_free_v2_config = {
         'num_cls_head': 2,
         'num_reg_head': 2,
         'head_depthwise': False,
+        'reg_max': 16,
         # matcher
-        'matcher': {'center_sampling_radius': 2.5,
-                    'topk_candicate': 10},
+        'matcher': {'topk': 10,
+                    'alpha': 0.5,
+                    'beta': 6.0},
         # loss weight
         'cls_loss': 'bce', # vfl (optional)
-        'loss_cls_weight': 1.0,
-        'loss_reg_weight': 5.0,
+        'loss_cls_weight': 0.5,
+        'loss_iou_weight': 7.5,
+        'loss_dfl_weight': 1.5,
         # training configuration
         'no_aug_epoch': 20,
         # optimizer
