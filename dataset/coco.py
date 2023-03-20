@@ -105,9 +105,7 @@ class COCODataset(Dataset):
 
 
     def __getitem__(self, index):
-        image, target, deltas = self.pull_item(index)
-
-        return image, target, deltas
+        return self.pull_item(index)
 
 
     def load_cache(self):
