@@ -15,7 +15,10 @@ yolo_free_v2_config = {
                           'perspective': 0.0,
                           'hsv_h': 0.015,
                           'hsv_s': 0.7,
-                          'hsv_v': 0.4
+                          'hsv_v': 0.4,
+                          'mosaic_type': 'yolov5_mosaic',
+                          'mixup_type': 'yolov5_mixup',
+                          'mixup_scale': [0.5, 1.5],
                           },
         # model
         'backbone': 'elannet',
@@ -87,7 +90,10 @@ yolo_free_v2_config = {
                           'perspective': 0.0,
                           'hsv_h': 0.015,
                           'hsv_s': 0.7,
-                          'hsv_v': 0.4
+                          'hsv_v': 0.4,
+                          'mosaic_type': 'yolov5_mosaic',
+                          'mixup_type': 'yolov5_mixup',
+                          'mixup_scale': [0.5, 1.5],
                           },
         # model
         'backbone': 'elannet',
@@ -159,7 +165,10 @@ yolo_free_v2_config = {
                           'perspective': 0.0,
                           'hsv_h': 0.015,
                           'hsv_s': 0.7,
-                          'hsv_v': 0.4
+                          'hsv_v': 0.4,
+                          'mosaic_type': 'yolov5_mosaic',
+                          'mixup_type': 'yolov5_mixup',
+                          'mixup_scale': [0.5, 1.5],
                           },
         # model
         'backbone': 'elannet',
@@ -231,7 +240,10 @@ yolo_free_v2_config = {
                           'perspective': 0.0,
                           'hsv_h': 0.015,
                           'hsv_s': 0.7,
-                          'hsv_v': 0.4
+                          'hsv_v': 0.4,
+                          'mosaic_type': 'yolov5_mosaic',
+                          'mixup_type': 'yolov5_mixup',
+                          'mixup_scale': [0.5, 1.5],
                           },
         # model
         'backbone': 'elannet',
@@ -303,7 +315,10 @@ yolo_free_v2_config = {
                           'perspective': 0.0,
                           'hsv_h': 0.015,
                           'hsv_s': 0.7,
-                          'hsv_v': 0.4
+                          'hsv_v': 0.4,
+                          'mosaic_type': 'yolov5_mosaic',
+                          'mixup_type': 'yolov5_mixup',
+                          'mixup_scale': [0.5, 1.5],
                           },
         # model
         'backbone': 'elannet',

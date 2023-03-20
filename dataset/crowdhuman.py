@@ -12,9 +12,9 @@ except:
     print("It seems that the COCOAPI is not installed.")
 
 try:
-    from .transforms import mosaic_x4_augment, mosaic_x9_augment, mixup_augment
+    from .transforms import yolov5_mosaic_augment, yolov5_mixup_augment, yolox_mixup_augment
 except:
-    from transforms import mosaic_x4_augment, mosaic_x9_augment, mixup_augment
+    from transforms import yolov5_mosaic_augment, yolov5_mixup_augment, yolox_mixup_augment
 
 
 crowd_class_labels = ('person',)
@@ -32,7 +32,8 @@ class CrowdHumanDataset(Dataset):
                  transform=None,
                  mosaic_prob=0.0,
                  mixup_prob=0.0,
-                 trans_config=None):
+                 trans_config=None,
+                 is_train=False):
         """
         COCO dataset initialization. Annotation data are read into memory by COCO API.
         Args:
@@ -48,6 +49,8 @@ class CrowdHumanDataset(Dataset):
         self.coco = COCO(os.path.join(self.data_dir, 'annotations', self.json_file))
         self.ids = self.coco.getImgIds()
         self.class_ids = sorted(self.coco.getCatIds())
+        self.is_train = is_train
+
         # augmentation
         self.transform = transform
         self.mosaic_prob = mosaic_prob
@@ -66,113 +69,84 @@ class CrowdHumanDataset(Dataset):
 
 
     def __getitem__(self, index):
-        image, target = self.pull_item(index)
-        return image, target
+        return self.pull_item(index)
 
 
     def load_image_target(self, index):
-        im_ann = self.coco.loadImgs(index)[0] 
-
-        anno_ids = self.coco.getAnnIds(imgIds=[int(index)], iscrowd=0)
-        annotations = self.coco.loadAnns(anno_ids)
-
         # load an image
-        img_file = os.path.join(
-                self.data_dir, 'CrowdHuman_{}'.format(self.image_set), 'Images', im_ann["file_name"])
-        image = cv2.imread(img_file)
-        
-        assert image is not None
-
+        image, _ = self.pull_image(index)
         height, width, channels = image.shape
-        
-        #load a target
-        anno = []
-        for label in annotations:
-            if 'bbox' in label and label['area'] > 0:   
-                xmin = np.max((0, label['bbox'][0]))
-                ymin = np.max((0, label['bbox'][1]))
-                xmax = np.min((width - 1, xmin + np.max((0, label['bbox'][2] - 1))))
-                ymax = np.min((height - 1, ymin + np.max((0, label['bbox'][3] - 1))))
-                if xmax > xmin and ymax > ymin:
-                    label_ind = label['category_id']
-                    cls_id = self.class_ids.index(label_ind)
 
-                    anno.append([xmin, ymin, xmax, ymax, cls_id])  # [xmin, ymin, xmax, ymax, label_ind]
+        # load a target
+        bboxes, labels = self.pull_anno(index)
 
-        # guard against no boxes via resizing
-        anno = np.array(anno).reshape(-1, 5)
         target = {
-            "boxes": anno[:, :4],
-            "labels": anno[:, 4],
+            "boxes": bboxes,
+            "labels": labels,
             "orig_size": [height, width]
         }
-        
+
         return image, target
 
 
-    def load_mosaic(self, index, load_4x=True):
-        if load_4x:
-            # load 4x mosaic image
-            ids_list_ = self.ids[:index] + self.ids[index+1:]
-            # random sample other indexs
-            id1 = self.ids[index]
-            id2, id3, id4 = random.sample(ids_list_, 3)
-            ids = [id1, id2, id3, id4]
+    def load_mosaic(self, index):
+        # load 4x mosaic image
+        index_list = np.arange(index).tolist() + np.arange(index+1, len(self.ids)).tolist()
+        id1 = index
+        id2, id3, id4 = random.sample(index_list, 3)
+        indexs = [id1, id2, id3, id4]
 
-        else:
-            # load 9x mosaic image
-            ids_list_ = self.ids[:index] + self.ids[index+1:]
-            # random sample other indexs
-            id1 = self.ids[index]
-            id2_9 = random.sample(ids_list_, 8)
-            ids = [id1] + id2_9
-
+        # load images and targets
         image_list = []
         target_list = []
-        for id_ in ids:
-            img_i, target_i = self.load_image_target(id_)
+        for index in indexs:
+            img_i, target_i = self.load_image_target(index)
             image_list.append(img_i)
             target_list.append(target_i)
 
-        if load_4x:
-            image, target = mosaic_x4_augment(
-                image_list, target_list, self.img_size, self.trans_config)
-        else:
-            image, target = mosaic_x9_augment(
-                image_list, target_list, self.img_size, self.trans_config)
+        # Mosaic
+        if self.trans_config['mosaic_type'] == 'yolov5_mosaic':
+            image, target = yolov5_mosaic_augment(
+                image_list, target_list, self.img_size, self.trans_config, self.is_train)
 
         return image, target
 
         
-    def pull_item(self, index):
-        # load a mosaic image
-        mosaic = False
-        if random.random() < self.mosaic_prob:
-            mosaic = True
-            if random.random() < 0.8:
-                image, target = self.load_mosaic(index, True)
-            else:
-                image, target = self.load_mosaic(index, False)
-            # MixUp
-            if random.random() < self.mixup_prob:
-                if random.random() < 0.8:
-                    new_index = np.random.randint(0, len(self.ids))
-                    new_image, new_target = self.load_mosaic(new_index, True)
-                else:
-                    new_index = np.random.randint(0, len(self.ids))
-                    new_image, new_target = self.load_mosaic(new_index, False)
-
-                image, target = mixup_augment(image, target, new_image, new_target)
-
-        # load an image and target
-        else:
-            img_id = self.ids[index]
-            image, target = self.load_image_target(img_id)
-
-        # augment
-        image, target = self.transform(image, target, mosaic)
+    def load_mixup(self, origin_image, origin_target):
+        # YOLOv5 type Mixup
+        if self.trans_config['mixup_type'] == 'yolov5_mixup':
+            new_index = np.random.randint(0, len(self.ids))
+            new_image, new_target = self.load_mosaic(new_index)
+            image, target = yolov5_mixup_augment(
+                origin_image, origin_target, new_image, new_target)
+        # YOLOX type Mixup
+        elif self.trans_config['mixup_type'] == 'yolox_mixup':
+            new_index = np.random.randint(0, len(self.ids))
+            new_image, new_target = self.load_image_target(new_index)
+            image, target = yolox_mixup_augment(
+                origin_image, origin_target, new_image, new_target, self.img_size, self.trans_config['mixup_scale'])
 
         return image, target
+    
+
+    def pull_item(self, index):
+        if random.random() < self.mosaic_prob:
+            # load a mosaic image
+            mosaic = True
+            image, target = self.load_mosaic(index)
+        else:
+            mosaic = False
+            # load an image and target
+            image, target = self.load_image_target(index)
+
+        # MixUp
+        if random.random() < self.mixup_prob:
+            image, target = self.load_mixup(image, target)
+
+        # augment
+        image, target, deltas = self.transform(image, target, mosaic)
+
+        return image, target, deltas
 
 
     def pull_image(self, index):
@@ -191,22 +165,29 @@ class CrowdHumanDataset(Dataset):
         anno_ids = self.coco.getAnnIds(imgIds=[int(id_)], iscrowd=None)
         annotations = self.coco.loadAnns(anno_ids)
         
-        anno = []
-        for label in annotations:
-            if 'bbox' in label:
-                xmin = np.max((0, label['bbox'][0]))
-                ymin = np.max((0, label['bbox'][1]))
-                xmax = xmin + label['bbox'][2]
-                ymax = ymin + label['bbox'][3]
+        #load a target
+        bboxes = []
+        labels = []
+        for anno in annotations:
+            if 'bbox' in anno and anno['area'] > 0:
+                # bbox
+                x1 = np.max((0, anno['bbox'][0]))
+                y1 = np.max((0, anno['bbox'][1]))
+                x2 = x1 + anno['bbox'][2]
+                y2 = y1 + anno['bbox'][3]
+                if x2 < x1 or y2 < y1:
+                    continue
+                # class label
+                cls_id = self.class_ids.index(anno['category_id'])
                 
-                if label['area'] > 0 and xmax >= xmin and ymax >= ymin:
-                    label_ind = label['category_id']
-                    cls_id = self.class_ids.index(label_ind)
+                bboxes.append([x1, y1, x2, y2])
+                labels.append(cls_id)
 
-                    anno.append([xmin, ymin, xmax, ymax, cls_id])  # [xmin, ymin, xmax, ymax, label_ind]
-            else:
-                print('No bbox !!')
-        return anno
+        # guard against no boxes via resizing
+        bboxes = np.array(bboxes).reshape(-1, 4)
+        labels = np.array(labels).reshape(-1)
+        
+        return bboxes, labels
 
 
 if __name__ == "__main__":
@@ -231,7 +212,11 @@ if __name__ == "__main__":
         'perspective': 0.0,
         'hsv_h': 0.015,
         'hsv_s': 0.7,
-        'hsv_v': 0.4
+        'hsv_v': 0.4,
+        'mosaic_type': 'yolov5_mosaic',
+        'mixup_type': 'yolov5_mixup',
+        'mixup_scale': [0.5, 1.5],
+        'use_segment': False,
     }
     train_transform = TrainTransforms(
         trans_config=trans_config,
@@ -260,7 +245,7 @@ if __name__ == "__main__":
     print('Data length: ', len(dataset))
 
     for i in range(1000):
-        image, target = dataset.pull_item(i)
+        image, target, _ = dataset.pull_item(i)
         # to numpy
         image = image.permute(1, 2, 0).numpy()
         image = image.astype(np.uint8)
