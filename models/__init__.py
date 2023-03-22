@@ -13,18 +13,18 @@ def build_model(args,
                 device, 
                 num_classes=80, 
                 trainable=False):
-    # detector    
+    # YOLOv8    
     if args.version in ['yolov8_nano', 'yolov8_small', 'yolov8_medium',
                         'yolov8_large', 'yolov8_huge',     # P5
                         ]:
         model, criterion = build_yolov8(
             args, cfg, device, num_classes, trainable)
-
+    # YOLOX
     elif args.version in ['yolox_nano', 'yolox_small', 'yolox_medium',
                           'yolox_large', 'yolox_huge']:
         model, criterion = build_yolox(
             args, cfg, device, num_classes, trainable)
-
+    # FreeYOLOv2
     elif args.version in ['yolo_free_v2_pico', 'yolo_free_v2_nano', 'yolo_free_v2_tiny',
                           'yolo_free_v2_small', 'yolo_free_v2_medium', 'yolo_free_v2_large',
                           'yolo_free_v2_huge', # P5

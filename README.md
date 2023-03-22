@@ -79,23 +79,40 @@ python train.py --cuda -d coco -v yolo_free_v2_tiny -bs 16 --max_epoch 300 --wp_
 | FreeYOLOv2-L |  640  |  ×   |         48.6           |                         |                          |  144.2            |  41.8              |  |
 | FreeYOLOv2-H |  640  |  √   |                        |                         |                          |  250.1            |  72.5              |  | -->
 
-| Model    | Scale |  IP  | AP<sup>val<br>0.5:0.95 | AP<sup>test<br>0.5:0.95 | FPS<sup>3090<br>FP32-bs1 | FLOPs<br><sup>(G) | Params<br><sup>(M) | Weight |
-|----------|-------|------|------------------------|-------------------------|--------------------------|-------------------|--------------------|--------|
-| YOLOv8-N |  640  |  ×   |                        |                         |                          |  6.4              |  2.4               |  |
-| YOLOv8-S |  640  |  ×   |                        |                         |                          |                   |                    |  |
-| YOLOv8-M |  640  |  ×   |                        |                         |                          |                   |                    |  |
-| YOLOv8-L |  640  |  ×   |                        |                         |                          |  165.4            |  43.7              |  |
-| YOLOv8-H |  640  |  ×   |                        |                         |                          |  255.8            |  69.4              |  |
+- FreeYOLOv2
 
 | Model        | Scale |  IP  | AP<sup>val<br>0.5:0.95 | AP<sup>test<br>0.5:0.95 | FPS<sup>3090<br>FP32-bs1 | FLOPs<br><sup>(G) | Params<br><sup>(M) | Weight |
 |--------------|-------|------|------------------------|-------------------------|--------------------------|-------------------|--------------------|--------|
-| FreeYOLOvx-N |  640  |  ×   |                        |                         |                          |                   |                    |  |
-| FreeYOLOvx-S |  640  |  ×   |                        |                         |                          |                   |                    |  |
-| FreeYOLOvx-M |  640  |  ×   |                        |                         |                          |                   |                    |  |
-| FreeYOLOvx-L |  640  |  ×   |                        |                         |                          |                   |                    |  |
-| FreeYOLOvx-H |  640  |  ×   |                        |                         |                          |                   |                    |  |
+| FreeYOLOv2-N |  640  |  √   |                        |                         |                          |   9.0             |   2.3              |  |
+| FreeYOLOv2-S |  640  |  √   |                        |                         |                          |   33.5            |   8.3              |  |
+| FreeYOLOv2-M |  640  |  √   |                        |                         |                          |                   |                    |  |
+| FreeYOLOv2-L |  640  |  √   |                        |                         |                          |                   |                    |  |
+| FreeYOLOv2-H |  640  |  √   |                        |                         |                          |                   |                    |  |
 
-*All the models are trained from the scratch without ImageNet pretrained weight (IP). All FLOPs are measured with a 640x640 image size on COCO val2017. The FPS is measured with batch size 1 on 3090 GPU from the model inference to the NMS operation.*
+*FreeYOLOv2 are trained with ImageNet pretrained weight (IP). All FLOPs are measured with a 640x640 image size on COCO val2017. The FPS is measured with batch size 1 on 3090 GPU from the model inference to the NMS operation.*
+
+
+- YOLOv8 (reproduced by this project)
+
+| Model    | Scale |  IP  | AP<sup>val<br>0.5:0.95 | AP<sup>test<br>0.5:0.95 | FPS<sup>3090<br>FP32-bs1 | FLOPs<br><sup>(G) | Params<br><sup>(M) | Weight |
+|----------|-------|------|------------------------|-------------------------|--------------------------|-------------------|--------------------|--------|
+| YOLOv8-N |  640  |  ×   |                        |                         |                          |                   |                    |  |
+| YOLOv8-S |  640  |  ×   |                        |                         |                          |                   |                    |  |
+| YOLOv8-M |  640  |  ×   |                        |                         |                          |                   |                    |  |
+| YOLOv8-L |  640  |  ×   |                        |                         |                          |                   |                    |  |
+| YOLOv8-H |  640  |  ×   |                        |                         |                          |                   |                    |  |
+
+
+- YOLOX (reproduced by this project)
+
+| Model   | Scale |  IP  | AP<sup>val<br>0.5:0.95 | AP<sup>test<br>0.5:0.95 | FPS<sup>3090<br>FP32-bs1 | FLOPs<br><sup>(G) | Params<br><sup>(M) | Weight |
+|---------|-------|------|------------------------|-------------------------|--------------------------|-------------------|--------------------|--------|
+| YOLOX-N |  640  |  ×   |                        |                         |                          |                   |                    |  |
+| YOLOX-S |  640  |  ×   |                        |                         |                          |                   |                    |  |
+| YOLOX-M |  640  |  ×   |                        |                         |                          |                   |                    |  |
+| YOLOX-L |  640  |  ×   |                        |                         |                          |                   |                    |  |
+| YOLOX-H |  640  |  ×   |                        |                         |                          |                   |                    |  |
+
 
 ### WiderFace
 - Download [WiderFace](http://shuoyang1213.me/WIDERFACE/).
