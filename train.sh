@@ -4,7 +4,7 @@ python train.py \
         -d coco \
         --root /mnt/share/ssd2/dataset/ \
         -v yolo_free_v2_large \
-        -bs 16 \
+        -bs 14 \
         -size 640 \
         --wp_epoch 3 \
         --max_epoch 300 \
