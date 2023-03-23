@@ -85,8 +85,8 @@ python train.py --cuda -d coco -v yolo_free_v2_tiny -bs 16 --max_epoch 300 --wp_
 |--------------|-------|------|------------------------|-------------------------|--------------------------|-------------------|--------------------|--------|
 | FreeYOLOv2-N |  640  |  √   |   35.5                 |                         |     100                  |   9.0             |   2.3              |  |
 | FreeYOLOv2-S |  640  |  √   |                        |                         |                          |   33.5            |   8.3              |  |
-| FreeYOLOv2-M |  640  |  √   |                        |                         |                          |                   |                    |  |
-| FreeYOLOv2-L |  640  |  √   |                        |                         |                          |                   |                    |  |
+| FreeYOLOv2-M |  640  |  √   |                        |                         |                          |   86.7            |   23.0             |  |
+| FreeYOLOv2-L |  640  |  √   |                        |                         |                          |   175.4           |   46.5             |  |
 | FreeYOLOv2-H |  640  |  √   |                        |                         |                          |                   |                    |  |
 
 *FreeYOLOv2 are trained with ImageNet pretrained weight (IP). All FLOPs are measured with a 640x640 image size on COCO val2017. The FPS is measured with batch size 1 on 3090 GPU from the model inference to the NMS operation.*
