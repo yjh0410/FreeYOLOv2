@@ -68,43 +68,37 @@ python train.py --cuda -d coco -v yolo_free_v2_tiny -bs 16 --max_epoch 300 --wp_
 
 **P5-Model on COCO:**
 
-| Model        | Scale | AP<sup>val<br>0.5:0.95 | AP<sup>test<br>0.5:0.95 |FPS<sup>3090<br>FP32-bs1 | FLOPs<br><sup>(G) | Params<br><sup>(M) | Weight |
-|--------------|-------|------------------------|-------------------------|---------------------------|-------------------|--------------------|--------|
-| FreeYOLOv2-P |  416  |         25.4           |          25.5           |                           |  1.4              |  1.0               | [ckpt](https://github.com/yjh0410/FreeYOLOv2/releases/download/yolo_free_v2_weights/yolo_free_v2_pico_coco.pth) |
-| FreeYOLOv2-N |  640  |         30.8           |          30.8           |                           |  6.9              |  1.7               | [ckpt](https://github.com/yjh0410/FreeYOLOv2/releases/download/yolo_free_v2_weights/yolo_free_v2_nano_coco.pth) |
-| FreeYOLOv2-T |  640  |         37.6           |          38.0           |           87              |  16.1             |  4.6               | [ckpt](https://github.com/yjh0410/FreeYOLOv2/releases/download/yolo_free_v2_weights/yolo_free_v2_tiny_coco.pth) |
-| FreeYOLOv2-S |  640  |         42.0           |          42.4           |           90              |  28.3             |  8.2               | [ckpt](https://github.com/yjh0410/FreeYOLOv2/releases/download/yolo_free_v2_weights/yolo_free_v2_small_coco.pth) |
-| FreeYOLOv2-M |  640  |         47.0           |          46.8           |           62              |  72.5             |  21.0              | [ckpt](https://github.com/yjh0410/FreeYOLOv2/releases/download/yolo_free_v2_weights/yolo_free_v2_medium_coco.pth) |
-| FreeYOLOv2-L |  640  |                        |                         |                           |  144.2            |  41.8              |  |
-| FreeYOLOv2-H |  640  |                        |                         |                           |  250.1            |  72.5              |  |
+| Model        | Scale |  IP  | AP<sup>val<br>0.5:0.95 | AP<sup>test<br>0.5:0.95 | FPS<sup>3090<br>FP32-bs1 | FLOPs<br><sup>(G) | Params<br><sup>(M) | Weight |
+|--------------|-------|------|------------------------|-------------------------|--------------------------|-------------------|--------------------|--------|
+| FreeYOLOv2-N |  640  |  √   |   35.5                 |    35.6                 |     100                  |   9.0             |   2.3              | [ckpt](https://github.com/yjh0410/FreeYOLOv2/releases/download/yolo_free_v2_ckpt/yolo_free_v2_nano_coco.pth) |
+| FreeYOLOv2-S |  640  |  √   |                        |                         |                          |   33.5            |   8.3              |  |
+| FreeYOLOv2-M |  640  |  √   |                        |                         |                          |   86.7            |   23.0             |  |
+| FreeYOLOv2-L |  640  |  √   |                        |                         |                          |   175.4           |   46.5             |  |
+| FreeYOLOv2-H |  640  |  √   |                        |                         |                          |                   |                    |  |
 
-*由于我只有1个RTX 3090型号的GPU，所以在训练**FreeYOLOv2-L**和**FreeYOLOv2-H**时，使用了ImageNet预训练权重来初始化backbone，对于最小的**FreeYOLOv2-Pico**，我也用了预训练权重，其他模型均采用**从头训练**的策略。*
+*所有模型都使用了ImageNet预训练权重，所有模型的FLOPs都是在COCO-val数据集上以640x640或1280x1280的输入尺寸来测试的。FPS指标是在一张3090型号的GPU上以batch size=1的输入来测试的，请注意，测速的内容包括模型前向推理、后处理以及NMS操作。*
 
-<!-- **P6-Model on COCO:**
+- YOLOv8 (由本项目复现)
 
-| Model         | Scale | AP<sup>val<br>0.5:0.95 | AP<sup>test<br>0.5:0.95 |FPS<sup>3090<br>FP32-bs1 | FLOPs<br><sup>(G) | Params<br><sup>(M) | Weight |
-|---------------|-------|------------------------|-------------------------|---------------------------|-------------------|--------------------|--------|
-| FreeYOLOv2-P6 | 1280  |                        |                         |                           |  10.9             |  1.5               |  |
-| FreeYOLOv2-N6 | 1280  |                        |                         |                           |  26.4             |  2.8               |  |
-| FreeYOLOv2-T6 | 1280  |                        |                         |                           |  59.0             |  7.1               |  |
-| FreeYOLOv2-S6 | 1280  |                        |                         |                           |  104.0            |  12.6              |  |
-| FreeYOLOv2-M6 | 1280  |                        |                         |                           |  274.2            |  35.0              |  |
-| FreeYOLOv2-L6 | 1280  |                        |                         |                           |  560.1            |  74.3              |  |
-| FreeYOLOv2-H6 | 1280  |                        |                         |                           |  973.8            |  135.1             |  |
+| Model    | Scale |  IP  | AP<sup>val<br>0.5:0.95 | AP<sup>test<br>0.5:0.95 | FPS<sup>3090<br>FP32-bs1 | FLOPs<br><sup>(G) | Params<br><sup>(M) | Weight |
+|----------|-------|------|------------------------|-------------------------|--------------------------|-------------------|--------------------|--------|
+| YOLOv8-N |  640  |  ×   |                        |                         |                          |                   |                    |  |
+| YOLOv8-S |  640  |  ×   |                        |                         |                          |                   |                    |  |
+| YOLOv8-M |  640  |  ×   |                        |                         |                          |                   |                    |  |
+| YOLOv8-L |  640  |  ×   |                        |                         |                          |                   |                    |  |
+| YOLOv8-H |  640  |  ×   |                        |                         |                          |                   |                    |  |
 
-**P7-Model on COCO:**
 
-| Model         | Scale | AP<sup>val<br>0.5:0.95 | AP<sup>test<br>0.5:0.95 |FPS<sup>3090<br>FP32-bs1 | FLOPs<br><sup>(G) | Params<br><sup>(M) | Weight |
-|---------------|-------|------------------------|-------------------------|---------------------------|-------------------|--------------------|--------|
-| FreeYOLOv2-P7 | 1280  |                        |                         |                           |  11.1             |  2.2               |  |
-| FreeYOLOv2-N7 | 1280  |                        |                         |                           |  26.9             |  3.8               |  |
-| FreeYOLOv2-T7 | 1280  |                        |                         |                           |  59.3             |  9.3               |  |
-| FreeYOLOv2-S7 | 1280  |                        |                         |                           |  104.5            |  16.5              |  |
-| FreeYOLOv2-M7 | 1280  |                        |                         |                           |  275.8            |  45.8              |  |
-| FreeYOLOv2-L7 | 1280  |                        |                         |                           |  564.4            |  97.0              |  |
-| FreeYOLOv2-H7 | 1280  |                        |                         |                           |  998.4            |  176.0             |  | -->
+- YOLOX (由本项目复现)
 
-*所有的FLOPs都是在COCO-val数据集上以640x640或1280x1280的输入尺寸来测试的。FPS指标是在一张3090型号的GPU上以batch size=1的输入来测试的，请注意，测速的内容包括模型前向推理、后处理以及NMS操作。*
+| Model   | Scale |  IP  | AP<sup>val<br>0.5:0.95 | AP<sup>test<br>0.5:0.95 | FPS<sup>3090<br>FP32-bs1 | FLOPs<br><sup>(G) | Params<br><sup>(M) | Weight |
+|---------|-------|------|------------------------|-------------------------|--------------------------|-------------------|--------------------|--------|
+| YOLOX-N |  640  |  ×   |                        |                         |                          |                   |                    |  |
+| YOLOX-S |  640  |  ×   |                        |                         |                          |                   |                    |  |
+| YOLOX-M |  640  |  ×   |                        |                         |                          |                   |                    |  |
+| YOLOX-L |  640  |  ×   |                        |                         |                          |                   |                    |  |
+| YOLOX-H |  640  |  ×   |                        |                         |                          |                   |                    |  |
+
 
 ### WiderFace
 - 下载 [WiderFace](http://shuoyang1213.me/WIDERFACE/).
