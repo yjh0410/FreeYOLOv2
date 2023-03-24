@@ -83,7 +83,7 @@ python train.py --cuda -d coco -v yolo_free_v2_tiny -bs 16 --max_epoch 300 --wp_
 
 | Model        | Scale |  IP  | AP<sup>val<br>0.5:0.95 | AP<sup>test<br>0.5:0.95 | FPS<sup>3090<br>FP32-bs1 | FLOPs<br><sup>(G) | Params<br><sup>(M) | Weight |
 |--------------|-------|------|------------------------|-------------------------|--------------------------|-------------------|--------------------|--------|
-| FreeYOLOv2-N |  640  |  √   |   35.5                 |    35.6                 |     100                  |   9.0             |   2.3              |  |
+| FreeYOLOv2-N |  640  |  √   |   35.5                 |    35.6                 |     100                  |   9.0             |   2.3              | [ckpt](https://github.com/yjh0410/FreeYOLOv2/releases/download/yolo_free_v2_ckpt/yolo_free_v2_nano_coco.pth) |
 | FreeYOLOv2-S |  640  |  √   |                        |                         |                          |   33.5            |   8.3              |  |
 | FreeYOLOv2-M |  640  |  √   |                        |                         |                          |   86.7            |   23.0             |  |
 | FreeYOLOv2-L |  640  |  √   |                        |                         |                          |   175.4           |   46.5             |  |
