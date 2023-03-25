@@ -137,7 +137,7 @@ def train_one_epoch(epoch,
             t1 = time.time()
             cur_lr = [param_group['lr']  for param_group in optimizer.param_groups]
             # basic infor
-            log =  '[Epoch: {}/{}]'.format(epoch+1, total_epochs)
+            log =  '[Epoch: {}/{}]'.format(epoch, total_epochs)
             log += '[Iter: {}/{}]'.format(iter_i, epoch_size)
             log += '[lr: {:.6f}]'.format(cur_lr[2])
             # loss infor
@@ -173,8 +173,8 @@ def val_one_epoch(args,
     if distributed_utils.is_main_process():
         if evaluator is None:
             print('No evaluator ... save model and go on training.')
-            print('Saving state, epoch: {}'.format(epoch + 1))
-            weight_name = '{}_epoch_{}.pth'.format(args.version, epoch + 1)
+            print('Saving state, epoch: {}'.format(epoch))
+            weight_name = '{}_epoch_{}.pth'.format(args.version, epoch)
             checkpoint_path = os.path.join(path_to_save, weight_name)
             torch.save({'model': model.state_dict(),
                         'mAP': -1.,
@@ -197,8 +197,8 @@ def val_one_epoch(args,
                 # update best-map
                 best_map = cur_map
                 # save model
-                print('Saving state, epoch:', epoch + 1)
-                weight_name = '{}_epoch_{}_{:.2f}.pth'.format(args.version, epoch + 1, best_map*100)
+                print('Saving state, epoch:', epoch)
+                weight_name = '{}_epoch_{}_{:.2f}.pth'.format(args.version, epoch, best_map*100)
                 checkpoint_path = os.path.join(path_to_save, weight_name)
                 torch.save({'model': model.state_dict(),
                             'mAP': round(best_map*100, 1),
