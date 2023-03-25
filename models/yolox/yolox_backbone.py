@@ -127,11 +127,11 @@ if __name__ == '__main__':
         'pretrained': False,
         'bk_act': 'lrelu',
         'bk_norm': 'BN',
-        'bk_dpw': True,
+        'bk_dpw': False,
         'p6_feat': False,
         'p7_feat': False,
-        'width': 0.25,
-        'depth': 0.34,
+        'width': 1.0,
+        'depth': 1.0,
     }
     model, feats = build_backbone(cfg)
     x = torch.randn(1, 3, 256, 256)
