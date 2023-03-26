@@ -3,7 +3,6 @@
 
 import torch
 from .yolov8.build import build_yolov8
-from .yolox.build import build_yolox
 from .yolo_free_v2.build import build_yolo_free_v2
 
 
@@ -18,11 +17,6 @@ def build_model(args,
                         'yolov8_large', 'yolov8_huge',     # P5
                         ]:
         model, criterion = build_yolov8(
-            args, cfg, device, num_classes, trainable)
-    # YOLOX
-    elif args.version in ['yolox_nano', 'yolox_small', 'yolox_medium',
-                          'yolox_large', 'yolox_huge']:
-        model, criterion = build_yolox(
             args, cfg, device, num_classes, trainable)
     # FreeYOLOv2
     elif args.version in ['yolo_free_v2_pico', 'yolo_free_v2_nano', 'yolo_free_v2_tiny',
