@@ -92,17 +92,6 @@ python train.py --cuda -d coco -v yolo_free_v2_tiny -bs 16 --max_epoch 300 --wp_
 *FreeYOLOv2 are trained with ImageNet pretrained weight (IP). All FLOPs are measured with a 640x640 image size on COCO val2017. The FPS is measured with batch size 1 on 3090 GPU from the model inference to the NMS operation.*
 
 
-- YOLOv8 (reproduced by this project)
-
-| Model    | Scale |  IP  | AP<sup>val<br>0.5:0.95 | AP<sup>test<br>0.5:0.95 | FPS<sup>3090<br>FP32-bs1 | FLOPs<br><sup>(G) | Params<br><sup>(M) | Weight |
-|----------|-------|------|------------------------|-------------------------|--------------------------|-------------------|--------------------|--------|
-| YOLOv8-N |  640  |  √   |                        |                         |                          |                   |                    |  |
-| YOLOv8-S |  640  |  √   |                        |                         |                          |                   |                    |  |
-| YOLOv8-M |  640  |  √   |                        |                         |                          |                   |                    |  |
-| YOLOv8-L |  640  |  √   |                        |                         |                          |                   |                    |  |
-| YOLOv8-H |  640  |  √   |                        |                         |                          |                   |                    |  |
-
-
 ### WiderFace
 - Download [WiderFace](http://shuoyang1213.me/WIDERFACE/).
 
