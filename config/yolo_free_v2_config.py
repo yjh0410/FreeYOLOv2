@@ -61,7 +61,7 @@ yolo_free_v2_config = {
         'loss_iou_weight': 7.5,
         'loss_dfl_weight': 1.5,
         # training configuration
-        'no_aug_epoch': 20,
+        'no_aug_epoch': 10,
         # optimizer
         'optimizer': 'sgd',      # optional: sgd, adamw
         'momentum': 0.937,         # SGD: 0.937;    AdamW: invalid
@@ -136,7 +136,7 @@ yolo_free_v2_config = {
         'loss_iou_weight': 7.5,
         'loss_dfl_weight': 1.5,
         # training configuration
-        'no_aug_epoch': 20,
+        'no_aug_epoch': 10,
         # optimizer
         'optimizer': 'sgd',      # optional: sgd, adamw
         'momentum': 0.937,         # SGD: 0.937;    AdamW: invalid
@@ -211,7 +211,7 @@ yolo_free_v2_config = {
         'loss_iou_weight': 7.5,
         'loss_dfl_weight': 1.5,
         # training configuration
-        'no_aug_epoch': 20,
+        'no_aug_epoch': 10,
         # optimizer
         'optimizer': 'sgd',      # optional: sgd, adamw
         'momentum': 0.937,         # SGD: 0.937;    AdamW: invalid
@@ -286,7 +286,7 @@ yolo_free_v2_config = {
         'loss_iou_weight': 7.5,
         'loss_dfl_weight': 1.5,
         # training configuration
-        'no_aug_epoch': 20,
+        'no_aug_epoch': 10,
         # optimizer
         'optimizer': 'sgd',      # optional: sgd, adamw
         'momentum': 0.937,         # SGD: 0.937;    AdamW: invalid
@@ -361,7 +361,7 @@ yolo_free_v2_config = {
         'loss_iou_weight': 7.5,
         'loss_dfl_weight': 1.5,
         # training configuration
-        'no_aug_epoch': 20,
+        'no_aug_epoch': 10,
         # optimizer
         'optimizer': 'sgd',      # optional: sgd, adamw
         'momentum': 0.937,         # SGD: 0.937;    AdamW: invalid
