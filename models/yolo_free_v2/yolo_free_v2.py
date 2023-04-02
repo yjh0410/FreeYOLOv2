@@ -42,7 +42,7 @@ class FreeYOLOv2(nn.Module):
         self.backbone, feats_dim = build_backbone(cfg=cfg)
 
         ## neck
-        self.neck = build_neck(cfg=cfg, in_dim=feats_dim[-1], out_dim=feats_dim[-1])
+        self.neck = build_neck(cfg=cfg, in_dim=feats_dim[-1], out_dim=feats_dim[-1]//2)
         feats_dim[-1] = self.neck.out_dim
         
         ## fpn

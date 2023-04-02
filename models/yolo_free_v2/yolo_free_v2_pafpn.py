@@ -10,7 +10,7 @@ except:
 # PaFPN-ELAN
 class ELAN_PaFPN(nn.Module):
     def __init__(self, 
-                 in_dims=[512, 1024, 1024],
+                 in_dims=[512, 1024, 512],
                  out_dim=None,
                  width=1.0,
                  depth=1.0,
@@ -28,9 +28,8 @@ class ELAN_PaFPN(nn.Module):
 
         # top dwon
         ## P5 -> P4
-        self.reduce_layer_1 = Conv(c5, int(512 * width), k=1, norm_type=norm_type, act_type=act_type)
-        self.reduce_layer_2 = Conv(c4, int(512 * width), k=1, norm_type=norm_type, act_type=act_type)
-        self.elan_layer_1 = ELANBlock(in_dim=int(512 * width) + int(512 * width),
+        self.reduce_layer_1 = Conv(c4, int(512 * width), k=1, norm_type=norm_type, act_type=act_type)
+        self.elan_layer_1 = ELANBlock(in_dim=int(512 * width) + c5,
                                      out_dim=int(512 * width),
                                      expand_ratio=[0.5, 0.5],
                                      depth=depth,
@@ -64,7 +63,7 @@ class ELAN_PaFPN(nn.Module):
         # P4 -> P5
         self.down_layer_2 = Conv(int(512 * width), int(512 * width), k=3, p=1, s=2,
                                  act_type=act_type, norm_type=norm_type, depthwise=depthwise)
-        self.elan_layer_4 = ELANBlock(in_dim=int(512 * width) + int(512 * width),
+        self.elan_layer_4 = ELANBlock(in_dim=int(512 * width) + c5,
                                      out_dim=int(1024 * width),  # 512
                                      expand_ratio=[0.5, 0.5],
                                      depth=depth,
@@ -91,9 +90,8 @@ class ELAN_PaFPN(nn.Module):
 
         # Top down
         ## P5 -> P4
-        c6 = self.reduce_layer_1(c5)
-        c7 = self.reduce_layer_2(c4)
-        c8 = torch.cat([F.interpolate(c6, scale_factor=2.0), c7], dim=1)
+        c7 = self.reduce_layer_1(c4)
+        c8 = torch.cat([F.interpolate(c5, scale_factor=2.0), c7], dim=1)
         c9 = self.elan_layer_1(c8)
         ## P4 -> P3
         c10 = self.reduce_layer_3(c9)
@@ -108,7 +106,7 @@ class ELAN_PaFPN(nn.Module):
         c16 = self.elan_layer_3(c15)
         # P4 -> P5
         c17 = self.down_layer_2(c16)
-        c18 = torch.cat([c17, c6], dim=1)
+        c18 = torch.cat([c17, c5], dim=1)
         c19 = self.elan_layer_4(c18)
 
         out_feats = [c13, c16, c19] # [P3, P4, P5]
