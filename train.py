@@ -55,7 +55,7 @@ def parse_args():
                         help='after eval epoch, the model is evaluated on val dataset.')
     
     # model
-    parser.add_argument('-v', '--version', default='yolo_free_v2_large', type=str,
+    parser.add_argument('-m', '--model', default='yolo_free_v2_large', type=str,
                         help='build yolo')
     parser.add_argument('-ct', '--conf_thresh', default=0.005, type=float,
                         help='confidence threshold')
@@ -115,7 +115,7 @@ def train():
         print("git:\n  {}\n".format(distributed_utils.get_sha()))
 
     # path to save model
-    path_to_save = os.path.join(args.save_folder, args.dataset, args.version)
+    path_to_save = os.path.join(args.save_folder, args.dataset, args.model)
     os.makedirs(path_to_save, exist_ok=True)
 
     # cuda

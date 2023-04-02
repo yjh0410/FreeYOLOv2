@@ -38,7 +38,7 @@ def parse_args():
                         help='resave the model weight.')
 
     # model
-    parser.add_argument('-v', '--version', default='yolo_free_v2_large', type=str,
+    parser.add_argument('-m', '--model', default='yolo_free_v2_large', type=str,
                         help='build yolo_free_v2')
     parser.add_argument('--weight', default=None,
                         type=str, help='Trained state_dict file path to open')
@@ -122,7 +122,7 @@ def test(args,
          show=False,
          dataset_name='coco'):
     num_images = len(dataset)
-    save_path = os.path.join('det_results/', args.dataset, args.version)
+    save_path = os.path.join('det_results/', args.dataset, args.model)
     os.makedirs(save_path, exist_ok=True)
 
     for index in range(num_images):
@@ -205,9 +205,9 @@ if __name__ == '__main__':
 
     # resave model weight
     if args.resave:
-        print('Resave: {}'.format(args.version.upper()))
-        weight_name = '{}_pure.pth'.format(args.version)
-        checkpoint_path = 'weights/{}/{}/{}'.format(args.dataset, args.version, weight_name)
+        print('Resave: {}'.format(args.model.upper()))
+        weight_name = '{}_pure.pth'.format(args.model)
+        checkpoint_path = 'weights/{}/{}/{}'.format(args.dataset, args.model, weight_name)
         torch.save({'model': model.state_dict()}, checkpoint_path)                      
 
     # compute FLOPs and Params

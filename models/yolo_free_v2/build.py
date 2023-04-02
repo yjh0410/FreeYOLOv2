@@ -9,7 +9,7 @@ from .yolo_free_v2 import FreeYOLOv2
 # build object detector
 def build_yolo_free_v2(args, cfg, device, num_classes=80, trainable=False):
     print('==============================')
-    print('Build {} ...'.format(args.version.upper()))
+    print('Build {} ...'.format(args.model.upper()))
     
     print('==============================')
     print('Model Configuration: \n', cfg)
