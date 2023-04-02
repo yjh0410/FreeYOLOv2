@@ -81,11 +81,11 @@ yolo_free_v2_config = {
     'yolo_free_v2_small': {
         # input
         'mosaic_prob': 1.0,
-        'mixup_prob': 0.0,
+        'mixup_prob': 0.05,
         'multi_scale': [0.5, 1.25],
         'trans_config': {'degrees': 0.0,
-                          'translate': 0.1,
-                          'scale': 0.5,
+                          'translate': 0.2,
+                          'scale': 0.9,
                           'shear': 0.0,
                           'perspective': 0.0,
                           'hsv_h': 0.015,
