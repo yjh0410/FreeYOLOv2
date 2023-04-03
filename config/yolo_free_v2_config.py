@@ -97,7 +97,7 @@ yolo_free_v2_config = {
                           },
         # model
         'backbone': 'elannet',
-        'pretrained': False,
+        'pretrained': True,
         'bk_act': 'silu',
         'bk_norm': 'BN',
         'bk_dpw': False,
