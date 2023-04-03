@@ -183,7 +183,8 @@ def train():
     optimizer, start_epoch = build_optimizer(cfg, model_without_ddp, cfg['lr0'], args.resume)
 
     # Scheduler
-    scheduler, lf = build_lr_scheduler(cfg, optimizer, args.max_epoch)
+    total_epochs = args.wp_epoch + args.max_epoch
+    scheduler, lf = build_lr_scheduler(cfg, optimizer, total_epochs)
     scheduler.last_epoch = start_epoch - 1  # do not move
     if args.resume:
         scheduler.step()
@@ -198,7 +199,6 @@ def train():
     # start training loop
     best_map = -1.0
     last_opt_step = -1
-    total_epochs = args.max_epoch
     heavy_eval = False
     optimizer.zero_grad()
     
