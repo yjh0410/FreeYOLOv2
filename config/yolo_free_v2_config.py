@@ -71,7 +71,7 @@ yolo_free_v2_config = {
         'ema_decay': 0.9999,       # SGD: 0.9999;   AdamW: 0.9998
         'ema_tau': 2000,
         # lr schedule
-        'scheduler': 'cosine',
+        'scheduler': 'linear',
         'lr0': 0.01,              # SGD: 0.01;     AdamW: 0.004
         'lrf': 0.01,               # SGD: 0.01;     AdamW: 0.05
         'warmup_momentum': 0.8,
@@ -146,7 +146,7 @@ yolo_free_v2_config = {
         'ema_decay': 0.9999,       # SGD: 0.9999;   AdamW: 0.9998
         'ema_tau': 2000,
         # lr schedule
-        'scheduler': 'cosine',
+        'scheduler': 'linear',
         'lr0': 0.01,              # SGD: 0.01;     AdamW: 0.004
         'lrf': 0.01,               # SGD: 0.01;     AdamW: 0.05
         'warmup_momentum': 0.8,
@@ -221,7 +221,7 @@ yolo_free_v2_config = {
         'ema_decay': 0.9999,       # SGD: 0.9999;   AdamW: 0.9998
         'ema_tau': 2000,
         # lr schedule
-        'scheduler': 'cosine',
+        'scheduler': 'linear',
         'lr0': 0.01,              # SGD: 0.01;     AdamW: 0.004
         'lrf': 0.01,               # SGD: 0.01;     AdamW: 0.05
         'warmup_momentum': 0.8,
@@ -296,7 +296,7 @@ yolo_free_v2_config = {
         'ema_decay': 0.9999,       # SGD: 0.9999;   AdamW: 0.9998
         'ema_tau': 2000,
         # lr schedule
-        'scheduler': 'cosine',
+        'scheduler': 'linear',
         'lr0': 0.01,              # SGD: 0.01;     AdamW: 0.004
         'lrf': 0.01,               # SGD: 0.01;     AdamW: 0.05
         'warmup_momentum': 0.8,
@@ -371,7 +371,7 @@ yolo_free_v2_config = {
         'ema_decay': 0.9999,       # SGD: 0.9999;   AdamW: 0.9998
         'ema_tau': 2000,
         # lr schedule
-        'scheduler': 'cosine',
+        'scheduler': 'linear',
         'lr0': 0.01,              # SGD: 0.01;     AdamW: 0.004
         'lrf': 0.01,               # SGD: 0.01;     AdamW: 0.05
         'warmup_momentum': 0.8,
