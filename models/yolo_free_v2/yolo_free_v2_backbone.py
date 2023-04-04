@@ -262,17 +262,17 @@ if __name__ == '__main__':
     import time
     from thop import profile
     cfg = {
-        'pretrained': True,
+        'pretrained': False,
         'bk_act': 'lrelu',
         'bk_norm': 'BN',
-        'bk_dpw': True,
+        'bk_dpw': False,
         'p6_feat': False,
         'p7_feat': False,
-        'width': 0.25,
-        'depth': 0.34,
+        'width': 1.0,
+        'depth': 1.0,
     }
     model, feats = build_backbone(cfg)
-    x = torch.randn(1, 3, 256, 256)
+    x = torch.randn(1, 3, 640, 640)
     t0 = time.time()
     outputs = model(x)
     t1 = time.time()
@@ -280,7 +280,6 @@ if __name__ == '__main__':
     for out in outputs:
         print(out.shape)
 
-    x = torch.randn(1, 3, 256, 256)
     print('==============================')
     flops, params = profile(model, inputs=(x, ), verbose=False)
     print('==============================')

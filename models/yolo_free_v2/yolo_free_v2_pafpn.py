@@ -149,8 +149,8 @@ if __name__ == '__main__':
         'width': 1.0,
         'depth': 1.0,
     }
-    model = build_fpn(cfg, in_dims=[512, 1024, 512])
-    pyramid_feats = [torch.randn(1, 512, 80, 80), torch.randn(1, 1024, 40, 40), torch.randn(1, 512, 20, 20)]
+    model = build_fpn(cfg, in_dims=[512, 1024, 1024])
+    pyramid_feats = [torch.randn(1, 512, 80, 80), torch.randn(1, 1024, 40, 40), torch.randn(1, 1024, 20, 20)]
     t0 = time.time()
     outputs = model(pyramid_feats)
     t1 = time.time()
