@@ -1,9 +1,9 @@
 import torch
 import torch.nn as nn
 try:
-    from .yolo_free_v2_basic import ELANBlock, DownSample
+    from .yolo_free_v2_basic import Conv, ELANBlock, DownSample
 except:
-    from yolo_free_v2_basic import ELANBlock, DownSample
+    from yolo_free_v2_basic import Conv, ELANBlock, DownSample
 
 
 
@@ -16,136 +16,8 @@ model_urls = {
 }
 
 
-def get_activation(act_type=None):
-    if act_type == 'relu':
-        return nn.ReLU(inplace=True)
-    elif act_type == 'lrelu':
-        return nn.LeakyReLU(0.1, inplace=True)
-    elif act_type == 'mish':
-        return nn.Mish(inplace=True)
-    elif act_type == 'silu':
-        return nn.SiLU(inplace=True)
-
-
-def get_norm(norm_type, dim):
-    if norm_type == 'BN':
-        return nn.BatchNorm2d(dim)
-    elif norm_type == 'GN':
-        return nn.GroupNorm(num_groups=32, num_channels=dim)
-
-
-# ---------------------------- Basic module ----------------------------
-# Basic conv layer
-class Conv(nn.Module):
-    def __init__(self, 
-                 c1,                   # in channels
-                 c2,                   # out channels 
-                 k=1,                  # kernel size 
-                 p=0,                  # padding
-                 s=1,                  # padding
-                 d=1,                  # dilation
-                 act_type='silu',      # activation
-                 norm_type='BN',       # normalization
-                 depthwise=False):
-        super(Conv, self).__init__()
-        convs = []
-        if depthwise:
-            # depthwise conv
-            convs.append(nn.Conv2d(c1, c1, kernel_size=k, stride=s, padding=p, dilation=d, groups=c1, bias=False))
-            convs.append(get_norm(norm_type, c1))
-            if act_type is not None:
-                convs.append(get_activation(act_type))
-
-            # pointwise conv
-            convs.append(nn.Conv2d(c1, c2, kernel_size=1, stride=1, padding=0, dilation=d, groups=1, bias=False))
-            convs.append(get_norm(norm_type, c2))
-            if act_type is not None:
-                convs.append(get_activation(act_type))
-
-        else:
-            convs.append(nn.Conv2d(c1, c2, kernel_size=k, stride=s, padding=p, dilation=d, groups=1, bias=False))
-            convs.append(get_norm(norm_type, c2))
-            if act_type is not None:
-                convs.append(get_activation(act_type))
-            
-        self.convs = nn.Sequential(*convs)
-
-
-    def forward(self, x):
-        return self.convs(x)
-
-
-# ELANBlock
-class ELANBlock(nn.Module):
-    """
-    ELAN BLock of YOLOv7's backbone
-    """
-    def __init__(self, in_dim, out_dim, expand_ratio=0.5, depth=1.0, act_type='silu', norm_type='BN', depthwise=False):
-        super(ELANBlock, self).__init__()
-        inter_dim = int(in_dim * expand_ratio)
-        self.cv1 = Conv(in_dim, inter_dim, k=1, act_type=act_type, norm_type=norm_type)
-        self.cv2 = Conv(in_dim, inter_dim, k=1, act_type=act_type, norm_type=norm_type)
-        self.cv3 = nn.Sequential(*[
-            Conv(inter_dim, inter_dim, k=3, p=1, act_type=act_type, norm_type=norm_type, depthwise=depthwise)
-            for _ in range(int(3*depth))
-        ])
-        self.cv4 = nn.Sequential(*[
-            Conv(inter_dim, inter_dim, k=3, p=1, act_type=act_type, norm_type=norm_type, depthwise=depthwise)
-            for _ in range(int(3*depth))
-        ])
-
-        self.out = Conv(inter_dim*4, out_dim, k=1, act_type=act_type, norm_type=norm_type)
-
-
-    def forward(self, x):
-        """
-        Input:
-            x: [B, C_in, H, W]
-        Output:
-            out: [B, C_out, H, W]
-        """
-        x1 = self.cv1(x)
-        x2 = self.cv2(x)
-        x3 = self.cv3(x2)
-        x4 = self.cv4(x3)
-
-        # [B, C, H, W] -> [B, 2C, H, W]
-        out = self.out(torch.cat([x1, x2, x3, x4], dim=1))
-
-        return out
-
-
-# DownSample
-class DownSample(nn.Module):
-    def __init__(self, in_dim, out_dim, act_type='silu', norm_type='BN'):
-        super().__init__()
-        inter_dim = out_dim // 2
-        self.mp = nn.MaxPool2d((2, 2), 2)
-        self.cv1 = Conv(in_dim, inter_dim, k=1, act_type=act_type, norm_type=norm_type)
-        self.cv2 = nn.Sequential(
-            Conv(in_dim, inter_dim, k=1, act_type=act_type, norm_type=norm_type),
-            Conv(inter_dim, inter_dim, k=3, p=1, s=2, act_type=act_type, norm_type=norm_type)
-        )
-
-    def forward(self, x):
-        """
-        Input:
-            x: [B, C, H, W]
-        Output:
-            out: [B, C, H//2, W//2]
-        """
-        # [B, C, H, W] -> [B, C//2, H//2, W//2]
-        x1 = self.cv1(self.mp(x))
-        x2 = self.cv2(x)
-
-        # [B, C, H//2, W//2]
-        out = torch.cat([x1, x2], dim=1)
-
-        return out
-
-
 # ---------------------------- Backbones ----------------------------
-# ELANNet-P5
+## ELANNet-P5
 class ELANNet(nn.Module):
     def __init__(self, width=1.0, depth=1.0, act_type='silu', norm_type='BN', depthwise=False):
         super(ELANNet, self).__init__()

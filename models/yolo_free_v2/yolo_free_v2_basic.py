@@ -43,8 +43,8 @@ class Conv(nn.Module):
                  p=0,                  # padding
                  s=1,                  # padding
                  d=1,                  # dilation
-                 act_type='',          # activation
-                 norm_type='',         # normalization
+                 act_type='silu',      # activation
+                 norm_type='BN',       # normalization
                  depthwise=False):
         super(Conv, self).__init__()
         convs = []
@@ -140,17 +140,8 @@ class DownSample(nn.Module):
         )
 
     def forward(self, x):
-        """
-        Input:
-            x: [B, C, H, W]
-        Output:
-            out: [B, C, H//2, W//2]
-        """
-        # [B, C, H, W] -> [B, C//2, H//2, W//2]
         x1 = self.cv1(self.mp(x))
         x2 = self.cv2(x)
-
-        # [B, C, H//2, W//2]
         out = torch.cat([x1, x2], dim=1)
 
         return out

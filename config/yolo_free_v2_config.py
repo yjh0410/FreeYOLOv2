@@ -329,7 +329,7 @@ yolo_free_v2_config = {
         'p6_feat': False,
         'p7_feat': False,
         'width': 1.25,
-        'depth': 1.0,
+        'depth': 1.34,
         'stride': [8, 16, 32],  # P3, P4, P5
         # neck
         'neck': 'sppf',
