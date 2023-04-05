@@ -7,7 +7,7 @@ python train.py \
         -bs 16 \
         -size 640 \
         --wp_epoch 3 \
-        --max_epoch 400 \
+        --max_epoch 300 \
         --eval_epoch 10 \
         --ema \
         --fp16 \
