@@ -7,7 +7,7 @@ from copy import deepcopy
 import torch
 
 # load transform
-from dataset.transforms import ValTransforms
+from dataset.transforms import build_transform
 
 # load some utils
 from utils.misc import build_dataset, load_weight
@@ -111,16 +111,13 @@ def visualize(img,
 
 @torch.no_grad()
 def test(args,
-         net, 
+         model, 
          device, 
          dataset,
          transforms=None,
-         vis_thresh=0.4, 
          class_colors=None, 
          class_names=None, 
-         class_indexs=None, 
-         show=False,
-         dataset_name='coco'):
+         class_indexs=None):
     num_images = len(dataset)
     save_path = os.path.join('det_results/', args.dataset, args.model)
     os.makedirs(save_path, exist_ok=True)
@@ -137,7 +134,7 @@ def test(args,
 
         t0 = time.time()
         # inference
-        bboxes, scores, labels = net(x)
+        bboxes, scores, labels = model(x)
         print("detection time used ", time.time() - t0, "s")
         
         # rescale
@@ -155,20 +152,22 @@ def test(args,
                             bboxes=bboxes,
                             scores=scores,
                             labels=labels,
-                            vis_thresh=vis_thresh,
+                            vis_thresh=args.visual_threshold,
                             class_colors=class_colors,
                             class_names=class_names,
                             class_indexs=class_indexs,
-                            dataset_name=dataset_name)
-        if show:
+                            dataset_name=args.dataset)
+        if args.show:
             h, w = img_processed.shape[:2]
             sw, sh = int(w*args.window_scale), int(h*args.window_scale)
             cv2.namedWindow('detection', 0)
             cv2.resizeWindow('detection', sw, sh)
             cv2.imshow('detection', img_processed)
             cv2.waitKey(0)
-        # save result
-        cv2.imwrite(os.path.join(save_path, str(index).zfill(6) +'.jpg'), img_processed)
+
+        if args.save:
+            # save result
+            cv2.imwrite(os.path.join(save_path, str(index).zfill(6) +'.jpg'), img_processed)
 
 
 if __name__ == '__main__':
@@ -203,13 +202,6 @@ if __name__ == '__main__':
     model = load_weight(model=model, path_to_ckpt=args.weight)
     model.to(device).eval()
 
-    # resave model weight
-    if args.resave:
-        print('Resave: {}'.format(args.model.upper()))
-        weight_name = '{}_pure.pth'.format(args.model)
-        checkpoint_path = 'weights/{}/{}/{}'.format(args.dataset, args.model, weight_name)
-        torch.save({'model': model.state_dict()}, checkpoint_path)                      
-
     # compute FLOPs and Params
     model_copy = deepcopy(model)
     model_copy.trainable = False
@@ -226,19 +218,16 @@ if __name__ == '__main__':
         model = fuse_conv_bn.fuse_conv_bn(model)
 
     # transform
-    transform = ValTransforms(img_size=args.img_size, max_stride=max(cfg['stride']))
+    transform = build_transform(args.img_size, max_stride=max(cfg['stride']), is_train=False)
 
-    print("================= DETECT =================")
-    
     # run
+    print("================= DETECT =================")
     test(args=args,
-        net=model, 
-        device=device, 
-        dataset=dataset,
-        transforms=transform,
-        vis_thresh=args.visual_threshold,
-        class_colors=class_colors,
-        class_names=class_names,
-        class_indexs=class_indexs,
-        show=args.show,
-        dataset_name=args.dataset)
+         model=model, 
+         device=device, 
+         dataset=dataset,
+         transforms=transform,
+         class_colors=class_colors,
+         class_names=class_names,
+         class_indexs=class_indexs
+         )

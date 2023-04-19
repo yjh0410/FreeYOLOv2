@@ -10,8 +10,11 @@ from evaluator.crowdhuman_evaluator import CrowdHumanEvaluator
 from evaluator.widerface_evaluator import WiderFaceEvaluator
 from evaluator.ourdataset_evaluator import OurDatasetEvaluator
 
-from dataset.transforms import ValTransforms
+# load transform
 from dataset.ourdataset import our_class_labels
+from dataset.transforms import build_transform
+
+# load some utils
 from utils.misc import load_weight
 from utils.com_flops_params import FLOPs_and_Params
 
@@ -183,7 +186,7 @@ if __name__ == '__main__':
     del model_copy
 
     # transform
-    transform = ValTransforms(img_size=args.img_size)
+    transform = build_transform(args.img_size, max_stride=max(cfg['stride']), is_train=False)
 
     # evaluation
     with torch.no_grad():

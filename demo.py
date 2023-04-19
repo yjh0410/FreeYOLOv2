@@ -7,7 +7,7 @@ import numpy as np
 import torch
 import torch.backends.cudnn as cudnn
 
-from dataset.transforms import ValTransforms
+from dataset.transforms import build_transform
 from utils.misc import load_weight
 from utils.vis_tools import visualize
 
@@ -220,7 +220,7 @@ def run():
     model.to(device).eval()
 
     # transform
-    transform = ValTransforms(img_size=args.img_size)
+    transform = build_transform(args.img_size, max_stride=max(cfg['stride']), is_train=False)
 
     # run
     detect(args=args, net=model, 

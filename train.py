@@ -14,7 +14,6 @@ from utils.com_flops_params import FLOPs_and_Params
 from utils.misc import ModelEMA, CollateFunc, build_dataset, build_dataloader
 from utils.solver.optimizer import build_optimizer
 from utils.solver.lr_scheduler import build_lr_scheduler
-from utils.solver.warmup_schedule import build_warmup
 
 from engine import train_one_epoch, val_one_epoch
 
@@ -126,9 +125,6 @@ def train():
     else:
         device = torch.device("cpu")
 
-    # amp
-    scaler = torch.cuda.amp.GradScaler(enabled=args.fp16)
-
     # config
     cfg = build_config(args)
 
@@ -172,6 +168,9 @@ def train():
     if args.distributed:
         # wait for all processes to synchronize
         dist.barrier()
+
+    # amp
+    scaler = torch.cuda.amp.GradScaler(enabled=args.fp16)
 
     # batch size
     total_bs = args.batch_size

@@ -43,7 +43,7 @@ class Conv(nn.Module):
                  p=0,                  # padding
                  s=1,                  # padding
                  d=1,                  # dilation
-                 act_type='silu',      # activation
+                 act_type='lrelu',     # activation
                  norm_type='BN',       # normalization
                  depthwise=False):
         super(Conv, self).__init__()
@@ -77,57 +77,77 @@ class Conv(nn.Module):
         return self.convs(x)
 
 
-# ELANBlock
+# ELAN Block
 class ELANBlock(nn.Module):
-    def __init__(self, in_dim, out_dim, expand_ratio=0.5, depth=1.0, act_type='silu', norm_type='BN', depthwise=False):
+    def __init__(self, in_dim, out_dim, expand_ratio=0.5, depth=2.0, act_type='silu', norm_type='BN', depthwise=False):
         super(ELANBlock, self).__init__()
-        if isinstance(expand_ratio, float):
-            inter_dim = int(in_dim * expand_ratio)
-            inter_dim2 = inter_dim
-        elif isinstance(expand_ratio, list):
-            assert len(expand_ratio) == 2
-            e1, e2 = expand_ratio
-            inter_dim = int(in_dim * e1)
-            inter_dim2 = int(inter_dim * e2)
-        # branch-1
+        inter_dim = int(in_dim * expand_ratio)
         self.cv1 = Conv(in_dim, inter_dim, k=1, act_type=act_type, norm_type=norm_type)
-        # branch-2
         self.cv2 = Conv(in_dim, inter_dim, k=1, act_type=act_type, norm_type=norm_type)
-        # branch-3
-        for idx in range(round(3*depth)):
-            if idx == 0:
-                cv3 = [Conv(inter_dim, inter_dim2, k=3, p=1, act_type=act_type, norm_type=norm_type, depthwise=depthwise)]
-            else:
-                cv3.append(Conv(inter_dim2, inter_dim2, k=3, p=1, act_type=act_type, norm_type=norm_type, depthwise=depthwise))
-        self.cv3 = nn.Sequential(*cv3)
-        # branch-4
-        self.cv4 = nn.Sequential(*[
-            Conv(inter_dim2, inter_dim2, k=3, p=1, act_type=act_type, norm_type=norm_type, depthwise=depthwise)
-            for _ in range(round(3*depth))
+        self.cv3 = nn.Sequential(*[
+            Conv(inter_dim, inter_dim, k=3, p=1, act_type=act_type, norm_type=norm_type, depthwise=depthwise)
+            for _ in range(round(depth))
         ])
-        # output
-        self.out = Conv(inter_dim*2 + inter_dim2*2, out_dim, k=1, act_type=act_type, norm_type=norm_type)
+        self.cv4 = nn.Sequential(*[
+            Conv(inter_dim, inter_dim, k=3, p=1, act_type=act_type, norm_type=norm_type, depthwise=depthwise)
+            for _ in range(round(depth))
+        ])
+
+        self.out = Conv(inter_dim*4, out_dim, k=1, act_type=act_type, norm_type=norm_type)
+
 
 
     def forward(self, x):
-        """
-        Input:
-            x: [B, C_in, H, W]
-        Output:
-            out: [B, C_out, H, W]
-        """
         x1 = self.cv1(x)
         x2 = self.cv2(x)
         x3 = self.cv3(x2)
         x4 = self.cv4(x3)
-
-        # [B, C, H, W] -> [B, 2C, H, W]
         out = self.out(torch.cat([x1, x2, x3, x4], dim=1))
 
         return out
 
 
-# DownSample
+# ELAN Block for PaFPN
+class ELANBlockFPN(nn.Module):
+    def __init__(self, in_dim, out_dim, expand_ratio=0.5, nbranch=4, depth=1, act_type='silu', norm_type='BN', depthwise=False):
+        super(ELANBlockFPN, self).__init__()
+        # Basic parameters
+        inter_dim = int(in_dim * expand_ratio)
+        inter_dim2 = int(inter_dim * expand_ratio) 
+        # Network structure
+        self.cv1 = Conv(in_dim, inter_dim, k=1, act_type=act_type, norm_type=norm_type)
+        self.cv2 = Conv(in_dim, inter_dim, k=1, act_type=act_type, norm_type=norm_type)
+        self.cv3 = nn.ModuleList()
+        for idx in range(round(nbranch)):
+            if idx == 0:
+                cvs = [Conv(inter_dim, inter_dim2, k=3, p=1, act_type=act_type, norm_type=norm_type, depthwise=depthwise)]
+            else:
+                cvs = [Conv(inter_dim2, inter_dim2, k=3, p=1, act_type=act_type, norm_type=norm_type, depthwise=depthwise)]
+            # deeper
+            if round(depth) > 1:
+                for _ in range(1, round(depth)):
+                    cvs.append(Conv(inter_dim2, inter_dim2, k=3, p=1, act_type=act_type, norm_type=norm_type, depthwise=depthwise))
+                self.cv3.append(nn.Sequential(*cvs))
+            else:
+                self.cv3.append(cvs[0])
+
+        self.out = Conv(inter_dim*2+inter_dim2*len(self.cv3), out_dim, k=1, act_type=act_type, norm_type=norm_type)
+
+
+    def forward(self, x):
+        x1 = self.cv1(x)
+        x2 = self.cv2(x)
+        inter_outs = [x1, x2]
+        for m in self.cv3:
+            y1 = inter_outs[-1]
+            y2 = m(y1)
+            inter_outs.append(y2)
+        out = self.out(torch.cat(inter_outs, dim=1))
+
+        return out
+
+
+# DownSample Block
 class DownSample(nn.Module):
     def __init__(self, in_dim, out_dim, act_type='silu', norm_type='BN', depthwise=False):
         super().__init__()
@@ -145,4 +165,3 @@ class DownSample(nn.Module):
         out = torch.cat([x1, x2], dim=1)
 
         return out
-    

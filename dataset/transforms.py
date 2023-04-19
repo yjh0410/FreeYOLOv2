@@ -93,8 +93,9 @@ def augment_hsv(img, hgain=0.5, sgain=0.5, vgain=0.5):
     cv2.cvtColor(img_hsv, cv2.COLOR_HSV2BGR, dst=img)  # no return needed
 
 
-# YOLOv5-Mosaic
-def yolov5_mosaic_augment(image_list, target_list, img_size, affine_params=None, is_train=False):
+# -------------------------- Mosaic Augmentation --------------------------
+## YOLOv5-Mosaic-4x
+def yolov5_mosaic_augment(image_list, target_list, img_size, affine_params=None):
     assert len(image_list) == 4
 
     mosaic_img = np.ones([img_size*2, img_size*2, image_list[0].shape[2]], dtype=np.uint8) * 114
@@ -112,10 +113,13 @@ def yolov5_mosaic_augment(image_list, target_list, img_size, affine_params=None,
         orig_h, orig_w, _ = img_i.shape
 
         # resize
-        r = img_size / max(orig_h, orig_w)
-        if r != 1: 
-            interp = cv2.INTER_LINEAR if (is_train or r > 1) else cv2.INTER_AREA
-            img_i = cv2.resize(img_i, (int(orig_w * r), int(orig_h * r)), interpolation=interp)
+        if np.random.randint(2):
+            # keep aspect ratio
+            r = img_size / max(orig_h, orig_w)
+            if r != 1: 
+                img_i = cv2.resize(img_i, (int(orig_w * r), int(orig_h * r)))
+        else:
+            img_i = cv2.resize(img_i, (int(img_size), int(img_size)))
         h, w, _ = img_i.shape
 
         # place img in img4
@@ -181,7 +185,114 @@ def yolov5_mosaic_augment(image_list, target_list, img_size, affine_params=None,
     return mosaic_img, mosaic_target
 
 
-# YOLOv5-Mixup
+## YOLOv5-Mosaic-9x
+def yolov5_mosaic_augment_9x(image_list, target_list, img_size, affine_params=None):
+    assert len(image_list) == 9
+
+    s = img_size
+    mosaic_border = [-img_size//2, -img_size//2]
+    mosaic_bboxes = []
+    mosaic_labels = []
+    for i in range(9):
+        # Load image
+        img_i, target_i = image_list[i], target_list[i]
+        bboxes_i = target_i["boxes"]
+        labels_i = target_i["labels"]
+
+        orig_h, orig_w, _ = img_i.shape
+
+        # resize
+        if np.random.randint(2):
+            # keep aspect ratio
+            r = img_size / max(orig_h, orig_w)
+            if r != 1: 
+                img_i = cv2.resize(img_i, (int(orig_w * r), int(orig_h * r)))
+        else:
+            img_i = cv2.resize(img_i, (int(img_size), int(img_size)))
+        h, w, _ = img_i.shape
+
+        # place img in img9
+        if i == 0:  # center
+            mosaic_img = np.full((s * 3, s * 3, img_i.shape[2]), 114, dtype=np.uint8)  # base image with 4 tiles
+            h0, w0 = h, w
+            c = s, s, s + w, s + h  # xmin, ymin, xmax, ymax (base) coordinates
+        elif i == 1:  # top
+            c = s, s - h, s + w, s
+        elif i == 2:  # top right
+            c = s + wp, s - h, s + wp + w, s
+        elif i == 3:  # right
+            c = s + w0, s, s + w0 + w, s + h
+        elif i == 4:  # bottom right
+            c = s + w0, s + hp, s + w0 + w, s + hp + h
+        elif i == 5:  # bottom
+            c = s + w0 - w, s + h0, s + w0, s + h0 + h
+        elif i == 6:  # bottom left
+            c = s + w0 - wp - w, s + h0, s + w0 - wp, s + h0 + h
+        elif i == 7:  # left
+            c = s - w, s + h0 - h, s, s + h0
+        elif i == 8:  # top left
+            c = s - w, s + h0 - hp - h, s, s + h0 - hp
+
+        padx, pady = c[:2]
+        x1, y1, x2, y2 = [max(x, 0) for x in c]  # allocate coords
+
+        # Image
+        mosaic_img[y1:y2, x1:x2] = img_i[y1 - pady:, x1 - padx:]
+        hp, wp = h, w  # height, width previous
+
+        # Labels
+        bboxes_i_ = bboxes_i.copy()
+        if len(bboxes_i) > 0:
+            # a valid target, and modify it.
+            bboxes_i_[:, 0] = (w * bboxes_i[:, 0] / orig_w + padx)
+            bboxes_i_[:, 1] = (h * bboxes_i[:, 1] / orig_h + pady)
+            bboxes_i_[:, 2] = (w * bboxes_i[:, 2] / orig_w + padx)
+            bboxes_i_[:, 3] = (h * bboxes_i[:, 3] / orig_h + pady)    
+
+            mosaic_bboxes.append(bboxes_i_)
+            mosaic_labels.append(labels_i)
+
+    if len(mosaic_bboxes) == 0:
+        mosaic_bboxes = np.array([]).reshape(-1, 4)
+        mosaic_labels = np.array([]).reshape(-1)
+    else:
+        mosaic_bboxes = np.concatenate(mosaic_bboxes)
+        mosaic_labels = np.concatenate(mosaic_labels)
+
+    # Offset
+    yc, xc = [int(random.uniform(0, s)) for _ in mosaic_border]  # mosaic center x, y
+    mosaic_img = mosaic_img[yc:yc + 2 * s, xc:xc + 2 * s]
+    mosaic_bboxes[..., [0, 2]] -= xc
+    mosaic_bboxes[..., [1, 3]] -= yc
+
+    # clip
+    mosaic_bboxes = mosaic_bboxes.clip(0, img_size * 2)
+
+    # random perspective
+    mosaic_targets = np.concatenate([mosaic_labels[..., None], mosaic_bboxes], axis=-1)
+    mosaic_img, mosaic_targets = random_perspective(
+        mosaic_img,
+        mosaic_targets,
+        affine_params['degrees'],
+        translate=affine_params['translate'],
+        scale=affine_params['scale'],
+        shear=affine_params['shear'],
+        perspective=affine_params['perspective'],
+        border=mosaic_border
+        )
+
+    # target
+    mosaic_target = {
+        "boxes": mosaic_targets[..., 1:],
+        "labels": mosaic_targets[..., 0],
+        "orig_size": [img_size, img_size]
+    }
+
+    return mosaic_img, mosaic_target
+
+
+# -------------------------- Mixup Augmentation --------------------------
+## YOLOv5-style Mixup
 def yolov5_mixup_augment(origin_image, origin_target, new_image, new_target):
     r = np.random.beta(32.0, 32.0)  # mixup ratio, alpha=beta=32.0
     mixup_image = r * origin_image.astype(np.float32) + \
@@ -203,7 +314,7 @@ def yolov5_mixup_augment(origin_image, origin_target, new_image, new_target):
     return mixup_image, mixup_target
     
 
-# YOLOX-Mixup
+## YOLOX-style Mixup
 def yolox_mixup_augment(origin_img, origin_target, new_img, new_target, img_size, mixup_scale):
     jit_factor = random.uniform(*mixup_scale)
     FLIP = random.uniform(0, 1) > 0.5
@@ -283,7 +394,8 @@ def yolox_mixup_augment(origin_img, origin_target, new_img, new_target, img_size
     return origin_img.astype(np.uint8), mixup_target
         
 
-# TrainTransform
+# -------------------------- Transforms --------------------------
+## Transform for training
 class TrainTransforms(object):
     def __init__(self, 
                  trans_config=None,
@@ -363,7 +475,7 @@ class TrainTransforms(object):
         return pad_image, target, [dw, dh]
 
 
-# ValTransform
+## Transform for evaluating
 class ValTransforms(object):
     def __init__(self, img_size=640, max_stride=32):
         self.img_size = img_size
@@ -375,7 +487,6 @@ class ValTransforms(object):
         img_h0, img_w0 = image.shape[:2]
 
         r = self.img_size / max(img_h0, img_w0)
-        r = min(r, 1.0) # only scale down, do not scale up (for better val mAP)
         if r != 1: 
             new_shape = (int(round(img_w0 * r)), int(round(img_h0 * r)))
             img = cv2.resize(image, new_shape, interpolation=cv2.INTER_LINEAR)
@@ -412,3 +523,19 @@ class ValTransforms(object):
         pad_image[:, :img_h0, :img_w0] = img_tensor
 
         return pad_image, target, [dw, dh]
+
+
+def build_transform(img_size, trans_config=None, max_stride=32, is_train=False):
+    if is_train:
+        transform = TrainTransforms(
+            img_size=img_size,
+            trans_config=trans_config,
+            min_box_size=8
+            )
+    else:
+        transform = ValTransforms(
+            img_size=img_size,
+            max_stride=max_stride
+            )
+
+    return transform

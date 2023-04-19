@@ -38,7 +38,7 @@ class DecoupledHead(nn.Module):
                 
         # reg head
         reg_feats = []
-        self.reg_out_dim = max(out_dim, 4*cfg['reg_max'])
+        self.reg_out_dim = max(out_dim, 64)
         for i in range(cfg['num_reg_head']):
             if i == 0:
                 reg_feats.append(

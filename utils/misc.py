@@ -11,33 +11,26 @@ from evaluator.coco_evaluator import COCOAPIEvaluator
 from evaluator.voc_evaluator import VOCAPIEvaluator
 from evaluator.crowdhuman_evaluator import CrowdHumanEvaluator
 from evaluator.widerface_evaluator import WiderFaceEvaluator
-from evaluator.mot_evaluator import MOTEvaluator
 from evaluator.ourdataset_evaluator import OurDatasetEvaluator
 
 from dataset.voc import VOCDetection, VOC_CLASSES
 from dataset.coco import COCODataset, coco_class_index, coco_class_labels
 from dataset.widerface import WiderFaceDataset, widerface_class_labels
 from dataset.crowdhuman import CrowdHumanDataset, crowd_class_labels
-from dataset.mot17 import MOT17Dataset, mot_class_labels
-from dataset.mot20 import MOT20Dataset, mot_class_labels
 from dataset.ourdataset import OurDataset, our_class_labels
 
-from dataset.transforms import TrainTransforms, ValTransforms
+from dataset.transforms import build_transform
 
 
+# ---------------------------- For Dataset ----------------------------
+## build dataset
 def build_dataset(cfg, args, device, is_train=False):
     # transform
     print('==============================')
     print('TrainTransforms: {}'.format(cfg['trans_config']))
-    train_transform = TrainTransforms(
-        trans_config=cfg['trans_config'],
-        img_size=args.img_size,
-        min_box_size=args.min_box_size
-        )
-    val_transform = ValTransforms(
-        img_size=args.img_size,
-        max_stride=max(cfg['stride'])
-        )
+    trans_config = cfg['trans_config']
+    train_transform = build_transform(args.img_size, trans_config, max(cfg['stride']), True)
+    val_transform = build_transform(args.img_size, trans_config, max(cfg['stride']), False)
     
     # dataset params
     transform = train_transform if is_train else None
@@ -47,13 +40,13 @@ def build_dataset(cfg, args, device, is_train=False):
     if args.mosaic is not None:
         mosaic_prob=args.mosaic if is_train else 0.0
     else:
-        mosaic_prob=cfg['mosaic_prob'] if is_train else 0.0
+        mosaic_prob=trans_config['mosaic_prob'] if is_train else 0.0
 
     # mixup prob.
     if args.mixup is not None:
         mixup_prob=args.mixup if is_train else 0.0
     else:
-        mixup_prob=cfg['mixup_prob']  if is_train else 0.0
+        mixup_prob=trans_config['mixup_prob']  if is_train else 0.0
 
     # dataset
     if args.dataset == 'voc':
@@ -70,8 +63,7 @@ def build_dataset(cfg, args, device, is_train=False):
             transform=transform,
             mosaic_prob=mosaic_prob,
             mixup_prob=mixup_prob,
-            trans_config=trans_config,
-            is_train=is_train
+            trans_config=trans_config
             )
         # evaluator
         if is_train:
@@ -96,9 +88,7 @@ def build_dataset(cfg, args, device, is_train=False):
             transform=transform,
             mosaic_prob=mosaic_prob,
             mixup_prob=mixup_prob,
-            trans_config=trans_config,
-            data_cache=is_train,
-            is_train=is_train
+            trans_config=trans_config
             )
         # evaluator
         if is_train:
@@ -125,7 +115,6 @@ def build_dataset(cfg, args, device, is_train=False):
             mosaic_prob=mosaic_prob,
             mixup_prob=mixup_prob,
             trans_config=trans_config,
-            is_train=is_train
             )
         # evaluator
         if is_train:
@@ -153,7 +142,6 @@ def build_dataset(cfg, args, device, is_train=False):
             mosaic_prob=mosaic_prob,
             mixup_prob=mixup_prob,
             trans_config=trans_config,
-            is_train=is_train
             )
         # evaluator
         if is_train:
@@ -165,136 +153,6 @@ def build_dataset(cfg, args, device, is_train=False):
             )
         else:
             evaluator = None
-
-    elif args.dataset == 'mot17_half':
-        data_dir = os.path.join(args.root, 'MOT17')
-        num_classes = 1
-        class_names = mot_class_labels
-        class_indexs = None
-
-        # dataset
-        dataset = MOT17Dataset(
-            data_dir=data_dir,
-            img_size=args.img_size,
-            image_set='train',
-            json_file='train_half.json' if is_train else 'val_half.json',
-            transform=transform,
-            mosaic_prob=mosaic_prob,
-            mixup_prob=mixup_prob,
-            trans_config=trans_config,
-            is_train=is_train
-            )
-        # evaluator
-        if is_train:
-            evaluator = MOTEvaluator(
-                data_dir=data_dir,
-                device=device,
-                dataset='mot17',
-                transform=val_transform
-                )
-        else:
-            evaluator = None
-
-    elif args.dataset == 'mot17':
-        data_dir = os.path.join(args.root, 'MOT17')
-        num_classes = 1
-        class_names = mot_class_labels
-        class_indexs = None
-
-        # dataset
-        dataset = MOT17Dataset(
-            data_dir=data_dir,
-            img_size=args.img_size,
-            image_set='train',
-            json_file='train.json',
-            transform=transform,
-            mosaic_prob=mosaic_prob,
-            mixup_prob=mixup_prob,
-            trans_config=trans_config,
-            is_train=is_train
-            )
-        # evaluator
-        evaluator = None
-
-    elif args.dataset == 'mot17_test':
-        data_dir = os.path.join(args.root, 'MOT17')
-        num_classes = 1
-        class_names = mot_class_labels
-        class_indexs = None
-
-        # dataset
-        dataset = MOT17Dataset(
-                data_dir=data_dir,
-                image_set='test',
-                json_file='test.json',
-                transform=None)
-        # evaluator
-        evaluator = None
-
-    elif args.dataset == 'mot20_half':
-        data_dir = os.path.join(args.root, 'MOT20')
-        num_classes = 1
-        class_names = mot_class_labels
-        class_indexs = None
-
-        # dataset
-        dataset = MOT20Dataset(
-            data_dir=data_dir,
-            img_size=args.img_size,
-            image_set='train',
-            json_file='train_half.json' if is_train else 'val_half.json',
-            transform=transform,
-            mosaic_prob=mosaic_prob,
-            mixup_prob=mixup_prob,
-            trans_config=trans_config,
-            is_train=is_train
-            )
-        # evaluator
-        if is_train:
-            evaluator = MOTEvaluator(
-                data_dir=data_dir,
-                device=device,
-                dataset='mot20',
-                transform=val_transform
-                )
-        else:
-            evaluator = None
-
-    elif args.dataset == 'mot20':
-        data_dir = os.path.join(args.root, 'MOT20')
-        num_classes = 1
-        class_names = mot_class_labels
-        class_indexs = None
-
-        # dataset
-        dataset = MOT20Dataset(
-            data_dir=data_dir,
-            img_size=args.img_size,
-            image_set='train',
-            json_file='train.json',
-            transform=transform,
-            mosaic_prob=mosaic_prob,
-            mixup_prob=mixup_prob,
-            trans_config=trans_config,
-            is_train=is_train
-            )
-        # evaluator
-        evaluator = None
-
-    elif args.dataset == 'mot20_test':
-        data_dir = os.path.join(args.root, 'MOT20')
-        num_classes = 1
-        class_names = mot_class_labels
-        class_indexs = None
-
-        # dataset
-        dataset = MOT20Dataset(
-                data_dir=data_dir,
-                image_set='test',
-                json_file='test.json',
-                transform=None)
-        # evaluator
-        evaluator = None
 
     elif args.dataset == 'ourdataset':
         data_dir = os.path.join(args.root, 'OurDataset')
@@ -311,7 +169,6 @@ def build_dataset(cfg, args, device, is_train=False):
             mosaic_prob=mosaic_prob,
             mixup_prob=mixup_prob,
             trans_config=trans_config,
-            is_train=is_train
             )
         # evaluator
         if is_train:
@@ -334,7 +191,7 @@ def build_dataset(cfg, args, device, is_train=False):
 
     return dataset, (num_classes, class_names, class_indexs), evaluator
 
-
+## build dataloader
 def build_dataloader(args, dataset, batch_size, collate_fn=None):
     # distributed
     if args.distributed:
@@ -349,7 +206,26 @@ def build_dataloader(args, dataset, batch_size, collate_fn=None):
     
     return dataloader
     
+## collate_fn for dataloader
+class CollateFunc(object):
+    def __call__(self, batch):
+        targets = []
+        images = []
 
+        for sample in batch:
+            image = sample[0]
+            target = sample[1]
+
+            images.append(image)
+            targets.append(target)
+
+        images = torch.stack(images, 0) # [B, C, H, W]
+
+        return images, targets
+
+
+# ---------------------------- For Model ----------------------------
+## load trained weight
 def load_weight(model, path_to_ckpt):
     # check ckpt file
     if path_to_ckpt is None:
@@ -365,26 +241,7 @@ def load_weight(model, path_to_ckpt):
 
     return model
 
-
-def is_parallel(model):
-    # Returns True if model is of type DP or DDP
-    return type(model) in (nn.parallel.DataParallel, nn.parallel.DistributedDataParallel)
-
-
-def de_parallel(model):
-    # De-parallelize a model: returns single-GPU model if model is of type DP or DDP
-    return model.module if is_parallel(model) else model
-
-
-def copy_attr(a, b, include=(), exclude=()):
-    # Copy attributes from b to a, options to only include [...] and to exclude [...]
-    for k, v in b.__dict__.items():
-        if (len(include) and k not in include) or k.startswith('_') or k in exclude:
-            continue
-        else:
-            setattr(a, k, v)
-
-
+##
 def replace_module(module, replaced_module_type, new_module_type, replace_func=None) -> nn.Module:
     """
     Replace given type in module to a new type. mostly used in deploy.
@@ -416,48 +273,7 @@ def replace_module(module, replaced_module_type, new_module_type, replace_func=N
 
     return model
 
-
-def sigmoid_focal_loss(logits, targets, alpha=0.25, gamma=2.0, reduction='none'):
-    p = torch.sigmoid(logits)
-    # bce loss
-    ce_loss = F.binary_cross_entropy_with_logits(
-        input=logits, target=targets, reduction="none")
-    # focal weight
-    p_t = p * targets + (1.0 - p) * (1.0 - targets)
-    # focal loss
-    loss = ce_loss * ((1.0 - p_t) ** gamma)
-
-    if alpha >= 0:
-        alpha_t = alpha * targets + (1.0 - alpha) * (1.0 - targets)
-        loss = alpha_t * loss
-
-    if reduction == "mean":
-        loss = loss.mean()
-
-    elif reduction == "sum":
-        loss = loss.sum()
-
-    return loss
-
-
-class CollateFunc(object):
-    def __call__(self, batch):
-        targets = []
-        images = []
-
-        for sample in batch:
-            image = sample[0]
-            target = sample[1]
-
-            images.append(image)
-            targets.append(target)
-
-        images = torch.stack(images, 0) # [B, C, H, W]
-
-        return images, targets
-
-
-# Model EMA
+## Model EMA
 class ModelEMA(object):
     """ Updated Exponential Moving Average (EMA) from https://github.com/rwightman/pytorch-image-models
     Keeps a moving average of everything in the model state_dict (parameters and buffers)
@@ -466,24 +282,45 @@ class ModelEMA(object):
 
     def __init__(self, model, decay=0.9999, tau=2000, updates=0):
         # Create EMA
-        self.ema = deepcopy(de_parallel(model)).eval()  # FP32 EMA
+        self.ema = deepcopy(self.de_parallel(model)).eval()  # FP32 EMA
         self.updates = updates  # number of EMA updates
         self.decay = lambda x: decay * (1 - math.exp(-x / tau))  # decay exponential ramp (to help early epochs)
         for p in self.ema.parameters():
             p.requires_grad_(False)
+
+
+    def is_parallel(self, model):
+        # Returns True if model is of type DP or DDP
+        return type(model) in (nn.parallel.DataParallel, nn.parallel.DistributedDataParallel)
+
+
+    def de_parallel(self, model):
+        # De-parallelize a model: returns single-GPU model if model is of type DP or DDP
+        return model.module if self.is_parallel(model) else model
+
+
+    def copy_attr(self, a, b, include=(), exclude=()):
+        # Copy attributes from b to a, options to only include [...] and to exclude [...]
+        for k, v in b.__dict__.items():
+            if (len(include) and k not in include) or k.startswith('_') or k in exclude:
+                continue
+            else:
+                setattr(a, k, v)
+
 
     def update(self, model):
         # Update EMA parameters
         self.updates += 1
         d = self.decay(self.updates)
 
-        msd = de_parallel(model).state_dict()  # model state_dict
+        msd = self.de_parallel(model).state_dict()  # model state_dict
         for k, v in self.ema.state_dict().items():
             if v.dtype.is_floating_point:  # true for FP16 and FP32
                 v *= d
                 v += (1 - d) * msd[k].detach()
         # assert v.dtype == msd[k].dtype == torch.float32, f'{k}: EMA {v.dtype} and model {msd[k].dtype} must be FP32'
 
+
     def update_attr(self, model, include=(), exclude=('process_group', 'reducer')):
         # Update EMA attributes
-        copy_attr(self.ema, model, include, exclude)
+        self.copy_attr(self.ema, model, include, exclude)

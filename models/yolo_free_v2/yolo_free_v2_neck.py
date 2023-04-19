@@ -1,12 +1,14 @@
 import torch
 import torch.nn as nn
-
 from .yolo_free_v2_basic import Conv
 
 
 # Spatial Pyramid Pooling - Fast (SPPF) layer for YOLOv5 by Glenn Jocher
 class SPPF(nn.Module):
-    def __init__(self, in_dim, out_dim, expand_ratio=0.5, pooling_size=5, act_type='', norm_type=''):
+    """
+        This code referenced to https://github.com/ultralytics/yolov5
+    """
+    def __init__(self, in_dim, out_dim, expand_ratio=0.5, pooling_size=5, act_type='lrelu', norm_type='BN'):
         super().__init__()
         inter_dim = int(in_dim * expand_ratio)
         self.out_dim = out_dim
@@ -81,7 +83,7 @@ def build_neck(cfg, in_dim, out_dim):
             act_type=cfg['neck_act'],
             norm_type=cfg['neck_norm']
             )
-    elif model == 'sppf_block_csp':
+    elif model == 'csp_sppf':
         neck = SPPFBlockCSP(
             in_dim=in_dim,
             out_dim=out_dim,
@@ -93,4 +95,4 @@ def build_neck(cfg, in_dim, out_dim):
             )
 
     return neck
-    
+        

@@ -1,14 +1,13 @@
 # yolo-free config
 
 
-yolo_free_v2_config = {
+yolo_free_v2_cfg = {
     # P5
     'yolo_free_v2_nano': {
         # input
-        'mosaic_prob': 1.0,
-        'mixup_prob': 0.0,
         'multi_scale': [0.5, 1.25],
-        'trans_config': {'degrees': 0.0,
+        'trans_config': {# Basic Augment
+                          'degrees': 0.0,
                           'translate': 0.1,
                           'scale': 0.5,
                           'shear': 0.0,
@@ -16,54 +15,53 @@ yolo_free_v2_config = {
                           'hsv_h': 0.015,
                           'hsv_s': 0.7,
                           'hsv_v': 0.4,
+                          # Mosaic & Mixup
+                          'mosaic_prob': 0.5,
+                          'mixup_prob': 0.0,
                           'mosaic_type': 'yolov5_mosaic',
                           'mixup_type': 'yolov5_mixup',
                           'mixup_scale': [0.5, 1.5],
                           },
         # model
-        'backbone': 'elannet',
+        'backbone': 'elannet_nano',
         'pretrained': True,
-        'bk_act': 'silu',
+        'bk_act': 'lrelu',
         'bk_norm': 'BN',
-        'bk_dpw': False,
-        'p6_feat': False,
-        'p7_feat': False,
-        'width': 0.25,
-        'depth': 0.34,
+        'bk_dpw': True,
         'stride': [8, 16, 32],  # P3, P4, P5
         # neck
         'neck': 'sppf',
         'expand_ratio': 0.5,
         'pooling_size': 5,
-        'neck_act': 'silu',
+        'neck_act': 'lrelu',
         'neck_norm': 'BN',
-        'neck_depthwise': False,
+        'neck_depthwise': True,
         # fpn
-        'fpn': 'elan_pafpn',
-        'fpn_act': 'silu',
+        'fpn': 'yolov7_pafpn',
+        'fpn_act': 'lrelu',
         'fpn_norm': 'BN',
-        'fpn_depthwise': False,
+        'fpn_depthwise': True,
+        'nbranch': 2.0,        # number of branch in ELANBlockFPN
+        'depth': 1.0,          # depth factor of each branch in ELANBlockFPN
+        'width': 0.25,         # width factor of channel in FPN
         # head
         'head': 'decoupled_head',
-        'head_act': 'silu',
+        'head_act': 'lrelu',
         'head_norm': 'BN',
         'num_cls_head': 2,
         'num_reg_head': 2,
-        'head_depthwise': False,
-        'reg_max': 16,
+        'head_depthwise': True,
         # matcher
-        'matcher': {'topk': 10,
-                    'alpha': 0.5,
-                    'beta': 6.0},
+        'matcher': {'center_sampling_radius': 2.5,
+                    'topk_candicate': 10},
         # loss weight
-        'cls_loss': 'bce', # vfl (optional)
-        'loss_cls_weight': 0.5,
-        'loss_iou_weight': 7.5,
-        'loss_dfl_weight': 1.5,
+        'loss_obj_weight': 1.0,
+        'loss_cls_weight': 1.0,
+        'loss_box_weight': 5.0,
         # training configuration
-        'no_aug_epoch': 10,
+        'no_aug_epoch': 20,
         # optimizer
-        'optimizer': 'sgd',      # optional: sgd, adamw
+        'optimizer': 'sgd',        # optional: sgd, adam, adamw
         'momentum': 0.937,         # SGD: 0.937;    AdamW: invalid
         'weight_decay': 5e-4,      # SGD: 5e-4;     AdamW: 5e-2
         'clip_grad': 10,           # SGD: 10.0;     AdamW: -1
@@ -72,18 +70,17 @@ yolo_free_v2_config = {
         'ema_tau': 2000,
         # lr schedule
         'scheduler': 'linear',
-        'lr0': 0.01,              # SGD: 0.01;     AdamW: 0.004
-        'lrf': 0.01,               # SGD: 0.01;     AdamW: 0.05
+        'lr0': 0.01,               # SGD: 0.01;     AdamW: 0.001
+        'lrf': 0.01,               # SGD: 0.01;     AdamW: 0.01
         'warmup_momentum': 0.8,
         'warmup_bias_lr': 0.1,
         },
 
-    'yolo_free_v2_small': {
+    'yolo_free_v2_tiny': {
         # input
-        'mosaic_prob': 1.0,
-        'mixup_prob': 0.05,
-        'multi_scale': [0.5, 1.25],
-        'trans_config': {'degrees': 0.0,
+        'multi_scale': [0.5, 1.4],
+        'trans_config': {# Basic Augment
+                          'degrees': 0.0,
                           'translate': 0.2,
                           'scale': 0.9,
                           'shear': 0.0,
@@ -91,33 +88,35 @@ yolo_free_v2_config = {
                           'hsv_h': 0.015,
                           'hsv_s': 0.7,
                           'hsv_v': 0.4,
+                          # Mosaic & Mixup
+                          'mosaic_prob': 1.0,
+                          'mixup_prob': 0.05,
                           'mosaic_type': 'yolov5_mosaic',
                           'mixup_type': 'yolov5_mixup',
                           'mixup_scale': [0.5, 1.5],
                           },
         # model
-        'backbone': 'elannet',
+        'backbone': 'elannet_tiny',
         'pretrained': True,
         'bk_act': 'silu',
         'bk_norm': 'BN',
         'bk_dpw': False,
-        'p6_feat': False,
-        'p7_feat': False,
-        'width': 0.50,
-        'depth': 0.34,
         'stride': [8, 16, 32],  # P3, P4, P5
         # neck
-        'neck': 'sppf',
+        'neck': 'csp_sppf',
         'expand_ratio': 0.5,
         'pooling_size': 5,
         'neck_act': 'silu',
         'neck_norm': 'BN',
         'neck_depthwise': False,
         # fpn
-        'fpn': 'elan_pafpn',
+        'fpn': 'yolov7_pafpn',
         'fpn_act': 'silu',
         'fpn_norm': 'BN',
         'fpn_depthwise': False,
+        'nbranch': 2.0,       # number of branch in ELANBlockFPN
+        'depth': 1.0,         # depth factor of each branch in ELANBlockFPN
+        'width': 0.5,         # width factor of channel in FPN
         # head
         'head': 'decoupled_head',
         'head_act': 'silu',
@@ -125,20 +124,17 @@ yolo_free_v2_config = {
         'num_cls_head': 2,
         'num_reg_head': 2,
         'head_depthwise': False,
-        'reg_max': 16,
         # matcher
-        'matcher': {'topk': 10,
-                    'alpha': 0.5,
-                    'beta': 6.0},
+        'matcher': {'center_sampling_radius': 2.5,
+                    'topk_candicate': 10},
         # loss weight
-        'cls_loss': 'bce', # vfl (optional)
-        'loss_cls_weight': 0.5,
-        'loss_iou_weight': 7.5,
-        'loss_dfl_weight': 1.5,
+        'loss_obj_weight': 1.0,
+        'loss_cls_weight': 1.0,
+        'loss_box_weight': 5.0,
         # training configuration
-        'no_aug_epoch': 10,
+        'no_aug_epoch': 20,
         # optimizer
-        'optimizer': 'sgd',      # optional: sgd, adamw
+        'optimizer': 'sgd',        # optional: sgd, adam, adamw
         'momentum': 0.937,         # SGD: 0.937;    AdamW: invalid
         'weight_decay': 5e-4,      # SGD: 5e-4;     AdamW: 5e-2
         'clip_grad': 10,           # SGD: 10.0;     AdamW: -1
@@ -147,93 +143,17 @@ yolo_free_v2_config = {
         'ema_tau': 2000,
         # lr schedule
         'scheduler': 'linear',
-        'lr0': 0.01,              # SGD: 0.01;     AdamW: 0.004
-        'lrf': 0.01,               # SGD: 0.01;     AdamW: 0.05
-        'warmup_momentum': 0.8,
-        'warmup_bias_lr': 0.1,
-        },
-
-    'yolo_free_v2_medium': {
-        # input
-        'mosaic_prob': 1.0,
-        'mixup_prob': 0.1,
-        'multi_scale': [0.5, 1.25],
-        'trans_config': {'degrees': 0.0,
-                          'translate': 0.2,
-                          'scale': 0.9,
-                          'shear': 0.0,
-                          'perspective': 0.0,
-                          'hsv_h': 0.015,
-                          'hsv_s': 0.7,
-                          'hsv_v': 0.4,
-                          'mosaic_type': 'yolov5_mosaic',
-                          'mixup_type': 'yolov5_mixup',
-                          'mixup_scale': [0.5, 1.5],
-                          },
-        # model
-        'backbone': 'elannet',
-        'pretrained': True,
-        'bk_act': 'silu',
-        'bk_norm': 'BN',
-        'bk_dpw': False,
-        'p6_feat': False,
-        'p7_feat': False,
-        'width': 0.75,
-        'depth': 0.67,
-        'stride': [8, 16, 32],  # P3, P4, P5
-        # neck
-        'neck': 'sppf',
-        'expand_ratio': 0.5,
-        'pooling_size': 5,
-        'neck_act': 'silu',
-        'neck_norm': 'BN',
-        'neck_depthwise': False,
-        # fpn
-        'fpn': 'elan_pafpn',
-        'fpn_act': 'silu',
-        'fpn_norm': 'BN',
-        'fpn_depthwise': False,
-        # head
-        'head': 'decoupled_head',
-        'head_act': 'silu',
-        'head_norm': 'BN',
-        'num_cls_head': 2,
-        'num_reg_head': 2,
-        'head_depthwise': False,
-        'reg_max': 16,
-        # matcher
-        'matcher': {'topk': 10,
-                    'alpha': 0.5,
-                    'beta': 6.0},
-        # loss weight
-        'cls_loss': 'bce', # vfl (optional)
-        'loss_cls_weight': 0.5,
-        'loss_iou_weight': 7.5,
-        'loss_dfl_weight': 1.5,
-        # training configuration
-        'no_aug_epoch': 10,
-        # optimizer
-        'optimizer': 'sgd',      # optional: sgd, adamw
-        'momentum': 0.937,         # SGD: 0.937;    AdamW: invalid
-        'weight_decay': 5e-4,      # SGD: 5e-4;     AdamW: 5e-2
-        'clip_grad': 10,           # SGD: 10.0;     AdamW: -1
-        # model EMA
-        'ema_decay': 0.9999,       # SGD: 0.9999;   AdamW: 0.9998
-        'ema_tau': 2000,
-        # lr schedule
-        'scheduler': 'linear',
-        'lr0': 0.01,              # SGD: 0.01;     AdamW: 0.004
-        'lrf': 0.01,               # SGD: 0.01;     AdamW: 0.05
+        'lr0': 0.01,               # SGD: 0.01;     AdamW: 0.001
+        'lrf': 0.01,               # SGD: 0.01;     AdamW: 0.01
         'warmup_momentum': 0.8,
         'warmup_bias_lr': 0.1,
         },
 
     'yolo_free_v2_large': {
         # input
-        'mosaic_prob': 1.0,
-        'mixup_prob': 0.15,
-        'multi_scale': [0.5, 1.25],
-        'trans_config': {'degrees': 0.0,
+        'multi_scale': [0.5, 1.4],
+        'trans_config': {# Basic Augment
+                          'degrees': 0.0,
                           'translate': 0.2,
                           'scale': 0.9,
                           'shear': 0.0,
@@ -241,33 +161,35 @@ yolo_free_v2_config = {
                           'hsv_h': 0.015,
                           'hsv_s': 0.7,
                           'hsv_v': 0.4,
+                          # Mosaic & Mixup
+                          'mosaic_prob': 1.0,
+                          'mixup_prob': 0.15,
                           'mosaic_type': 'yolov5_mosaic',
                           'mixup_type': 'yolov5_mixup',
                           'mixup_scale': [0.5, 1.5],
                           },
         # model
-        'backbone': 'elannet',
+        'backbone': 'elannet_large',
         'pretrained': True,
         'bk_act': 'silu',
         'bk_norm': 'BN',
         'bk_dpw': False,
-        'p6_feat': False,
-        'p7_feat': False,
-        'width': 1.0,
-        'depth': 1.0,
         'stride': [8, 16, 32],  # P3, P4, P5
         # neck
-        'neck': 'sppf',
+        'neck': 'csp_sppf',
         'expand_ratio': 0.5,
         'pooling_size': 5,
         'neck_act': 'silu',
         'neck_norm': 'BN',
         'neck_depthwise': False,
         # fpn
-        'fpn': 'elan_pafpn',
+        'fpn': 'yolov7_pafpn',
         'fpn_act': 'silu',
         'fpn_norm': 'BN',
         'fpn_depthwise': False,
+        'nbranch': 4.0,       # number of branch in ELANBlockFPN
+        'depth': 1.0,         # depth factor of each branch in ELANBlockFPN
+        'width': 1.0,         # width factor of channel in FPN
         # head
         'head': 'decoupled_head',
         'head_act': 'silu',
@@ -275,20 +197,17 @@ yolo_free_v2_config = {
         'num_cls_head': 2,
         'num_reg_head': 2,
         'head_depthwise': False,
-        'reg_max': 16,
         # matcher
-        'matcher': {'topk': 10,
-                    'alpha': 0.5,
-                    'beta': 6.0},
+        'matcher': {'center_sampling_radius': 2.5,
+                    'topk_candicate': 10},
         # loss weight
-        'cls_loss': 'bce', # vfl (optional)
-        'loss_cls_weight': 0.5,
-        'loss_iou_weight': 7.5,
-        'loss_dfl_weight': 1.5,
+        'loss_obj_weight': 1.0,
+        'loss_cls_weight': 1.0,
+        'loss_box_weight': 5.0,
         # training configuration
-        'no_aug_epoch': 10,
+        'no_aug_epoch': 20,
         # optimizer
-        'optimizer': 'sgd',      # optional: sgd, adamw
+        'optimizer': 'sgd',        # optional: sgd, adam, adamw
         'momentum': 0.937,         # SGD: 0.937;    AdamW: invalid
         'weight_decay': 5e-4,      # SGD: 5e-4;     AdamW: 5e-2
         'clip_grad': 10,           # SGD: 10.0;     AdamW: -1
@@ -297,18 +216,17 @@ yolo_free_v2_config = {
         'ema_tau': 2000,
         # lr schedule
         'scheduler': 'linear',
-        'lr0': 0.01,              # SGD: 0.01;     AdamW: 0.004
-        'lrf': 0.01,               # SGD: 0.01;     AdamW: 0.05
+        'lr0': 0.01,               # SGD: 0.01;     AdamW: 0.001
+        'lrf': 0.01,               # SGD: 0.01;     AdamW: 0.01
         'warmup_momentum': 0.8,
         'warmup_bias_lr': 0.1,
         },
 
     'yolo_free_v2_huge': {
         # input
-        'mosaic_prob': 1.0,
-        'mixup_prob': 0.15,
-        'multi_scale': [0.5, 1.25],
-        'trans_config': {'degrees': 0.0,
+        'multi_scale': [0.5, 1.4],
+        'trans_config': {# Basic Augment
+                          'degrees': 0.0,
                           'translate': 0.2,
                           'scale': 0.9,
                           'shear': 0.0,
@@ -316,33 +234,35 @@ yolo_free_v2_config = {
                           'hsv_h': 0.015,
                           'hsv_s': 0.7,
                           'hsv_v': 0.4,
+                          # Mosaic & Mixup
+                          'mosaic_prob': 1.0,
+                          'mixup_prob': 0.15,
                           'mosaic_type': 'yolov5_mosaic',
                           'mixup_type': 'yolov5_mixup',
                           'mixup_scale': [0.5, 1.5],
                           },
         # model
-        'backbone': 'elannet',
+        'backbone': 'elannet_huge',
         'pretrained': True,
         'bk_act': 'silu',
         'bk_norm': 'BN',
         'bk_dpw': False,
-        'p6_feat': False,
-        'p7_feat': False,
-        'width': 1.25,
-        'depth': 1.34,
         'stride': [8, 16, 32],  # P3, P4, P5
         # neck
-        'neck': 'sppf',
+        'neck': 'csp_sppf',
         'expand_ratio': 0.5,
         'pooling_size': 5,
         'neck_act': 'silu',
         'neck_norm': 'BN',
         'neck_depthwise': False,
         # fpn
-        'fpn': 'elan_pafpn',
+        'fpn': 'yolov7_pafpn',
         'fpn_act': 'silu',
         'fpn_norm': 'BN',
         'fpn_depthwise': False,
+        'nbranch': 4.0,        # number of branch in ELANBlockFPN
+        'depth': 2.0,          # depth factor of each branch in ELANBlockFPN
+        'width': 1.25,         # width factor of channel in FPN
         # head
         'head': 'decoupled_head',
         'head_act': 'silu',
@@ -350,20 +270,17 @@ yolo_free_v2_config = {
         'num_cls_head': 2,
         'num_reg_head': 2,
         'head_depthwise': False,
-        'reg_max': 16,
         # matcher
-        'matcher': {'topk': 10,
-                    'alpha': 0.5,
-                    'beta': 6.0},
+        'matcher': {'center_sampling_radius': 2.5,
+                    'topk_candicate': 10},
         # loss weight
-        'cls_loss': 'bce', # vfl (optional)
-        'loss_cls_weight': 0.5,
-        'loss_iou_weight': 7.5,
-        'loss_dfl_weight': 1.5,
+        'loss_obj_weight': 1.0,
+        'loss_cls_weight': 1.0,
+        'loss_box_weight': 5.0,
         # training configuration
-        'no_aug_epoch': 10,
+        'no_aug_epoch': 20,
         # optimizer
-        'optimizer': 'sgd',      # optional: sgd, adamw
+        'optimizer': 'sgd',        # optional: sgd, adam, adamw
         'momentum': 0.937,         # SGD: 0.937;    AdamW: invalid
         'weight_decay': 5e-4,      # SGD: 5e-4;     AdamW: 5e-2
         'clip_grad': 10,           # SGD: 10.0;     AdamW: -1
@@ -372,8 +289,8 @@ yolo_free_v2_config = {
         'ema_tau': 2000,
         # lr schedule
         'scheduler': 'linear',
-        'lr0': 0.01,              # SGD: 0.01;     AdamW: 0.004
-        'lrf': 0.01,               # SGD: 0.01;     AdamW: 0.05
+        'lr0': 0.01,               # SGD: 0.01;     AdamW: 0.001
+        'lrf': 0.01,               # SGD: 0.01;     AdamW: 0.01
         'warmup_momentum': 0.8,
         'warmup_bias_lr': 0.1,
         },

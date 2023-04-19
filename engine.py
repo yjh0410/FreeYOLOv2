@@ -3,7 +3,6 @@ import torch.distributed as dist
 
 import time
 import os
-import math
 import numpy as np
 import random
 
@@ -11,13 +10,18 @@ from utils import distributed_utils
 from utils.vis_tools import vis_data
 
 
-def rescale_image_targets(images, targets, max_stride, min_box_size, multi_scale=[0.5, 1.5]):
+def rescale_image_targets(images, targets, stride, min_box_size, multi_scale_range=[0.5, 1.5]):
     """
         Deployed for Multi scale trick.
     """
+    if isinstance(stride, int):
+        max_stride = stride
+    elif isinstance(stride, list):
+        max_stride = max(stride)
+
     # During training phase, the shape of input image is square.
     old_img_size = images.shape[-1]
-    new_img_size = random.randrange(old_img_size * multi_scale[0], old_img_size * multi_scale[1] + max_stride)
+    new_img_size = random.randrange(old_img_size * multi_scale_range[0], old_img_size * multi_scale_range[1] + max_stride)
     new_img_size = new_img_size // max_stride * max_stride  # size
     if new_img_size / old_img_size != 1:
         # interpolate
@@ -89,7 +93,7 @@ def train_one_epoch(epoch,
         # multi scale
         if args.multi_scale:
             images, targets, img_size = rescale_image_targets(
-                images, targets, max(model.stride), args.min_box_size, cfg['multi_scale'])
+                images, targets, model.stride, args.min_box_size, cfg['multi_scale'])
             
         # inference
         with torch.cuda.amp.autocast(enabled=args.fp16):
@@ -138,7 +142,7 @@ def train_one_epoch(epoch,
             t1 = time.time()
             cur_lr = [param_group['lr']  for param_group in optimizer.param_groups]
             # basic infor
-            log =  '[Epoch: {}/{}]'.format(epoch, total_epochs)
+            log =  '[Epoch: {}/{}]'.format(epoch+1, total_epochs)
             log += '[Iter: {}/{}]'.format(iter_i, epoch_size)
             log += '[lr: {:.6f}]'.format(cur_lr[2])
             # loss infor
@@ -174,8 +178,8 @@ def val_one_epoch(args,
     if distributed_utils.is_main_process():
         if evaluator is None:
             print('No evaluator ... save model and go on training.')
-            print('Saving state, epoch: {}'.format(epoch))
-            weight_name = '{}_epoch_{}.pth'.format(args.model, epoch)
+            print('Saving state, epoch: {}'.format(epoch + 1))
+            weight_name = '{}_epoch_{}.pth'.format(args.model, epoch + 1)
             checkpoint_path = os.path.join(path_to_save, weight_name)
             torch.save({'model': model.state_dict(),
                         'mAP': -1.,
@@ -198,8 +202,8 @@ def val_one_epoch(args,
                 # update best-map
                 best_map = cur_map
                 # save model
-                print('Saving state, epoch:', epoch)
-                weight_name = '{}_epoch_{}_{:.2f}.pth'.format(args.model, epoch, best_map*100)
+                print('Saving state, epoch:', epoch + 1)
+                weight_name = '{}_epoch_{}_{:.2f}.pth'.format(args.model, epoch + 1, best_map*100)
                 checkpoint_path = os.path.join(path_to_save, weight_name)
                 torch.save({'model': model.state_dict(),
                             'mAP': round(best_map*100, 1),

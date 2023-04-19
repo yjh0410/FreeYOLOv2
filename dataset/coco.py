@@ -1,11 +1,10 @@
 import os
+import cv2
 import random
 import numpy as np
 import time
 
-import torch
 from torch.utils.data import Dataset
-import cv2
 
 try:
     from pycocotools.coco import COCO
@@ -13,9 +12,9 @@ except:
     print("It seems that the COCOAPI is not installed.")
 
 try:
-    from .transforms import yolov5_mosaic_augment, yolov5_mixup_augment, yolox_mixup_augment
+    from .transforms import yolov5_mosaic_augment, yolov5_mosaic_augment_9x, yolov5_mixup_augment, yolox_mixup_augment
 except:
-    from transforms import yolov5_mosaic_augment, yolov5_mixup_augment, yolox_mixup_augment
+    from transforms import yolov5_mosaic_augment, yolov5_mosaic_augment_9x, yolov5_mixup_augment, yolox_mixup_augment
 
 
 coco_class_labels = ('background',
@@ -48,11 +47,9 @@ class COCODataset(Dataset):
                  data_dir=None, 
                  image_set='train2017',
                  transform=None,
-                 mosaic_prob=0.,
+                 mosaic_prob=0.0,
                  mixup_prob=0.0,
-                 trans_config=None,
-                 data_cache=False,
-                 is_train=False):
+                 trans_config=None):
         """
         COCO dataset initialization. Annotation data are read into memory by COCO API.
         Args:
@@ -73,24 +70,12 @@ class COCODataset(Dataset):
         self.coco = COCO(os.path.join(self.data_dir, 'annotations', self.json_file))
         self.ids = self.coco.getImgIds()
         self.class_ids = sorted(self.coco.getCatIds())
-        self.is_train = is_train
 
         # augmentation
         self.transform = transform
         self.mosaic_prob = mosaic_prob
         self.mixup_prob = mixup_prob
         self.trans_config = trans_config
-
-        # segment
-        try:
-            self.use_segment = trans_config['use_segment']
-        except:
-            self.use_segment = False
-
-        # load cache
-        self.data_cache = data_cache
-        if data_cache:
-            self.targets = self.load_cache()
 
         print('==============================')
         print('Image Set: {}'.format(image_set))
@@ -108,62 +93,37 @@ class COCODataset(Dataset):
         return self.pull_item(index)
 
 
-    def load_cache(self):
-        try:
-            # load coco targets from existing .npy file
-            targets = np.load("dataset/coco_{}_targets.npy".format(self.image_set), allow_pickle=True)
-        except:
-            # read coco targets
-            targets = []
-            print('caching the coco targets ...')
-            for index in range(len(self.ids)):
-                if index % 5000 == 0:
-                    print('loading {}/{}'.format(index, len(self.ids)))
-                bboxes, labels, segments = self.pull_anno(index)
-                target = np.concatenate([bboxes, labels[..., None]], axis=-1)  # [N, 5]
-                targets.append(target)
-            print('load done !')
-            np.save('dataset/coco_{}_targets.npy'.format(self.image_set), targets)
-            
-        return targets
-
-
     def load_image_target(self, index):
         # load an image
         image, _ = self.pull_image(index)
         height, width, channels = image.shape
 
         # load a target
-        if self.data_cache:
-            target = self.targets[index]
-            bboxes = target[..., :4]
-            labels = target[..., 4]
-        else:
-            bboxes, labels, segments = self.pull_anno(index)
-
-        if self.use_segment:
-            target = {
-                "boxes": bboxes,
-                "labels": labels,
-                'segments': None,
-                "orig_size": [height, width]
-            }
-        else:
-            target = {
-                "boxes": bboxes,
-                "labels": labels,
-                "orig_size": [height, width]
-            }
+        bboxes, labels = self.pull_anno(index)
+        target = {
+            "boxes": bboxes,
+            "labels": labels,
+            "orig_size": [height, width]
+        }
 
         return image, target
 
 
     def load_mosaic(self, index):
-        # load 4x mosaic image
-        index_list = np.arange(index).tolist() + np.arange(index+1, len(self.ids)).tolist()
-        id1 = index
-        id2, id3, id4 = random.sample(index_list, 3)
-        indexs = [id1, id2, id3, id4]
+        if random.random() < 0.8:
+            load_mosaic_4x = True
+            # load 4x mosaic image
+            index_list = np.arange(index).tolist() + np.arange(index+1, len(self.ids)).tolist()
+            id1 = index
+            id2, id3, id4 = random.sample(index_list, 3)
+            indexs = [id1, id2, id3, id4]
+        else:
+            load_mosaic_4x = False
+            # load 9x mosaic image
+            index_list = np.arange(index).tolist() + np.arange(index+1, len(self.ids)).tolist()
+            id1 = index
+            id2_9 = random.sample(index_list, 8)
+            indexs = [id1] + id2_9
 
         # load images and targets
         image_list = []
@@ -173,11 +133,15 @@ class COCODataset(Dataset):
             image_list.append(img_i)
             target_list.append(target_i)
 
-        # Mosaic
+        # Mosaic Augment
         if self.trans_config['mosaic_type'] == 'yolov5_mosaic':
-            image, target = yolov5_mosaic_augment(
-                image_list, target_list, self.img_size, self.trans_config, self.is_train)
-
+            if load_mosaic_4x:
+                image, target = yolov5_mosaic_augment(
+                    image_list, target_list, self.img_size, self.trans_config)
+            else:
+                image, target = yolov5_mosaic_augment_9x(
+                    image_list, target_list, self.img_size, self.trans_config)
+                
         return image, target
 
 
@@ -247,7 +211,6 @@ class COCODataset(Dataset):
         #load a target
         bboxes = []
         labels = []
-        segments = []
         for anno in annotations:
             if 'bbox' in anno and anno['area'] > 0:
                 # bbox
@@ -263,23 +226,17 @@ class COCODataset(Dataset):
                 bboxes.append([x1, y1, x2, y2])
                 labels.append(cls_id)
 
-                if self.use_segment:
-                    polygons = anno['segmentation']
-                    polygons = [np.array(poly).reshape(-1, 2) for poly in polygons]
-                    segments.append(polygons)
-
-
         # guard against no boxes via resizing
         bboxes = np.array(bboxes).reshape(-1, 4)
         labels = np.array(labels).reshape(-1)
         
-        return bboxes, labels, segments
+        return bboxes, labels
 
 
 if __name__ == "__main__":
     import time
     import argparse
-    from transforms import TrainTransforms, ValTransforms
+    from transforms import build_transform
     
     parser = argparse.ArgumentParser(description='FreeYOLO')
 
@@ -290,7 +247,9 @@ if __name__ == "__main__":
     args = parser.parse_args()
     
     img_size = 640
+    is_train = True
     trans_config = {
+        # Basic Augment
         'degrees': 0.0,
         'translate': 0.2,
         'scale': 0.9,
@@ -299,29 +258,23 @@ if __name__ == "__main__":
         'hsv_h': 0.015,
         'hsv_s': 0.7,
         'hsv_v': 0.4,
+        # Mosaic & Mixup
+        'mosaic_prob': 1.0,
+        'mixup_prob': 0.15,
         'mosaic_type': 'yolov5_mosaic',
-        'mixup_type': 'yolox_mixup',
-        'mixup_scale': [0.5, 1.5],
-        'use_segment': False,
+        'mixup_type': 'yolov5_mixup',
+        'mixup_scale': [0.5, 1.5]
     }
-    train_transform = TrainTransforms(
-        trans_config=trans_config,
-        img_size=img_size,
-        min_box_size=8
-        )
-
-    val_transform = ValTransforms(
-        img_size=img_size,
-        )
+    transform = build_transform(img_size, trans_config, max_stride=32, is_train=is_train)
 
     dataset = COCODataset(
         img_size=img_size,
         data_dir=args.root,
         image_set='val2017',
-        transform=train_transform,
-        mosaic_prob=1.0,
-        mixup_prob=1.0,
-        trans_config=trans_config
+        transform=transform,
+        mosaic_prob=trans_config['mosaic_prob'],
+        mixup_prob=trans_config['mixup_prob'],
+        trans_config=trans_config,
         )
     
     np.random.seed(0)

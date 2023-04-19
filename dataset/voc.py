@@ -4,7 +4,6 @@ https://github.com/fmassa/vision/blob/voc_dataset/torchvision/datasets/voc.py
 Updated by: Ellis Brown, Max deGroot
 """
 import os.path as osp
-import torch
 import torch.utils.data as data
 import cv2
 import numpy as np
@@ -12,9 +11,9 @@ import random
 import xml.etree.ElementTree as ET
 
 try:
-    from .transforms import yolov5_mosaic_augment, yolov5_mixup_augment, yolox_mixup_augment
+    from .transforms import yolov5_mosaic_augment, yolov5_mosaic_augment_9x, yolov5_mixup_augment, yolox_mixup_augment
 except:
-    from transforms import yolov5_mosaic_augment, yolov5_mixup_augment, yolox_mixup_augment
+    from transforms import yolov5_mosaic_augment, yolov5_mosaic_augment_9x, yolov5_mixup_augment, yolox_mixup_augment
 
 
 VOC_CLASSES = (  # always index 0
@@ -94,8 +93,7 @@ class VOCDetection(data.Dataset):
                  transform=None, 
                  mosaic_prob=0.0,
                  mixup_prob=0.0,
-                 trans_config=None,
-                 is_train=False):
+                 trans_config=None):
         self.root = data_dir
         self.img_size = img_size
         self.image_set = image_sets
@@ -103,7 +101,6 @@ class VOCDetection(data.Dataset):
         self._annopath = osp.join('%s', 'Annotations', '%s.xml')
         self._imgpath = osp.join('%s', 'JPEGImages', '%s.jpg')
         self.ids = list()
-        self.is_train = is_train
         for (year, name) in image_sets:
             rootpath = osp.join(self.root, 'VOC' + year)
             for line in open(osp.join(rootpath, 'ImageSets', 'Main', name + '.txt')):
@@ -151,11 +148,20 @@ class VOCDetection(data.Dataset):
 
 
     def load_mosaic(self, index):
-        # load 4x mosaic image
-        index_list = np.arange(index).tolist() + np.arange(index+1, len(self.ids)).tolist()
-        id1 = index
-        id2, id3, id4 = random.sample(index_list, 3)
-        indexs = [id1, id2, id3, id4]
+        if random.random() < 0.8:
+            load_mosaic_4x = True
+            # load 4x mosaic image
+            index_list = np.arange(index).tolist() + np.arange(index+1, len(self.ids)).tolist()
+            id1 = index
+            id2, id3, id4 = random.sample(index_list, 3)
+            indexs = [id1, id2, id3, id4]
+        else:
+            load_mosaic_4x = False
+            # load 9x mosaic image
+            index_list = np.arange(index).tolist() + np.arange(index+1, len(self.ids)).tolist()
+            id1 = index
+            id2_9 = random.sample(index_list, 8)
+            indexs = [id1] + id2_9
 
         # load images and targets
         image_list = []
@@ -165,11 +171,15 @@ class VOCDetection(data.Dataset):
             image_list.append(img_i)
             target_list.append(target_i)
 
-        # Mosaic
+        # Mosaic Augment
         if self.trans_config['mosaic_type'] == 'yolov5_mosaic':
-            image, target = yolov5_mosaic_augment(
-                image_list, target_list, self.img_size, self.trans_config, self.is_train)
-
+            if load_mosaic_4x:
+                image, target = yolov5_mosaic_augment(
+                    image_list, target_list, self.img_size, self.trans_config)
+            else:
+                image, target = yolov5_mosaic_augment_9x(
+                    image_list, target_list, self.img_size, self.trans_config)
+                
         return image, target
 
 
@@ -240,11 +250,10 @@ class VOCDetection(data.Dataset):
 
 
 if __name__ == "__main__":
-    import time
     import argparse
-    from transforms import TrainTransforms, ValTransforms
+    from transforms import build_transform
     
-    parser = argparse.ArgumentParser(description='FreeYOLO-Seg')
+    parser = argparse.ArgumentParser(description='FreeYOLO')
 
     # opt
     parser.add_argument('--root', default='D:\\python_work\\object-detection\\dataset\\VOCdevkit',
@@ -253,7 +262,9 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     img_size = 640
+    is_train = False
     trans_config = {
+        # Basic Augment
         'degrees': 0.0,
         'translate': 0.2,
         'scale': 0.9,
@@ -262,28 +273,22 @@ if __name__ == "__main__":
         'hsv_h': 0.015,
         'hsv_s': 0.7,
         'hsv_v': 0.4,
+        # Mosaic & Mixup
+        'mosaic_prob': 1.0,
+        'mixup_prob': 0.15,
         'mosaic_type': 'yolov5_mosaic',
-        'mixup_type': 'yolox_mixup',
-        'mixup_scale': [0.5, 1.5],
-        'use_segment': False,
+        'mixup_type': 'yolov5_mixup',
+        'mixup_scale': [0.5, 1.5]
     }
-    train_transform = TrainTransforms(
-        trans_config=trans_config,
-        img_size=img_size,
-        min_box_size=8
-        )
-
-    val_transform = ValTransforms(
-        img_size=img_size,
-        )
+    transform = build_transform(img_size, trans_config, max_stride=32, is_train=is_train)
 
     dataset = VOCDetection(
         img_size=img_size,
         data_dir=args.root,
-        transform=train_transform,
-        mosaic_prob=1.0,
-        mixup_prob=1.0,
-        trans_config=trans_config
+        transform=transform,
+        mosaic_prob=trans_config['mosaic_prob'],
+        mixup_prob=trans_config['mixup_prob'],
+        trans_config=trans_config,
         )
     
     np.random.seed(0)
@@ -296,6 +301,7 @@ if __name__ == "__main__":
         image, target, deltas = dataset.pull_item(i)
         # to numpy
         image = image.permute(1, 2, 0).numpy()
+        # to uint8
         image = image.astype(np.uint8)
         image = image.copy()
         img_h, img_w = image.shape[:2]
