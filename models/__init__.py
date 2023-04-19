@@ -12,8 +12,7 @@ def build_model(args,
                 num_classes=80, 
                 trainable=False):
     # FreeYOLOv2
-    if args.model in ['yolo_free_v2_pico',  'yolo_free_v2_nano',
-                      'yolo_free_v2_small', 'yolo_free_v2_medium',
+    if args.model in ['yolo_free_v2_nano', 'yolo_free_v2_tiny',
                       'yolo_free_v2_large', 'yolo_free_v2_huge', # P5
                      ]:
         model, criterion = build_yolo_free_v2(
