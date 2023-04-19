@@ -59,7 +59,6 @@ class ELANNet_Nano(nn.Module):
 
         outputs = [c3, c4, c5]
 
-        print(c3.shape, c4.shape, c5.shape)
         return outputs
 
 
