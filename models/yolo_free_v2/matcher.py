@@ -61,6 +61,7 @@ class SimOTA(object):
             .unsqueeze(1)
             .repeat(1, num_in_boxes_anchor, 1)
         )
+        gt_cls_soft = gt_cls * pair_wise_ious.unsqueeze(-1)
 
         with torch.cuda.amp.autocast(enabled=False):
             score_preds_ = torch.sqrt(
@@ -68,7 +69,7 @@ class SimOTA(object):
                 * obj_preds_.float().unsqueeze(0).repeat(num_gt, 1, 1).sigmoid_()
             ) # [N, Mp, C]
             pair_wise_cls_loss = F.binary_cross_entropy(
-                score_preds_, gt_cls, reduction="none"
+                score_preds_, gt_cls_soft, reduction="none"
             ).sum(-1) # [N, Mp]
         del score_preds_
 

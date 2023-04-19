@@ -78,11 +78,11 @@ yolo_free_v2_cfg = {
 
     'yolo_free_v2_tiny': {
         # input
-        'multi_scale': [0.5, 1.4],
+        'multi_scale': [0.5, 1.25],
         'trans_config': {# Basic Augment
                           'degrees': 0.0,
-                          'translate': 0.2,
-                          'scale': 0.9,
+                          'translate': 0.1,
+                          'scale': 0.5,
                           'shear': 0.0,
                           'perspective': 0.0,
                           'hsv_h': 0.015,
@@ -151,7 +151,7 @@ yolo_free_v2_cfg = {
 
     'yolo_free_v2_large': {
         # input
-        'multi_scale': [0.5, 1.4],
+        'multi_scale': [0.5, 1.25],
         'trans_config': {# Basic Augment
                           'degrees': 0.0,
                           'translate': 0.2,
@@ -224,7 +224,7 @@ yolo_free_v2_cfg = {
 
     'yolo_free_v2_huge': {
         # input
-        'multi_scale': [0.5, 1.4],
+        'multi_scale': [0.5, 1.25],
         'trans_config': {# Basic Augment
                           'degrees': 0.0,
                           'translate': 0.2,
