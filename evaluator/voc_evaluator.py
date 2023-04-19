@@ -34,7 +34,7 @@ class VOCAPIEvaluator():
         self.annopath = os.path.join(data_dir, 'VOC2007', 'Annotations', '%s.xml')
         self.imgpath = os.path.join(data_dir, 'VOC2007', 'JPEGImages', '%s.jpg')
         self.imgsetpath = os.path.join(data_dir, 'VOC2007', 'ImageSets', 'Main', set_type+'.txt')
-        self.output_dir = self.get_output_dir('voc_eval/', self.set_type)
+        self.output_dir = self.get_output_dir('det_results/voc_eval/', self.set_type)
 
         # dataset
         self.dataset = VOCDetection(
@@ -61,15 +61,21 @@ class VOCAPIEvaluator():
             orig_h, orig_w, _ = im.shape
 
             # preprocess
-            x = self.transform(im)[0]
+            x, _, deltas = self.transform(im)
             x = x.unsqueeze(0).to(self.device) / 255.
 
             t0 = time.time()
             # forward
             bboxes, scores, labels = net(x)
             detect_time = time.time() - t0
+
             # rescale
-            bboxes *= max(orig_h, orig_w)
+            img_h, img_w = x.shape[-2:]
+            bboxes[..., [0, 2]] = bboxes[..., [0, 2]] / (img_w - deltas[0]) * orig_w
+            bboxes[..., [1, 3]] = bboxes[..., [1, 3]] / (img_h - deltas[1]) * orig_h
+
+            # clip bbox
+            bboxes[..., [0, 2]] = np.clip(bboxes[..., [0, 2]], a_min=0., a_max=orig_w)
 
             for j in range(len(self.labelmap)):
                 inds = np.where(labels == j)[0]
