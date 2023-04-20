@@ -49,9 +49,9 @@ class AlignedSimOTA(object):
                     self.num_classes,
                     dtype=torch.long),
                 'assigned_bboxes':
-                gt_bboxes.new_full(pred_cls.shape, 0),
+                gt_bboxes.new_full(pred_box.shape, 0),
                 'assign_metrics':
-                gt_bboxes.new_full(pred_cls[..., 0].shape, 0)
+                gt_bboxes.new_full(pred_box[..., 0].shape, 0)
             }
         
         # get inside points: [N, M]
@@ -116,7 +116,6 @@ class AlignedSimOTA(object):
 
         assigned_bboxes = gt_bboxes.new_full(pred_box.shape, 0)        # [M, 4]
         assigned_bboxes[fg_mask_inboxes] = gt_bboxes[matched_gt_inds]  # [M, 4]
-        print(assigned_bboxes.shape)
 
         assign_metrics = gt_bboxes.new_full(pred_cls[..., 0].shape, 0) # [M, 4]
         assign_metrics[fg_mask_inboxes] = matched_pred_ious            # [M, 4]
