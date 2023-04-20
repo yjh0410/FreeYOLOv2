@@ -177,7 +177,7 @@ class AlignedSimOTA(object):
             topk_ids = sorted_indices[gt_idx, :dynamic_ks[gt_idx]]
             matching_matrix[gt_idx, :][topk_ids] = 1
 
-        del topk_ious, dynamic_ks
+        del topk_ious, dynamic_ks, topk_ids
 
         prior_match_gt_mask = matching_matrix.sum(0) > 1
         if prior_match_gt_mask.sum() > 0:
