@@ -13,12 +13,7 @@ class AlignedSimOTA(object):
     """
         This code referenced to https://github.com/open-mmlab/mmyolo/models/task_modules/assigners/batch_dsl_assigner.py
     """
-    def __init__(self,
-                 num_classes,
-                 soft_center_radius=3.0,
-                 topk=13,
-                 iou_weight=3.0
-                 ):
+    def __init__(self, num_classes, soft_center_radius=3.0, topk=13, iou_weight=3.0):
         self.num_classes = num_classes
         self.soft_center_radius = soft_center_radius
         self.topk = topk
