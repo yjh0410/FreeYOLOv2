@@ -53,7 +53,7 @@ yolo_free_v2_cfg = {
         'head_depthwise': True,
         # matcher
         'matcher': {'soft_center_radius': 3.0,
-                    'topk_candicate': 13,
+                    'topk_candicate': 10,
                     'iou_weight': 3.0},
         # loss weight
         'loss_cls_weight': 1.0,
@@ -126,7 +126,7 @@ yolo_free_v2_cfg = {
         'head_depthwise': False,
         # matcher
         'matcher': {'soft_center_radius': 3.0,
-                    'topk_candicate': 13,
+                    'topk_candicate': 10,
                     'iou_weight': 3.0},
         # loss weight
         'loss_cls_weight': 1.0,
@@ -199,7 +199,7 @@ yolo_free_v2_cfg = {
         'head_depthwise': False,
         # matcher
         'matcher': {'soft_center_radius': 3.0,
-                    'topk_candicate': 13,
+                    'topk_candicate': 10,
                     'iou_weight': 3.0},
         # loss weight
         'loss_cls_weight': 1.0,
@@ -272,7 +272,7 @@ yolo_free_v2_cfg = {
         'head_depthwise': False,
         # matcher
         'matcher': {'soft_center_radius': 3.0,
-                    'topk_candicate': 13,
+                    'topk_candicate': 10,
                     'iou_weight': 3.0},
         # loss weight
         'loss_cls_weight': 1.0,

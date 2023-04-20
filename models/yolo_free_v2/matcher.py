@@ -165,7 +165,6 @@ class AlignedSimOTA(object):
             matching_matrix[:, anchor_matching_gt > 1] *= 0
             matching_matrix[cost_argmin, anchor_matching_gt > 1] = 1
         fg_mask_inboxes = matching_matrix.sum(0) > 0
-        num_fg = fg_mask_inboxes.sum().item()
 
         is_in_gt[is_in_gt.clone()] = fg_mask_inboxes
         fg_mask = is_in_gt
