@@ -104,7 +104,6 @@ class Criterion(object):
 
             cls_targets.append(assigned_result['assigned_labels'])
             box_targets.append(assigned_result['assigned_bboxes'])
-            print(assigned_result['assigned_bboxes'].shape)
             assign_metrics.append(assigned_result['assign_metrics'])
 
         cls_targets = torch.cat(cls_targets, dim=0)

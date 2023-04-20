@@ -115,6 +115,7 @@ class AlignedSimOTA(object):
         assigned_labels = assigned_labels.long()  # [M,]
 
         assigned_bboxes = gt_bboxes.new_full(pred_box.shape, 0)        # [M, 4]
+        print(assigned_bboxes.shape)
         assigned_bboxes[fg_mask_inboxes] = gt_bboxes[matched_gt_inds]  # [M, 4]
 
         assign_metrics = gt_bboxes.new_full(pred_cls[..., 0].shape, 0) # [M, 4]
