@@ -51,14 +51,12 @@ class AlignedSimOTA(object):
                 'assigned_bboxes':
                 gt_bboxes.new_full(pred_box.shape, 0),
                 'assign_metrics':
-                gt_bboxes.new_full(pred_box[..., 0].shape, 0)
+                gt_bboxes.new_full(pred_cls[..., 0].shape, 0)
             }
         
         # get inside points: [N, M]
         is_in_gt = self.find_inside_points(gt_bboxes, anchors)
         valid_mask = is_in_gt.sum(dim=0) > 0
-
-        num_anchors = pred_box.shape[0]
 
         # ----------------------------------- soft center prior -----------------------------------
         gt_center = (gt_bboxes[..., :2] + gt_bboxes[..., 2:]) / 2.0
@@ -72,21 +70,15 @@ class AlignedSimOTA(object):
         pair_wise_ious_loss = -torch.log(pair_wise_ious + 1e-8) * self.iou_weight
 
         # ----------------------------------- classification cost -----------------------------------
-        gt_cls = (
-            F.one_hot(gt_labels.long(), self.num_classes)
-            .float()
-            .unsqueeze(1)
-            .repeat(1, num_anchors, 1)
-        ) # [N, C] -> [N, M, C]
-        soften_gt_cls = gt_cls * pair_wise_ious.unsqueeze(-1)
-        with torch.cuda.amp.autocast(enabled=False):
-            # [M, C] -> [N, M, C]
-            pairwise_pred_scores = pred_cls.float().unsqueeze(0).repeat(num_gt, 1, 1) # [N, M, C]
-            scale_factor = (soften_gt_cls - pairwise_pred_scores.sigmoid()).abs().pow(2.0)
-            pair_wise_cls_loss = F.binary_cross_entropy_with_logits(
-                pairwise_pred_scores, soften_gt_cls,
-                reduction="none") * scale_factor
-            pair_wise_cls_loss = pair_wise_cls_loss.sum(-1) # [N, M]
+        ## select the predicted scores corresponded to the gt_labels
+        pairwise_pred_scores = pred_cls.permute(1, 0)
+        pairwise_pred_scores = pairwise_pred_scores[gt_labels.long(), :].float()   # [N, M]
+        ## scale factor
+        scale_factor = (pair_wise_ious - pairwise_pred_scores.sigmoid()).abs().pow(2.0)
+        ## cls cost
+        pair_wise_cls_loss = F.binary_cross_entropy_with_logits(
+            pairwise_pred_scores, pair_wise_ious,
+            reduction="none") * scale_factor # [N, M]
             
         del pairwise_pred_scores
 
@@ -143,8 +135,6 @@ class AlignedSimOTA(object):
         # offset
         lt = anchors_expand - gt_bboxes_expand[..., :2]
         rb = gt_bboxes_expand[..., 2:] - anchors_expand
-
-
         bbox_deltas = torch.cat([lt, rb], dim=-1)
 
         is_in_gts = bbox_deltas.min(dim=-1).values > 0
