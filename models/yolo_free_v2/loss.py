@@ -28,10 +28,31 @@ class Criterion(object):
             )
     
 
-    def loss_classes(self, pred_cls, gt_label):
-        loss_cls = F.binary_cross_entropy_with_logits(pred_cls, gt_label, reduction='none')
+    def loss_classes(self, pred_cls, target, beta=2.0):
+        # Quality FocalLoss
+        """
+            pred_cls: (torch.Tensor): [N, C]。
+            target:   (tuple([torch.Tensor], [torch.Tensor])): label -> (N，)，score -> (N，)
+        """
+        label, score = target
+        pred_sigmoid = pred_cls.sigmoid()
+        scale_factor = pred_sigmoid
+        zerolabel = scale_factor.new_zeros(pred_cls.shape)
 
-        return loss_cls
+        ce_loss = F.binary_cross_entropy_with_logits(
+            pred_cls, zerolabel, reduction='none') * scale_factor.pow(beta)
+        
+        bg_class_ind = pred_cls.shape[-1]
+        pos = ((label >= 0) & (label < bg_class_ind)).nonzero().squeeze(1)
+        pos_label = label[pos].long()
+
+        scale_factor = score[pos] - pred_sigmoid[pos, pos_label]
+
+        ce_loss[pos, pos_label] = F.binary_cross_entropy_with_logits(
+            pred_cls[pos, pos_label], score[pos],
+            reduction='none') * scale_factor.abs().pow(beta)
+
+        return ce_loss
 
 
     def loss_bboxes(self, pred_box, gt_box):
@@ -58,7 +79,7 @@ class Criterion(object):
         device = outputs['pred_cls'][0].device
         fpn_strides = outputs['strides']
         anchors = outputs['anchors']
-        num_anchors = sum([ab.shape[0] for ab in anchors])
+
         # preds: [B, M, C]
         cls_preds = torch.cat(outputs['pred_cls'], dim=1)
         box_preds = torch.cat(outputs['pred_box'], dim=1)
@@ -66,63 +87,48 @@ class Criterion(object):
         # label assignment
         cls_targets = []
         box_targets = []
-        fg_masks = []
+        assign_metrics = []
 
         for batch_idx in range(bs):
-            tgt_labels = targets[batch_idx]["labels"].to(device)
-            tgt_bboxes = targets[batch_idx]["boxes"].to(device)
+            tgt_labels = targets[batch_idx]["labels"].to(device)  # [N,]
+            tgt_bboxes = targets[batch_idx]["boxes"].to(device)   # [N, 4]
 
-            # check target
-            if len(tgt_labels) == 0 or tgt_bboxes.max().item() == 0.:
-                num_anchors = sum([ab.shape[0] for ab in anchors])
-                # There is no valid gt
-                cls_target = cls_preds.new_zeros((num_anchors, self.num_classes))
-                box_target = cls_preds.new_zeros((0, 4))
-                fg_mask = cls_preds.new_zeros(num_anchors).bool()
-            else:
-                (
-                    fg_mask,
-                    assigned_labels,
-                    matched_pred_ious,
-                    matched_gt_inds,
-                ) = self.matcher(
-                    fpn_strides = fpn_strides,
-                    anchors = anchors,
-                    pred_cls = cls_preds[batch_idx], 
-                    pred_box = box_preds[batch_idx],
-                    gt_labels = tgt_labels,
-                    gt_bboxes = tgt_bboxes
-                    )
+            # label assignment
+            assigned_result = self.matcher(fpn_strides=fpn_strides,
+                                           anchors=anchors,
+                                           pred_cls=cls_preds[batch_idx].detach(),
+                                           pred_box=box_preds[batch_idx].detach(),
+                                           gt_labels=tgt_labels,
+                                           gt_bboxes=tgt_bboxes
+                                           )
 
-                # cls target
-                cls_target = cls_preds.new_zeros((num_anchors, self.num_classes))
-                gt_classes = F.one_hot(assigned_labels.long(), self.num_classes)
-                gt_classes = gt_classes * matched_pred_ious.unsqueeze(-1)
-                cls_target[fg_mask] = gt_classes.type_as(cls_target)
-                # box target
-                box_target = tgt_bboxes[matched_gt_inds]
+            cls_targets.append(assigned_result['assigned_labels'])
+            box_targets.append(assigned_result['assigned_bboxes'])
+            assign_metrics.append(assigned_result['assign_metrics'])
 
-            cls_targets.append(cls_target)
-            box_targets.append(box_target)
-            fg_masks.append(fg_mask)
+        cls_targets = torch.cat(cls_targets, dim=0)
+        box_targets = torch.cat(box_targets, dim=0)
+        assign_metrics = torch.cat(assign_metrics, dim=0)
 
-        cls_targets = torch.cat(cls_targets, 0)
-        box_targets = torch.cat(box_targets, 0)
-        fg_masks = torch.cat(fg_masks, 0)
-        num_fgs = fg_masks.sum()
+        # FG cat_id: [0, num_classes -1], BG cat_id: num_classes
+        bg_class_ind = self.num_classes
+        pos_inds = ((cls_targets >= 0)
+                    & (cls_targets < bg_class_ind)).nonzero().squeeze(1)
+        num_fgs = assign_metrics.sum()
 
         if is_dist_avail_and_initialized():
             torch.distributed.all_reduce(num_fgs)
-        num_fgs = (num_fgs / get_world_size()).clamp(1.0)
+        num_fgs = (num_fgs / get_world_size()).clamp(1.0).item()
         
         # cls loss
-        cls_preds_pos = cls_preds.view(-1, self.num_classes)
-        loss_cls = self.loss_classes(cls_preds_pos, cls_targets)
+        cls_preds = cls_preds.view(-1, self.num_classes)
+        loss_cls = self.loss_classes(cls_preds, (cls_targets, assign_metrics))
         loss_cls = loss_cls.sum() / num_fgs
 
         # regression loss
-        box_preds_pos = box_preds.view(-1, 4)[fg_masks]
-        loss_box = self.loss_bboxes(box_preds_pos, box_targets)
+        box_preds_pos = box_preds.view(-1, 4)[pos_inds]
+        box_targets_pos = box_targets[pos_inds]
+        loss_box = self.loss_bboxes(box_preds_pos, box_targets_pos)
         loss_box = loss_box.sum() / num_fgs
 
         # total loss
