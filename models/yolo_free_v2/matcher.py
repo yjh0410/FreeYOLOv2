@@ -9,107 +9,105 @@ from utils.box_ops import *
 
 
 # YOLOX SimOTA
-class SimOTA(object):
+class AlignedSimOTA(object):
     """
         This code referenced to https://github.com/Megvii-BaseDetection/YOLOX/blob/main/yolox/models/yolo_head.py
     """
-    def __init__(self, num_classes, center_sampling_radius, topk_candidate ):
+    def __init__(self,
+                 num_classes,
+                 soft_center_radius=3.0,
+                 topk=13,
+                 iou_weight=3.0
+                 ):
         self.num_classes = num_classes
-        self.center_sampling_radius = center_sampling_radius
-        self.topk_candidate = topk_candidate
+        self.soft_center_radius = soft_center_radius
+        self.topk = topk
+        self.iou_weight = iou_weight
 
 
     @torch.no_grad()
     def __call__(self, 
                  fpn_strides, 
                  anchors, 
-                 pred_obj, 
                  pred_cls, 
                  pred_box, 
-                 tgt_labels,
-                 tgt_bboxes):
+                 gt_labels,
+                 gt_bboxes):
         # [M,]
         strides = torch.cat([torch.ones_like(anchor_i[:, 0]) * stride_i
                                 for stride_i, anchor_i in zip(fpn_strides, anchors)], dim=-1)
         # List[F, M, 2] -> [M, 2]
         anchors = torch.cat(anchors, dim=0)
-        num_anchor = anchors.shape[0]        
-        num_gt = len(tgt_labels)
+        num_gt = len(gt_labels)
 
-        fg_mask, is_in_boxes_and_center = \
-            self.get_in_boxes_info(
-                tgt_bboxes,
-                anchors,
-                strides,
-                num_anchor,
-                num_gt
-                )
-
-        obj_preds_ = pred_obj[fg_mask]   # [Mp, 1]
-        cls_preds_ = pred_cls[fg_mask]   # [Mp, C]
-        box_preds_ = pred_box[fg_mask]   # [Mp, 4]
+        # get inside points
+        is_in_gt = self.get_in_boxes_info(gt_bboxes, anchors)
+        cls_preds_ = pred_cls[is_in_gt]   # [Mp, C]
+        box_preds_ = pred_box[is_in_gt]   # [Mp, 4]
         num_in_boxes_anchor = box_preds_.shape[0]
 
-        # [N, Mp]
-        pair_wise_ious, _ = box_iou(tgt_bboxes, box_preds_)
-        pair_wise_ious_loss = -torch.log(pair_wise_ious + 1e-8)
+        # ----------------------------------- soft center prior -----------------------------------
+        gt_center = (gt_bboxes[..., :2] + gt_bboxes[..., 2:]) / 2.0
+        distance = (anchors[is_in_gt].unsqueeze(0) - gt_center.unsqueeze(1)
+                    ).pow(2).sum(-1).sqrt() / strides[is_in_gt].unsqueeze(0)  # [N, Mp]
+        soft_center_prior = torch.pow(10, distance - self.soft_center_radius)
 
-        # [N, C] -> [N, Mp, C]
+        # ----------------------------------- regression cost -----------------------------------
+        pair_wise_ious, _ = box_iou(gt_bboxes, box_preds_)  # [N, Mp]
+        pair_wise_ious_loss = -torch.log(pair_wise_ious + 1e-8) * self.iou_weight
+
+        # ----------------------------------- classification cost -----------------------------------
         gt_cls = (
-            F.one_hot(tgt_labels.long(), self.num_classes)
+            F.one_hot(gt_labels.long(), self.num_classes)
             .float()
             .unsqueeze(1)
             .repeat(1, num_in_boxes_anchor, 1)
-        )
-        gt_cls_soft = gt_cls * pair_wise_ious.unsqueeze(-1)
-
+        ) # [N, C] -> [N, Mp, C]
+        soften_gt_cls = gt_cls * pair_wise_ious.unsqueeze(-1)
         with torch.cuda.amp.autocast(enabled=False):
-            score_preds_ = torch.sqrt(
-                cls_preds_.float().unsqueeze(0).repeat(num_gt, 1, 1).sigmoid_()
-                * obj_preds_.float().unsqueeze(0).repeat(num_gt, 1, 1).sigmoid_()
-            ) # [N, Mp, C]
-            pair_wise_cls_loss = F.binary_cross_entropy(
-                score_preds_, gt_cls_soft, reduction="none"
-            ).sum(-1) # [N, Mp]
-        del score_preds_
+            # [Mp, C] -> [N, Mp, C]
+            pairwise_pred_scores = cls_preds_.float().unsqueeze(0).repeat(num_gt, 1, 1) # [N, Mp, C]
+            scale_factor = (soften_gt_cls - pairwise_pred_scores.sigmoid()).abs().pow(2.0)
+            pair_wise_cls_loss = F.binary_cross_entropy_with_logits(
+                pairwise_pred_scores, soften_gt_cls,
+                reduction="none") * scale_factor
+            pair_wise_cls_loss = pair_wise_cls_loss.sum(-1) # [N, Mp]
+            
+        del pairwise_pred_scores
 
-        cost = (
-            pair_wise_cls_loss
-            + 3.0 * pair_wise_ious_loss
-            + 100000.0 * (~is_in_boxes_and_center)
-        ) # [N, Mp]
+        # foreground cost matrix
+        cost_metrix = pair_wise_cls_loss + pair_wise_ious_loss + soft_center_prior
 
         (
-            num_fg,
-            gt_matched_classes,         # [num_fg,]
-            pred_ious_this_matching,    # [num_fg,]
-            matched_gt_inds,            # [num_fg,]
+            fg_mask,              # [num_fg,]
+            assigned_labels,      # [num_fg,]
+            matched_pred_ious,    # [num_fg,]
+            matched_gt_inds,      # [num_fg,]
         ) = self.dynamic_k_matching(
-            cost,
+            cost_metrix,
             pair_wise_ious,
-            tgt_labels,
+            gt_labels,
             num_gt,
-            fg_mask
+            is_in_gt
             )
-        del pair_wise_cls_loss, cost, pair_wise_ious, pair_wise_ious_loss
+        del pair_wise_cls_loss, cost_metrix, pair_wise_ious, pair_wise_ious_loss
 
         return (
-                gt_matched_classes,
                 fg_mask,
-                pred_ious_this_matching,
+                assigned_labels,
+                matched_pred_ious,
                 matched_gt_inds,
-                num_fg,
         )
 
 
-    def get_in_boxes_info(
-        self,
-        gt_bboxes,   # [N, 4]
-        anchors,     # [M, 2]
-        strides,     # [M,]
-        num_anchors, # M
-        num_gt,      # N
-        ):
+    def get_in_boxes_info(self, gt_bboxes, anchors):
+        """
+            gt_bboxes: Tensor -> [N, 2]
+            anchors:   Tensor -> [M, 2]
+        """
+        num_anchors = anchors.shape[0]
+        num_gt = gt_bboxes.shape[0]
+
         # anchor center
         x_centers = anchors[:, 0]
         y_centers = anchors[:, 1]
@@ -132,35 +130,8 @@ class SimOTA(object):
 
         is_in_boxes = bbox_deltas.min(dim=-1).values > 0.0
         is_in_boxes_all = is_in_boxes.sum(dim=0) > 0
-        # in fixed center
-        center_radius = self.center_sampling_radius
 
-        # [N, 2]
-        gt_centers = (gt_bboxes[:, :2] + gt_bboxes[:, 2:]) * 0.5
-        
-        # [1, M]
-        center_radius_ = center_radius * strides.unsqueeze(0)
-
-        gt_bboxes_l = gt_centers[:, 0].unsqueeze(1).repeat(1, num_anchors) - center_radius_ # x1
-        gt_bboxes_t = gt_centers[:, 1].unsqueeze(1).repeat(1, num_anchors) - center_radius_ # y1
-        gt_bboxes_r = gt_centers[:, 0].unsqueeze(1).repeat(1, num_anchors) + center_radius_ # x2
-        gt_bboxes_b = gt_centers[:, 1].unsqueeze(1).repeat(1, num_anchors) + center_radius_ # y2
-
-        c_l = x_centers - gt_bboxes_l
-        c_r = gt_bboxes_r - x_centers
-        c_t = y_centers - gt_bboxes_t
-        c_b = gt_bboxes_b - y_centers
-        center_deltas = torch.stack([c_l, c_t, c_r, c_b], 2)
-        is_in_centers = center_deltas.min(dim=-1).values > 0.0
-        is_in_centers_all = is_in_centers.sum(dim=0) > 0
-
-        # in boxes and in centers
-        is_in_boxes_anchor = is_in_boxes_all | is_in_centers_all
-
-        is_in_boxes_and_center = (
-            is_in_boxes[:, is_in_boxes_anchor] & is_in_centers[:, is_in_boxes_anchor]
-        )
-        return is_in_boxes_anchor, is_in_boxes_and_center
+        return is_in_boxes_all
     
     
     def dynamic_k_matching(
@@ -169,14 +140,14 @@ class SimOTA(object):
         pair_wise_ious, 
         gt_classes, 
         num_gt, 
-        fg_mask
+        is_in_gt
         ):
         # Dynamic K
         # ---------------------------------------------------------------
         matching_matrix = torch.zeros_like(cost, dtype=torch.uint8)
 
         ious_in_boxes_matrix = pair_wise_ious
-        n_candidate_k = min(self.topk_candidate, ious_in_boxes_matrix.size(1))
+        n_candidate_k = min(self.topk, ious_in_boxes_matrix.size(1))
         topk_ious, _ = torch.topk(ious_in_boxes_matrix, n_candidate_k, dim=1)
         dynamic_ks = torch.clamp(topk_ious.sum(1).int(), min=1)
         dynamic_ks = dynamic_ks.tolist()
@@ -196,13 +167,14 @@ class SimOTA(object):
         fg_mask_inboxes = matching_matrix.sum(0) > 0
         num_fg = fg_mask_inboxes.sum().item()
 
-        fg_mask[fg_mask.clone()] = fg_mask_inboxes
+        is_in_gt[is_in_gt.clone()] = fg_mask_inboxes
+        fg_mask = is_in_gt
 
         matched_gt_inds = matching_matrix[:, fg_mask_inboxes].argmax(0)
-        gt_matched_classes = gt_classes[matched_gt_inds]
+        assigned_labels = gt_classes[matched_gt_inds]
 
-        pred_ious_this_matching = (matching_matrix * pair_wise_ious).sum(0)[
+        matched_pred_ious = (matching_matrix * pair_wise_ious).sum(0)[
             fg_mask_inboxes
         ]
-        return num_fg, gt_matched_classes, pred_ious_this_matching, matched_gt_inds
+        return fg_mask, assigned_labels, matched_pred_ious, matched_gt_inds
     

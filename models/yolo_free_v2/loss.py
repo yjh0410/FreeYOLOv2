@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from .matcher import SimOTA
+from .matcher import AlignedSimOTA
 from utils.box_ops import get_ious
 from utils.distributed_utils import get_world_size, is_dist_avail_and_initialized
 
@@ -16,22 +16,16 @@ class Criterion(object):
         self.device = device
         self.num_classes = num_classes
         # loss weight
-        self.loss_obj_weight = cfg['loss_obj_weight']
         self.loss_cls_weight = cfg['loss_cls_weight']
         self.loss_box_weight = cfg['loss_box_weight']
         # matcher
         matcher_config = cfg['matcher']
-        self.matcher = SimOTA(
+        self.matcher = AlignedSimOTA(
             num_classes=num_classes,
-            center_sampling_radius=matcher_config['center_sampling_radius'],
-            topk_candidate=matcher_config['topk_candicate']
+            soft_center_radius=matcher_config['soft_center_radius'],
+            topk=matcher_config['topk_candicate'],
+            iou_weight=matcher_config['iou_weight']
             )
-
-
-    def loss_objectness(self, pred_obj, gt_obj):
-        loss_obj = F.binary_cross_entropy_with_logits(pred_obj, gt_obj, reduction='none')
-
-        return loss_obj
     
 
     def loss_classes(self, pred_cls, gt_label):
@@ -53,7 +47,6 @@ class Criterion(object):
 
     def __call__(self, outputs, targets):        
         """
-            outputs['pred_obj']: List(Tensor) [B, M, 1]
             outputs['pred_cls']: List(Tensor) [B, M, C]
             outputs['pred_box']: List(Tensor) [B, M, 4]
             outputs['strides']: List(Int) [8, 16, 32] output stride
@@ -65,15 +58,14 @@ class Criterion(object):
         device = outputs['pred_cls'][0].device
         fpn_strides = outputs['strides']
         anchors = outputs['anchors']
+        num_anchors = sum([ab.shape[0] for ab in anchors])
         # preds: [B, M, C]
-        obj_preds = torch.cat(outputs['pred_obj'], dim=1)
         cls_preds = torch.cat(outputs['pred_cls'], dim=1)
         box_preds = torch.cat(outputs['pred_box'], dim=1)
 
         # label assignment
         cls_targets = []
         box_targets = []
-        obj_targets = []
         fg_masks = []
 
         for batch_idx in range(bs):
@@ -84,53 +76,47 @@ class Criterion(object):
             if len(tgt_labels) == 0 or tgt_bboxes.max().item() == 0.:
                 num_anchors = sum([ab.shape[0] for ab in anchors])
                 # There is no valid gt
-                cls_target = obj_preds.new_zeros((0, self.num_classes))
-                box_target = obj_preds.new_zeros((0, 4))
-                obj_target = obj_preds.new_zeros((num_anchors, 1))
-                fg_mask = obj_preds.new_zeros(num_anchors).bool()
+                cls_target = cls_preds.new_zeros((num_anchors, self.num_classes))
+                box_target = cls_preds.new_zeros((0, 4))
+                fg_mask = cls_preds.new_zeros(num_anchors).bool()
             else:
                 (
-                    gt_matched_classes,
                     fg_mask,
-                    pred_ious_this_matching,
+                    assigned_labels,
+                    matched_pred_ious,
                     matched_gt_inds,
-                    num_fg_img,
                 ) = self.matcher(
                     fpn_strides = fpn_strides,
                     anchors = anchors,
-                    pred_obj = obj_preds[batch_idx],
                     pred_cls = cls_preds[batch_idx], 
                     pred_box = box_preds[batch_idx],
-                    tgt_labels = tgt_labels,
-                    tgt_bboxes = tgt_bboxes
+                    gt_labels = tgt_labels,
+                    gt_bboxes = tgt_bboxes
                     )
 
-                obj_target = fg_mask.unsqueeze(-1)
-                cls_target = F.one_hot(gt_matched_classes.long(), self.num_classes)
-                cls_target = cls_target * pred_ious_this_matching.unsqueeze(-1)
+                # cls target
+                cls_target = cls_preds.new_zeros((num_anchors, self.num_classes))
+                gt_classes = F.one_hot(assigned_labels.long(), self.num_classes)
+                gt_classes = gt_classes * matched_pred_ious.unsqueeze(-1)
+                cls_target[fg_mask] = gt_classes.type_as(cls_target)
+                # box target
                 box_target = tgt_bboxes[matched_gt_inds]
 
             cls_targets.append(cls_target)
             box_targets.append(box_target)
-            obj_targets.append(obj_target)
             fg_masks.append(fg_mask)
 
         cls_targets = torch.cat(cls_targets, 0)
         box_targets = torch.cat(box_targets, 0)
-        obj_targets = torch.cat(obj_targets, 0)
         fg_masks = torch.cat(fg_masks, 0)
         num_fgs = fg_masks.sum()
 
         if is_dist_avail_and_initialized():
             torch.distributed.all_reduce(num_fgs)
         num_fgs = (num_fgs / get_world_size()).clamp(1.0)
-
-        # obj loss
-        loss_obj = self.loss_objectness(obj_preds.view(-1, 1), obj_targets.float())
-        loss_obj = loss_obj.sum() / num_fgs
         
         # cls loss
-        cls_preds_pos = cls_preds.view(-1, self.num_classes)[fg_masks]
+        cls_preds_pos = cls_preds.view(-1, self.num_classes)
         loss_cls = self.loss_classes(cls_preds_pos, cls_targets)
         loss_cls = loss_cls.sum() / num_fgs
 
@@ -140,12 +126,10 @@ class Criterion(object):
         loss_box = loss_box.sum() / num_fgs
 
         # total loss
-        losses = self.loss_obj_weight * loss_obj + \
-                 self.loss_cls_weight * loss_cls + \
+        losses = self.loss_cls_weight * loss_cls + \
                  self.loss_box_weight * loss_box
 
         loss_dict = dict(
-                loss_obj = loss_obj,
                 loss_cls = loss_cls,
                 loss_box = loss_box,
                 losses = losses

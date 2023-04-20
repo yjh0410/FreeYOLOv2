@@ -24,18 +24,18 @@ def parse_args():
     # basic
     parser.add_argument('-size', '--img_size', default=640, type=int,
                         help='the max size of input image')
-    parser.add_argument('--show', action='store_true', default=False,
-                        help='show the visulization results.')
     parser.add_argument('--cuda', action='store_true', default=False, 
                         help='use cuda.')
-    parser.add_argument('--save_folder', default='det_results/', type=str,
-                        help='Dir to save results')
     parser.add_argument('-vs', '--visual_threshold', default=0.3, type=float,
                         help='Final confidence threshold')
     parser.add_argument('-ws', '--window_scale', default=1.0, type=float,
                         help='resize window of cv2 for visualization.')
-    parser.add_argument('--resave', action='store_true', default=False, 
-                        help='resave the model weight.')
+    parser.add_argument('--show', action='store_true', default=False,
+                        help='show the visulization results.')
+    parser.add_argument('--save', action='store_true', default=False, 
+                        help='save the detection results.')
+    parser.add_argument('--save_folder', default='det_results/', type=str,
+                        help='Dir to save results')
 
     # model
     parser.add_argument('-m', '--model', default='yolo_free_v2_large', type=str,

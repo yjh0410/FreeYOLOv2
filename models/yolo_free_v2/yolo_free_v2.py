@@ -42,7 +42,7 @@ class FreeYOLOv2(nn.Module):
         feats_dim[-1] = self.neck.out_dim
         
         ## fpn
-        self.fpn = build_fpn(cfg=cfg, in_dims=feats_dim, out_dim=round(256*cfg['width']))
+        self.fpn = build_fpn(cfg=cfg, in_dims=feats_dim, out_dim=round(256*cfg['width']), deploy=not trainable)
         self.head_dim = self.fpn.out_dim
 
         ## non-shared heads
@@ -52,10 +52,6 @@ class FreeYOLOv2(nn.Module):
             ])
 
         ## pred
-        self.obj_preds = nn.ModuleList(
-                            [nn.Conv2d(head.reg_out_dim, 1, kernel_size=1) 
-                                for head in self.non_shared_heads
-                              ]) 
         self.cls_preds = nn.ModuleList(
                             [nn.Conv2d(head.cls_out_dim, self.num_classes, kernel_size=1) 
                                 for head in self.non_shared_heads
@@ -79,11 +75,6 @@ class FreeYOLOv2(nn.Module):
         # Init bias
         init_prob = 0.01
         bias_value = -torch.log(torch.tensor((1. - init_prob) / init_prob))
-        # obj pred
-        for obj_pred in self.obj_preds:
-            b = obj_pred.bias.view(1, -1)
-            b.data.fill_(bias_value.item())
-            obj_pred.bias = torch.nn.Parameter(b.view(-1), requires_grad=True)
         # cls pred
         for cls_pred in self.cls_preds:
             b = cls_pred.bias.view(1, -1)
@@ -132,10 +123,9 @@ class FreeYOLOv2(nn.Module):
         return pred_box
 
 
-    def post_process(self, obj_preds, cls_preds, reg_preds, anchors):
+    def post_process(self, cls_preds, reg_preds, anchors):
         """
         Input:
-            obj_preds: List(Tensor) [[H x W, 1], ...]
             cls_preds: List(Tensor) [[H x W, C], ...]
             reg_preds: List(Tensor) [[H x W, 4], ...]
             anchors:  List(Tensor) [[H x W, 2], ...]
@@ -144,9 +134,9 @@ class FreeYOLOv2(nn.Module):
         all_labels = []
         all_bboxes = []
         
-        for level, (obj_pred_i, cls_pred_i, reg_pred_i, anchors_i) in enumerate(zip(obj_preds, cls_preds, reg_preds, anchors)):
+        for level, (cls_pred_i, reg_pred_i, anchors_i) in enumerate(zip(cls_preds, reg_preds, anchors)):
             # (H x W x C,)
-            scores_i = (torch.sqrt(obj_pred_i.sigmoid() * cls_pred_i.sigmoid())).flatten()
+            scores_i = cls_pred_i.sigmoid().flatten()
 
             # Keep top k top scoring indices only.
             num_topk = min(self.topk, reg_pred_i.size(0))
@@ -202,7 +192,6 @@ class FreeYOLOv2(nn.Module):
         pyramid_feats = self.fpn(pyramid_feats)
 
         # non-shared heads
-        all_obj_preds = []
         all_cls_preds = []
         all_reg_preds = []
         all_anchors = []
@@ -210,7 +199,6 @@ class FreeYOLOv2(nn.Module):
             cls_feat, reg_feat = head(feat)
 
             # [1, C, H, W]
-            obj_pred = self.obj_preds[level](reg_feat)
             cls_pred = self.cls_preds[level](cls_feat)
             reg_pred = self.reg_preds[level](reg_feat)
 
@@ -222,29 +210,26 @@ class FreeYOLOv2(nn.Module):
                 anchors = self.generate_anchors(level, fmp_size)
 
             # [1, C, H, W] -> [H, W, C] -> [M, C]
-            obj_pred = obj_pred[0].permute(1, 2, 0).contiguous().view(-1, 1)
             cls_pred = cls_pred[0].permute(1, 2, 0).contiguous().view(-1, self.num_classes)
             reg_pred = reg_pred[0].permute(1, 2, 0).contiguous().view(-1, 4)
 
-            all_obj_preds.append(obj_pred)
             all_cls_preds.append(cls_pred)
             all_reg_preds.append(reg_pred)
             all_anchors.append(anchors)
 
         if self.no_decode:
             # no post process
-            obj_preds = torch.cat(all_obj_preds, dim=0)
             cls_preds = torch.cat(all_cls_preds, dim=0)
             reg_preds = torch.cat(all_reg_preds, dim=0)
-            # [n_anchors_all, 4 + 1 + C]
-            outputs = torch.cat([reg_preds, obj_preds.sigmoid(), cls_preds.sigmoid()], dim=-1)
+            # [n_anchors_all, 4 + C]
+            outputs = torch.cat([reg_preds, cls_preds.sigmoid()], dim=-1)
 
             return outputs
 
         else:
             # post process
             bboxes, scores, labels = self.post_process(
-                all_obj_preds, all_cls_preds, all_reg_preds, all_anchors)
+                all_cls_preds, all_reg_preds, all_anchors)
             
             return bboxes, scores, labels
 
@@ -264,14 +249,12 @@ class FreeYOLOv2(nn.Module):
 
             # non-shared heads
             all_anchors = []
-            all_obj_preds = []
             all_cls_preds = []
             all_box_preds = []
             for level, (feat, head) in enumerate(zip(pyramid_feats, self.non_shared_heads)):
                 cls_feat, reg_feat = head(feat)
 
                 # [B, C, H, W]
-                obj_pred = self.obj_preds[level](reg_feat)
                 cls_pred = self.cls_preds[level](cls_feat)
                 reg_pred = self.reg_preds[level](reg_feat)
 
@@ -281,21 +264,18 @@ class FreeYOLOv2(nn.Module):
                 anchors = self.generate_anchors(level, fmp_size)
                 
                 # [B, C, H, W] -> [B, H, W, C] -> [B, M, C]
-                obj_pred = obj_pred.permute(0, 2, 3, 1).contiguous().view(B, -1, 1)
                 cls_pred = cls_pred.permute(0, 2, 3, 1).contiguous().view(B, -1, self.num_classes)
                 reg_pred = reg_pred.permute(0, 2, 3, 1).contiguous().view(B, -1, 4)
 
                 # decode box: [M, 4]
                 box_pred = self.decode_boxes(anchors, reg_pred, self.stride[level])
 
-                all_obj_preds.append(obj_pred)
                 all_cls_preds.append(cls_pred)
                 all_box_preds.append(box_pred)
                 all_anchors.append(anchors)
             
             # output dict
-            outputs = {"pred_obj": all_obj_preds,        # List(Tensor) [B, M, 1]
-                       "pred_cls": all_cls_preds,        # List(Tensor) [B, M, C]
+            outputs = {"pred_cls": all_cls_preds,        # List(Tensor) [B, M, C]
                        "pred_box": all_box_preds,        # List(Tensor) [B, M, 4]
                        "anchors": all_anchors,           # List(Tensor) [B, M, 2]
                        'strides': self.stride}           # List(Int) [8, 16, 32]

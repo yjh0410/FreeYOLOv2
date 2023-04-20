@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from .yolo_free_v2_basic import Conv, ELANBlockFPN, DownSample
+from .yolo_free_v2_basic import Conv, ELANBlockFPN, DownSample, RepConv
 
 
 # PaFPN-ELAN (YOLOv7's)
@@ -14,7 +14,8 @@ class Yolov7PaFPN(nn.Module):
                  nbranch=4.0,
                  act_type='silu',
                  norm_type='BN',
-                 depthwise=False):
+                 depthwise=False,
+                 deploy=False):
         super(Yolov7PaFPN, self).__init__()
         self.in_dims = in_dims
         c3, c4, c5 = in_dims
@@ -70,19 +71,33 @@ class Yolov7PaFPN(nn.Module):
                                               norm_type=norm_type,
                                               depthwise=depthwise
                                               )
+        # Head Conv        
+        self.head_conv_1 = RepConv(round(128*width), round(256*width), k=3, s=1, p=1, act_type=act_type, deploy=deploy)
+        self.head_conv_2 = RepConv(round(256*width), round(512*width), k=3, s=1, p=1, act_type=act_type, deploy=deploy)
+        self.head_conv_3 = RepConv(round(512*width), round(1024*width), k=3, s=1, p=1, act_type=act_type, deploy=deploy)
         
-
         # output proj layers
         if out_dim is not None:
             self.out_layers = nn.ModuleList([
                 Conv(in_dim, out_dim, k=1,
                      norm_type=norm_type, act_type=act_type)
-                     for in_dim in [round(128*width), round(256*width), round(512*width)]
+                     for in_dim in [round(256*width), round(512*width), round(1024*width)]
                      ])
             self.out_dim = [out_dim] * 3
         else:
             self.out_layers = None
-            self.out_dim = [round(128*width), round(256*width), round(512*width)]
+            self.out_dim = [round(256*width), round(512*width), round(1024*width)]
+
+        # Fuse RepConv
+        if deploy:
+            self.fuse_repconv()
+
+
+    def fuse_repconv(self):
+        print('Fusing RepConv layers... ')
+        for m in self.modules():
+            if isinstance(m, RepConv):
+                m.fuse_repvgg_block()
 
 
     def forward(self, features):
@@ -110,7 +125,11 @@ class Yolov7PaFPN(nn.Module):
         c18 = torch.cat([c17, c5], dim=1)
         c19 = self.bottom_up_layer_2(c18)
 
-        out_feats = [c13, c16, c19] # [P3, P4, P5]
+        # Head conv
+        c20 = self.head_conv_1(c13)
+        c21 = self.head_conv_2(c16)
+        c22 = self.head_conv_3(c19)
+        out_feats = [c20, c21, c22] # [P3, P4, P5]
         
         # output proj layers
         if self.out_layers is not None:
@@ -122,7 +141,7 @@ class Yolov7PaFPN(nn.Module):
         return out_feats
 
 
-def build_fpn(cfg, in_dims, out_dim=None):
+def build_fpn(cfg, in_dims, out_dim=None, deploy=False):
     model = cfg['fpn']
     # build pafpn
     if model == 'yolov7_pafpn':
@@ -133,7 +152,8 @@ def build_fpn(cfg, in_dims, out_dim=None):
                              nbranch=cfg['nbranch'],
                              act_type=cfg['fpn_act'],
                              norm_type=cfg['fpn_norm'],
-                             depthwise=cfg['fpn_depthwise']
+                             depthwise=cfg['fpn_depthwise'],
+                             deploy=deploy
                              )
 
 
