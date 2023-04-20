@@ -1,5 +1,5 @@
 # ---------------------------------------------------------------------
-# Copyright (c) Megvii Inc. All rights reserved.
+# Copyright (c) OpenMMLab. All rights reserved.
 # ---------------------------------------------------------------------
 
 
@@ -8,10 +8,10 @@ import torch.nn.functional as F
 from utils.box_ops import *
 
 
-# YOLOX SimOTA
+# RTMDet SimOTA
 class AlignedSimOTA(object):
     """
-        This code referenced to https://github.com/Megvii-BaseDetection/YOLOX/blob/main/yolox/models/yolo_head.py
+        This code referenced to https://github.com/open-mmlab/mmyolo/models/task_modules/assigners/batch_dsl_assigner.py
     """
     def __init__(self,
                  num_classes,
@@ -90,13 +90,13 @@ class AlignedSimOTA(object):
             
         del pairwise_pred_scores
 
-        # foreground cost matrix
+        ## foreground cost matrix
         cost_matrix = pair_wise_cls_loss + pair_wise_ious_loss + soft_center_prior
         max_pad_value = torch.ones_like(cost_matrix) * 1e9
         cost_matrix = torch.where(valid_mask[None].repeat(num_gt, 1),
                                   cost_matrix, max_pad_value)
 
-        # dynamic label assignment
+        # ----------------------------------- dynamic label assignment -----------------------------------
         (
             matched_pred_ious,
             matched_gt_inds,
@@ -108,7 +108,7 @@ class AlignedSimOTA(object):
             )
         del pair_wise_cls_loss, cost_matrix, pair_wise_ious, pair_wise_ious_loss
 
-        # process assigned labels
+        # -----------------------------------process assigned labels -----------------------------------
         assigned_labels = gt_labels.new_full(pred_cls[..., 0].shape,
                                              self.num_classes)  # [M,]
         assigned_labels[fg_mask_inboxes] = gt_labels[matched_gt_inds].squeeze(-1)
@@ -193,48 +193,3 @@ class AlignedSimOTA(object):
         matched_gt_inds = matching_matrix[:, fg_mask_inboxes].argmax(0)
 
         return matched_pred_ious, matched_gt_inds, fg_mask_inboxes
-
-
-    def _dynamic_k_matching(
-        self, 
-        cost, 
-        pair_wise_ious, 
-        gt_classes, 
-        num_gt, 
-        is_in_gt
-        ):
-        # Dynamic K
-        # ---------------------------------------------------------------
-        matching_matrix = torch.zeros_like(cost, dtype=torch.uint8)
-
-        ious_in_boxes_matrix = pair_wise_ious
-        n_candidate_k = min(self.topk, ious_in_boxes_matrix.size(1))
-        topk_ious, _ = torch.topk(ious_in_boxes_matrix, n_candidate_k, dim=1)
-        dynamic_ks = torch.clamp(topk_ious.sum(1).int(), min=1)
-        dynamic_ks = dynamic_ks.tolist()
-        for gt_idx in range(num_gt):
-            _, pos_idx = torch.topk(
-                cost[gt_idx], k=dynamic_ks[gt_idx], largest=False
-            )
-            matching_matrix[gt_idx][pos_idx] = 1
-
-        del topk_ious, dynamic_ks, pos_idx
-
-        anchor_matching_gt = matching_matrix.sum(0)
-        if (anchor_matching_gt > 1).sum() > 0:
-            _, cost_argmin = torch.min(cost[:, anchor_matching_gt > 1], dim=0)
-            matching_matrix[:, anchor_matching_gt > 1] *= 0
-            matching_matrix[cost_argmin, anchor_matching_gt > 1] = 1
-        fg_mask_inboxes = matching_matrix.sum(0) > 0
-
-        is_in_gt[is_in_gt.clone()] = fg_mask_inboxes
-        fg_mask = is_in_gt
-
-        matched_gt_inds = matching_matrix[:, fg_mask_inboxes].argmax(0)
-        assigned_labels = gt_classes[matched_gt_inds]
-
-        matched_pred_ious = (matching_matrix * pair_wise_ious).sum(0)[
-            fg_mask_inboxes
-        ]
-        return fg_mask, assigned_labels, matched_pred_ious, matched_gt_inds
-    

@@ -353,3 +353,48 @@ class RepConv(nn.Module):
         if self.rbr_dense is not None:
             del self.rbr_dense
             self.rbr_dense = None
+
+
+# ---------------------------- FPN Modules ----------------------------
+## build fpn's core block
+def build_fpn_block(cfg, in_dim, out_dim):
+    if cfg['fpn_core_block'] == 'ELANBlock':
+        layer = ELANBlockFPN(in_dim=in_dim,
+                             out_dim=out_dim,
+                             expand_ratio=cfg['expand_ratio'],
+                             nbranch=cfg['nbranch'],
+                             depth=cfg['depth'],
+                             act_type=cfg['fpn_act'],
+                             norm_type=cfg['fpn_norm'],
+                             depthwise=cfg['fpn_depthwise']
+                             )
+        
+    return layer
+
+## build fpn's reduce layer
+def build_reduce_layer(cfg, in_dim, out_dim):
+    if cfg['fpn_reduce_layer'] == 'Conv':
+        layer = Conv(in_dim, out_dim, k=1, act_type=cfg['fpn_act'], norm_type=cfg['fpn_norm'])
+        
+    return layer
+
+## build fpn's downsample layer
+def build_downsample_layer(cfg, in_dim, out_dim):
+    if cfg['fpn_downsample_layer'] == 'Conv':
+        layer = Conv(in_dim, out_dim, k=3, s=2, p=1, act_type=cfg['fpn_act'], norm_type=cfg['fpn_norm'])
+    elif cfg['fpn_downsample_layer'] == 'DSBlock':
+        layer =  DownSample(in_dim=in_dim, out_dim=out_dim,
+                            act_type=cfg['fpn_act'],
+                            norm_type=cfg['fpn_norm'],
+                            depthwise=cfg['fpn_depthwise'])
+        
+    return layer
+
+## build fpn's head conv layer
+def build_fpn_head_conv(cfg, in_dim, out_dim, deploy=False):
+    if cfg['fpn_head_conv'] == 'RepConv':
+        layer = RepConv(in_dim, out_dim, k=3, s=1, p=1, act_type=cfg['fpn_act'], deploy=deploy)
+    elif cfg['fpn_head_conv'] == 'Conv':
+        layer = Conv(in_dim, out_dim, k=3, s=1, p=1, act_type=cfg['fpn_act'], norm_type=cfg['fpn_norm'])
+
+    return layer

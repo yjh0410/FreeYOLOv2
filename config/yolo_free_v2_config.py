@@ -38,6 +38,10 @@ yolo_free_v2_cfg = {
         'neck_depthwise': True,
         # fpn
         'fpn': 'yolov7_pafpn',
+        'fpn_reduce_layer': 'Conv',
+        'fpn_downsample_layer': 'DSBlock',
+        'fpn_core_block': 'ELANBlock',
+        'fpn_head_conv': 'RepConv',
         'fpn_act': 'lrelu',
         'fpn_norm': 'BN',
         'fpn_depthwise': True,
@@ -53,7 +57,7 @@ yolo_free_v2_cfg = {
         'head_depthwise': True,
         # matcher
         'matcher': {'soft_center_radius': 3.0,
-                    'topk_candicate': 10,
+                    'topk_candicate': 13,
                     'iou_weight': 3.0},
         # loss weight
         'loss_cls_weight': 1.0,
@@ -111,6 +115,10 @@ yolo_free_v2_cfg = {
         'neck_depthwise': False,
         # fpn
         'fpn': 'yolov7_pafpn',
+        'fpn_reduce_layer': 'Conv',
+        'fpn_downsample_layer': 'DSBlock',
+        'fpn_core_block': 'ELANBlock',
+        'fpn_head_conv': 'RepConv',
         'fpn_act': 'silu',
         'fpn_norm': 'BN',
         'fpn_depthwise': False,
@@ -126,7 +134,7 @@ yolo_free_v2_cfg = {
         'head_depthwise': False,
         # matcher
         'matcher': {'soft_center_radius': 3.0,
-                    'topk_candicate': 10,
+                    'topk_candicate': 13,
                     'iou_weight': 3.0},
         # loss weight
         'loss_cls_weight': 1.0,
@@ -184,6 +192,10 @@ yolo_free_v2_cfg = {
         'neck_depthwise': False,
         # fpn
         'fpn': 'yolov7_pafpn',
+        'fpn_reduce_layer': 'Conv',
+        'fpn_downsample_layer': 'DSBlock',
+        'fpn_core_block': 'ELANBlock',
+        'fpn_head_conv': 'RepConv',
         'fpn_act': 'silu',
         'fpn_norm': 'BN',
         'fpn_depthwise': False,
@@ -199,7 +211,7 @@ yolo_free_v2_cfg = {
         'head_depthwise': False,
         # matcher
         'matcher': {'soft_center_radius': 3.0,
-                    'topk_candicate': 10,
+                    'topk_candicate': 13,
                     'iou_weight': 3.0},
         # loss weight
         'loss_cls_weight': 1.0,
@@ -257,6 +269,10 @@ yolo_free_v2_cfg = {
         'neck_depthwise': False,
         # fpn
         'fpn': 'yolov7_pafpn',
+        'fpn_reduce_layer': 'Conv',
+        'fpn_downsample_layer': 'DSBlock',
+        'fpn_core_block': 'ELANBlock',
+        'fpn_head_conv': 'RepConv',
         'fpn_act': 'silu',
         'fpn_norm': 'BN',
         'fpn_depthwise': False,
@@ -272,7 +288,7 @@ yolo_free_v2_cfg = {
         'head_depthwise': False,
         # matcher
         'matcher': {'soft_center_radius': 3.0,
-                    'topk_candicate': 10,
+                    'topk_candicate': 13,
                     'iou_weight': 3.0},
         # loss weight
         'loss_cls_weight': 1.0,

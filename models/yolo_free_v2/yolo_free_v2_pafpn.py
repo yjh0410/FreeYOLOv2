@@ -1,20 +1,22 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from .yolo_free_v2_basic import Conv, ELANBlockFPN, DownSample, RepConv
+
+from .yolo_free_v2_basic import (Conv,
+                                 RepConv,
+                                 build_reduce_layer, 
+                                 build_downsample_layer, 
+                                 build_fpn_block, 
+                                 build_fpn_head_conv)
 
 
 # PaFPN-ELAN (YOLOv7's)
 class Yolov7PaFPN(nn.Module):
-    def __init__(self, 
+    def __init__(self,
+                 cfg,
                  in_dims=[512, 1024, 512],
                  out_dim=None,
                  width=1.0,
-                 depth=1.0,
-                 nbranch=4.0,
-                 act_type='silu',
-                 norm_type='BN',
-                 depthwise=False,
                  deploy=False):
         super(Yolov7PaFPN, self).__init__()
         self.in_dims = in_dims
@@ -22,65 +24,34 @@ class Yolov7PaFPN(nn.Module):
 
         # top dwon
         ## P5 -> P4
-        self.reduce_layer_1 = Conv(c5, round(256*width), k=1, norm_type=norm_type, act_type=act_type)
-        self.reduce_layer_2 = Conv(c4, round(256*width), k=1, norm_type=norm_type, act_type=act_type)
-        self.top_down_layer_1 = ELANBlockFPN(in_dim=round(256*width) + round(256*width),
-                                             out_dim=round(256*width),
-                                             expand_ratio=0.5,
-                                             nbranch=nbranch,
-                                             depth=depth,
-                                             act_type=act_type,
-                                             norm_type=norm_type,
-                                             depthwise=depthwise
-                                             )
+        self.reduce_layer_1 = build_reduce_layer(cfg, c5, round(256*width))
+        self.reduce_layer_2 = build_reduce_layer(cfg, c4, round(256*width))
+        self.top_down_layer_1 = build_fpn_block(cfg, round(256*width) + round(256*width), round(256*width))
+
         # P4 -> P3
-        self.reduce_layer_3 = Conv(round(256*width), round(128*width), k=1, norm_type=norm_type, act_type=act_type)
-        self.reduce_layer_4 = Conv(c3, round(128*width), k=1, norm_type=norm_type, act_type=act_type)
-        self.top_down_layer_2 = ELANBlockFPN(in_dim=round(128*width) + round(128*width),
-                                             out_dim=round(128*width),
-                                             expand_ratio=0.5,
-                                             nbranch=nbranch,
-                                             depth=depth,
-                                             act_type=act_type,
-                                             norm_type=norm_type,
-                                             depthwise=depthwise
-                                             )
+        self.reduce_layer_3 = build_reduce_layer(cfg, round(256*width), round(128*width))
+        self.reduce_layer_4 = build_reduce_layer(cfg, c3, round(128*width))
+        self.top_down_layer_2 = build_fpn_block(cfg, round(128*width) + round(128*width), round(128*width))
 
         # bottom up
         # P3 -> P4
-        self.downsample_layer_1 = DownSample(in_dim=round(128*width), out_dim=round(256*width),
-                                             act_type=act_type, norm_type=norm_type, depthwise=depthwise)
-        self.bottom_up_layer_1 = ELANBlockFPN(in_dim=round(256*width) + round(256*width),
-                                              out_dim=round(256*width),
-                                              expand_ratio=0.5,
-                                              nbranch=nbranch,
-                                              depth=depth,
-                                              act_type=act_type,
-                                              norm_type=norm_type,
-                                              depthwise=depthwise
-                                              )
+        self.downsample_layer_1 = build_downsample_layer(cfg, round(128*width), round(256*width))
+        self.bottom_up_layer_1 = build_fpn_block(cfg, round(256*width) + round(256*width), round(256*width))
+
         # P4 -> P5
-        self.downsample_layer_2 = DownSample(in_dim=round(256*width), out_dim=round(512*width),
-                                             act_type=act_type, norm_type=norm_type, depthwise=depthwise)
-        self.bottom_up_layer_2 = ELANBlockFPN(in_dim=round(512*width) + c5,
-                                              out_dim=round(512*width),
-                                              expand_ratio=0.5,
-                                              nbranch=nbranch,
-                                              depth=depth,
-                                              act_type=act_type,
-                                              norm_type=norm_type,
-                                              depthwise=depthwise
-                                              )
+        self.downsample_layer_2 = build_downsample_layer(cfg, round(256*width), round(512*width))
+        self.bottom_up_layer_2 = build_fpn_block(cfg, round(512*width) + round(512*width), round(512*width))
+        
         # Head Conv        
-        self.head_conv_1 = RepConv(round(128*width), round(256*width), k=3, s=1, p=1, act_type=act_type, deploy=deploy)
-        self.head_conv_2 = RepConv(round(256*width), round(512*width), k=3, s=1, p=1, act_type=act_type, deploy=deploy)
-        self.head_conv_3 = RepConv(round(512*width), round(1024*width), k=3, s=1, p=1, act_type=act_type, deploy=deploy)
+        self.head_conv_1 = build_fpn_head_conv(cfg, round(128*width), round(256*width), deploy)
+        self.head_conv_2 = build_fpn_head_conv(cfg, round(256*width), round(512*width), deploy)
+        self.head_conv_3 = build_fpn_head_conv(cfg, round(512*width), round(1024*width), deploy)
         
         # output proj layers
         if out_dim is not None:
             self.out_layers = nn.ModuleList([
                 Conv(in_dim, out_dim, k=1,
-                     norm_type=norm_type, act_type=act_type)
+                     act_type=cfg['fpn_act'], norm_type=cfg['fpn_norm'])
                      for in_dim in [round(256*width), round(512*width), round(1024*width)]
                      ])
             self.out_dim = [out_dim] * 3
@@ -145,16 +116,12 @@ def build_fpn(cfg, in_dims, out_dim=None, deploy=False):
     model = cfg['fpn']
     # build pafpn
     if model == 'yolov7_pafpn':
-        fpn_net = Yolov7PaFPN(in_dims=in_dims,
-                             out_dim=out_dim,
-                             width=cfg['width'],
-                             depth=cfg['depth'],
-                             nbranch=cfg['nbranch'],
-                             act_type=cfg['fpn_act'],
-                             norm_type=cfg['fpn_norm'],
-                             depthwise=cfg['fpn_depthwise'],
-                             deploy=deploy
-                             )
+        fpn_net = Yolov7PaFPN(cfg = cfg,
+                              in_dims = in_dims,
+                              out_dim = out_dim,
+                              width = cfg['width'],
+                              deploy = deploy
+                              )
 
 
     return fpn_net
