@@ -217,6 +217,8 @@ if __name__ == '__main__':
         print('fuse conv and bn ...')
         model = fuse_conv_bn.fuse_conv_bn(model)
 
+    model.fpn.fuse_repconv()
+
     # transform
     transform = build_transform(args.img_size, max_stride=max(cfg['stride']), is_train=False)
 
