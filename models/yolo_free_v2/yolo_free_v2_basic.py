@@ -393,7 +393,7 @@ def build_downsample_layer(cfg, in_dim, out_dim):
 ## build fpn's head conv layer
 def build_fpn_head_conv(cfg, in_dim, out_dim, deploy=False):
     if cfg['fpn_head_conv'] == 'RepConv':
-        layer = RepConv(in_dim, out_dim, k=3, s=1, p=1, act_type=cfg['fpn_act'], deploy=deploy)
+        layer = RepConv(in_dim, out_dim, k=3, s=1, p=1, act_type=cfg['fpn_act'])
     elif cfg['fpn_head_conv'] == 'Conv':
         layer = Conv(in_dim, out_dim, k=3, s=1, p=1, act_type=cfg['fpn_act'], norm_type=cfg['fpn_norm'])
 
