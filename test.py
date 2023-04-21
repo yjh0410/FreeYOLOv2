@@ -48,10 +48,12 @@ def parse_args():
                         help='NMS threshold')
     parser.add_argument('--topk', default=100, type=int,
                         help='topk candidates for testing')
-    parser.add_argument('--fuse_conv_bn', action='store_true', default=False,
-                        help='fuse conv and bn')
     parser.add_argument("--no_decode", action="store_true", default=False,
                         help="not decode in inference or yes")
+    parser.add_argument('--fuse_repconv', action='store_true', default=False,
+                        help='fuse RepConv')
+    parser.add_argument('--fuse_conv_bn', action='store_true', default=False,
+                        help='fuse Conv & BN')
 
     # dataset
     parser.add_argument('--root', default='/mnt/share/ssd2/dataset',
@@ -212,12 +214,13 @@ if __name__ == '__main__':
         device=device)
     del model_copy
 
+    # fuse repconv
+    if args.fuse_repconv:
+        model.fpn.fuse_repconv()
+
     # fuse conv bn
     if args.fuse_conv_bn:
-        print('fuse conv and bn ...')
         model = fuse_conv_bn.fuse_conv_bn(model)
-
-    model.fpn.fuse_repconv()
 
     # transform
     transform = build_transform(args.img_size, max_stride=max(cfg['stride']), is_train=False)

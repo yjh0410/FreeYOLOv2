@@ -36,6 +36,7 @@ def fuse_conv_bn(module):
     last_conv = None
     last_conv_name = None
 
+    print('Fusing Conv & BN ...')
     for name, child in module.named_children():
         if isinstance(child,
                       (nn.modules.batchnorm._BatchNorm, nn.SyncBatchNorm)):

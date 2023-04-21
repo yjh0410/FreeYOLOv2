@@ -40,9 +40,9 @@ class Yolov7PaFPN(nn.Module):
         self.bottom_up_layer_2 = build_fpn_block(cfg, round(512*width) + round(512*width), round(512*width))
         
         # Head Conv        
-        self.head_conv_1 = build_fpn_head_conv(cfg, round(128*width), round(256*width), deploy)
-        self.head_conv_2 = build_fpn_head_conv(cfg, round(256*width), round(512*width), deploy)
-        self.head_conv_3 = build_fpn_head_conv(cfg, round(512*width), round(1024*width), deploy)
+        self.head_conv_1 = build_fpn_head_conv(cfg, round(128*width), round(256*width))
+        self.head_conv_2 = build_fpn_head_conv(cfg, round(256*width), round(512*width))
+        self.head_conv_3 = build_fpn_head_conv(cfg, round(512*width), round(1024*width))
         
         # output proj layers
         if out_dim is not None:
@@ -55,10 +55,6 @@ class Yolov7PaFPN(nn.Module):
         else:
             self.out_layers = None
             self.out_dim = [round(256*width), round(512*width), round(1024*width)]
-
-        # # Fuse RepConv
-        # if deploy:
-        #     self.fuse_repconv()
 
 
     def fuse_repconv(self):
