@@ -56,9 +56,9 @@ class Yolov7PaFPN(nn.Module):
             self.out_layers = None
             self.out_dim = [round(256*width), round(512*width), round(1024*width)]
 
-        # Fuse RepConv
-        if deploy:
-            self.fuse_repconv()
+        # # Fuse RepConv
+        # if deploy:
+        #     self.fuse_repconv()
 
 
     def fuse_repconv(self):
