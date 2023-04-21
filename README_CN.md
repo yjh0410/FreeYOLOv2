@@ -68,25 +68,12 @@ python train.py --cuda -d coco -v yolo_free_v2_tiny -bs 16 --max_epoch 300 --wp_
 
 **P5-Model on COCO:**
 
-| Model        | Scale |  IP  | AP<sup>val<br>0.5:0.95 | AP<sup>test<br>0.5:0.95 | FPS<sup>3090<br>FP32-bs1 | FLOPs<br><sup>(G) | Params<br><sup>(M) | Weight |
-|--------------|-------|------|------------------------|-------------------------|--------------------------|-------------------|--------------------|--------|
-| FreeYOLOv2-N |  640  |  √   |   35.5                 |    35.6                 |     100                  |   9.0             |   2.3              | [ckpt](https://github.com/yjh0410/FreeYOLOv2/releases/download/yolo_free_v2_ckpt/yolo_free_v2_nano_coco.pth) |
-| FreeYOLOv2-S |  640  |  √   |                        |                         |                          |   33.5            |   8.3              |  |
-| FreeYOLOv2-M |  640  |  √   |                        |                         |                          |   86.7            |   23.0             |  |
-| FreeYOLOv2-L |  640  |  √   |                        |                         |                          |   175.4           |   46.5             |  |
-| FreeYOLOv2-H |  640  |  √   |                        |                         |                          |                   |                    |  |
-
-*所有模型都使用了ImageNet预训练权重，所有模型的FLOPs都是在COCO-val数据集上以640x640或1280x1280的输入尺寸来测试的。FPS指标是在一张3090型号的GPU上以batch size=1的输入来测试的，请注意，测速的内容包括模型前向推理、后处理以及NMS操作。*
-
-- YOLOv8 (由本项目复现)
-
-| Model    | Scale |  IP  | AP<sup>val<br>0.5:0.95 | AP<sup>test<br>0.5:0.95 | FPS<sup>3090<br>FP32-bs1 | FLOPs<br><sup>(G) | Params<br><sup>(M) | Weight |
-|----------|-------|------|------------------------|-------------------------|--------------------------|-------------------|--------------------|--------|
-| YOLOv8-N |  640  |  ×   |                        |                         |                          |                   |                    |  |
-| YOLOv8-S |  640  |  ×   |                        |                         |                          |                   |                    |  |
-| YOLOv8-M |  640  |  ×   |                        |                         |                          |                   |                    |  |
-| YOLOv8-L |  640  |  ×   |                        |                         |                          |                   |                    |  |
-| YOLOv8-H |  640  |  ×   |                        |                         |                          |                   |                    |  |
+| Model            | Scale |  IP  | AP<sup>val<br>0.5:0.95 | AP<sup>test<br>0.5:0.95 | FPS<sup>3090<br>FP32-bs1 | FLOPs<br><sup>(G) | Params<br><sup>(M) | Weight |
+|------------------|-------|------|------------------------|-------------------------|--------------------------|-------------------|--------------------|--------|
+| FreeYOLOv2-Nano  |  640  |  √   |                        |                         |                          |                   |                    |  |
+| FreeYOLOv2-Tiny  |  640  |  √   |                        |                         |                          |                   |                    |  |
+| FreeYOLOv2-Large |  640  |  √   |                        |                         |                          |                   |                    |  |
+| FreeYOLOv2-Huge  |  640  |  √   |                        |                         |                          |                   |                    |  |
 
 
 ### WiderFace
@@ -130,14 +117,12 @@ python train.py --cuda -d widerface --root path/to/WiderFace -v yolo_free_v2_tin
 
 Main results on WiderFace-val:
 
-| Model        |  Scale  |    AP    |    AP50    |  Weight  |
-|--------------|---------|----------|------------|----------|
-| FreeYOLOv2-N |  640    |      |        |  |
-| FreeYOLOv2-T |  640    |      |        |  |
-| FreeYOLOv2-S |  640    |      |        |  |
-| FreeYOLOv2-M |  640    |      |        |  |
-| FreeYOLOv2-L |  640    |      |        |  |
-| FreeYOLOv2-H |  640    |      |        |  |
+| Model            |  Scale  |    AP    |    AP50    |  Weight  |
+|------------------|---------|----------|------------|----------|
+| FreeYOLOv2-Nano  |  640    |      |        |  |
+| FreeYOLOv2-Tiny  |  640    |      |        |  |
+| FreeYOLOv2-Large |  640    |      |        |  |
+| FreeYOLOv2-Huge  |  640    |      |        |  |
 
 ### CrowdHuman
 - 下载 [CrowdHuman](https://www.crowdhuman.org/).
@@ -189,14 +174,12 @@ python train.py --cuda -d crowdhuman -v yolo_free_v2_tiny -bs 16 --max_epoch 100
 
 Main results on CrowdHuman-val:
 
-| Model        |  Scale  |    AP    |    AP50    |  Weight  |
-|--------------|---------|----------|------------|----------|
-| FreeYOLOv2-N |  640    |      |        |  |
-| FreeYOLOv2-T |  640    |      |        |  |
-| FreeYOLOv2-S |  640    |      |        |  |
-| FreeYOLOv2-M |  640    |      |        |  |
-| FreeYOLOv2-L |  640    |      |        |  |
-| FreeYOLOv2-H |  640    |      |        |  |
+| Model            |  Scale  |    AP    |    AP50    |  Weight  |
+|------------------|---------|----------|------------|----------|
+| FreeYOLOv2-Nano  |  640    |      |        |  |
+| FreeYOLOv2-Tiny  |  640    |      |        |  |
+| FreeYOLOv2-Large |  640    |      |        |  |
+| FreeYOLOv2-Huge  |  640    |      |        |  |
 
 ## 训练
 ### 使用单个GPU来训练

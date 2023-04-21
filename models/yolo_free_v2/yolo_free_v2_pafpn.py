@@ -2,12 +2,9 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from .yolo_free_v2_basic import (Conv,
-                                 RepConv,
-                                 build_reduce_layer, 
-                                 build_downsample_layer, 
-                                 build_fpn_block, 
-                                 build_fpn_head_conv)
+from .yolo_free_v2_basic import (
+    Conv, RepConv, build_reduce_layer, build_downsample_layer, 
+    build_fpn_block, build_fpn_head_conv)
 
 
 # PaFPN-ELAN (YOLOv7's)
