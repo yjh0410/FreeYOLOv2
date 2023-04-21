@@ -1,4 +1,7 @@
+# ----------------------------------------------------------
 # Copyright (c) OpenMMLab. All rights reserved.
+# ----------------------------------------------------------
+
 import torch
 import torch.nn as nn
 
@@ -36,7 +39,6 @@ def fuse_conv_bn(module):
     last_conv = None
     last_conv_name = None
 
-    print('Fusing Conv & BN ...')
     for name, child in module.named_children():
         if isinstance(child,
                       (nn.modules.batchnorm._BatchNorm, nn.SyncBatchNorm)):

@@ -307,7 +307,6 @@ class RepConv(nn.Module):
         
         # Fuse self.rbr_identity
         if (isinstance(self.rbr_identity, nn.BatchNorm2d) or isinstance(self.rbr_identity, nn.modules.batchnorm.SyncBatchNorm)):
-            # print(f"fuse: rbr_identity == BatchNorm2d or SyncBatchNorm")
             identity_conv_1x1 = nn.Conv2d(
                     in_channels=self.in_channels,
                     out_channels=self.out_channels,
@@ -318,25 +317,18 @@ class RepConv(nn.Module):
                     bias=False)
             identity_conv_1x1.weight.data = identity_conv_1x1.weight.data.to(self.rbr_1x1.weight.data.device)
             identity_conv_1x1.weight.data = identity_conv_1x1.weight.data.squeeze().squeeze()
-            # print(f" identity_conv_1x1.weight = {identity_conv_1x1.weight.shape}")
+
             identity_conv_1x1.weight.data.fill_(0.0)
             identity_conv_1x1.weight.data.fill_diagonal_(1.0)
             identity_conv_1x1.weight.data = identity_conv_1x1.weight.data.unsqueeze(2).unsqueeze(3)
-            # print(f" identity_conv_1x1.weight = {identity_conv_1x1.weight.shape}")
 
             identity_conv_1x1 = self.fuse_conv_bn(identity_conv_1x1, self.rbr_identity)
             bias_identity_expanded = identity_conv_1x1.bias
             weight_identity_expanded = torch.nn.functional.pad(identity_conv_1x1.weight, [1, 1, 1, 1])            
         else:
-            # print(f"fuse: rbr_identity != BatchNorm2d, rbr_identity = {self.rbr_identity}")
             bias_identity_expanded = torch.nn.Parameter( torch.zeros_like(rbr_1x1_bias) )
             weight_identity_expanded = torch.nn.Parameter( torch.zeros_like(weight_1x1_expanded) )            
         
-
-        #print(f"self.rbr_1x1.weight = {self.rbr_1x1.weight.shape}, ")
-        #print(f"weight_1x1_expanded = {weight_1x1_expanded.shape}, ")
-        #print(f"self.rbr_dense.weight = {self.rbr_dense.weight.shape}, ")
-
         self.rbr_dense.weight = torch.nn.Parameter(self.rbr_dense.weight + weight_1x1_expanded + weight_identity_expanded)
         self.rbr_dense.bias = torch.nn.Parameter(self.rbr_dense.bias + rbr_1x1_bias + bias_identity_expanded)
                 

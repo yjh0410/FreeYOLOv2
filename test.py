@@ -220,6 +220,7 @@ if __name__ == '__main__':
 
     # fuse conv bn
     if args.fuse_conv_bn:
+        print('Fusing Conv & BN ...')
         model = fuse_conv_bn.fuse_conv_bn(model)
 
     # transform

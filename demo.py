@@ -10,6 +10,7 @@ import torch.backends.cudnn as cudnn
 from dataset.transforms import build_transform
 from utils.misc import load_weight
 from utils.vis_tools import visualize
+from utils import fuse_conv_bn
 
 from config import build_config
 from models import build_model
@@ -50,6 +51,10 @@ def parse_args():
                         help='topk candidates for testing')
     parser.add_argument("--no_decode", action="store_true", default=False,
                         help="not decode in inference or yes")
+    parser.add_argument('--fuse_repconv', action='store_true', default=False,
+                        help='fuse RepConv')
+    parser.add_argument('--fuse_conv_bn', action='store_true', default=False,
+                        help='fuse Conv & BN')
 
     return parser.parse_args()
                     
@@ -218,6 +223,15 @@ def run():
     # load trained weight
     model = load_weight(model=model, path_to_ckpt=args.weight)
     model.to(device).eval()
+
+    # fuse repconv
+    if args.fuse_repconv:
+        model.fpn.fuse_repconv()
+
+    # fuse conv bn
+    if args.fuse_conv_bn:
+        print('Fusing Conv & BN ...')
+        model = fuse_conv_bn.fuse_conv_bn(model)
 
     # transform
     transform = build_transform(args.img_size, max_stride=max(cfg['stride']), is_train=False)
