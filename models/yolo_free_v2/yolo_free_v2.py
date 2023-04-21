@@ -38,11 +38,11 @@ class FreeYOLOv2(nn.Module):
         self.backbone, feats_dim = build_backbone(cfg, trainable&cfg['pretrained'])
 
         ## neck
-        self.neck = build_neck(cfg=cfg, in_dim=feats_dim[-1], out_dim=feats_dim[-1]//2)
+        self.neck = build_neck(cfg=cfg, in_dim=feats_dim[-1], out_dim=feats_dim[-1])
         feats_dim[-1] = self.neck.out_dim
         
         ## fpn
-        self.fpn = build_fpn(cfg=cfg, in_dims=feats_dim, out_dim=round(256*cfg['width']), deploy=not trainable)
+        self.fpn = build_fpn(cfg=cfg, in_dims=feats_dim, out_dim=round(256*cfg['width']))
         self.head_dim = self.fpn.out_dim
 
         ## non-shared heads

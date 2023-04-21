@@ -16,45 +16,45 @@ yolo_free_v2_cfg = {
                           'hsv_s': 0.7,
                           'hsv_v': 0.4,
                           # Mosaic & Mixup
-                          'mosaic_prob': 0.5,
+                          'mosaic_prob': 1.0,
                           'mixup_prob': 0.0,
                           'mosaic_type': 'yolov5_mosaic',
                           'mixup_type': 'yolov5_mixup',
                           'mixup_scale': [0.5, 1.5],
                           },
+        
         # model
-        'backbone': 'elannet_nano',
+        'backbone': 'elan_cspnet',
         'pretrained': True,
-        'bk_act': 'lrelu',
+        'bk_act': 'silu',
         'bk_norm': 'BN',
-        'bk_dpw': True,
+        'bk_dpw': False,
+        'width': 0.25,
+        'depth': 0.34,
+        'ratio': 2.0,
         'stride': [8, 16, 32],  # P3, P4, P5
         # neck
-        'neck': 'sppf',
+        'neck': 'csp_sppf',
         'expand_ratio': 0.5,
         'pooling_size': 5,
-        'neck_act': 'lrelu',
+        'neck_act': 'silu',
         'neck_norm': 'BN',
-        'neck_depthwise': True,
+        'neck_depthwise': False,
         # fpn
-        'fpn': 'yolov7_pafpn',
+        'fpn': 'yolo_pafpn',
         'fpn_reduce_layer': 'Conv',
-        'fpn_downsample_layer': 'DSBlock',
-        'fpn_core_block': 'ELANBlock',
-        'fpn_head_conv': 'RepConv',
-        'fpn_act': 'lrelu',
+        'fpn_downsample_layer': 'Conv',
+        'fpn_core_block': 'ELAN_CSPBlock',
+        'fpn_act': 'silu',
         'fpn_norm': 'BN',
-        'fpn_depthwise': True,
-        'nbranch': 2.0,        # number of branch in ELANBlockFPN
-        'depth': 1.0,          # depth factor of each branch in ELANBlockFPN
-        'width': 0.25,         # width factor of channel in FPN
+        'fpn_depthwise': False,
         # head
         'head': 'decoupled_head',
-        'head_act': 'lrelu',
+        'head_act': 'silu',
         'head_norm': 'BN',
         'num_cls_head': 2,
         'num_reg_head': 2,
-        'head_depthwise': True,
+        'head_depthwise': False,
         # matcher
         'matcher': {'soft_center_radius': 3.0,
                     'topk_candicate': 13,
@@ -80,13 +80,13 @@ yolo_free_v2_cfg = {
         'warmup_bias_lr': 0.1,
         },
 
-    'yolo_free_v2_tiny': {
+    'yolo_free_v2_small': {
         # input
         'multi_scale': [0.5, 1.25],
         'trans_config': {# Basic Augment
                           'degrees': 0.0,
-                          'translate': 0.1,
-                          'scale': 0.5,
+                          'translate': 0.2,
+                          'scale': 0.9,
                           'shear': 0.0,
                           'perspective': 0.0,
                           'hsv_h': 0.015,
@@ -100,11 +100,14 @@ yolo_free_v2_cfg = {
                           'mixup_scale': [0.5, 1.5],
                           },
         # model
-        'backbone': 'elannet_tiny',
+        'backbone': 'elan_cspnet',
         'pretrained': True,
         'bk_act': 'silu',
         'bk_norm': 'BN',
         'bk_dpw': False,
+        'width': 0.50,
+        'depth': 0.34,
+        'ratio': 2.0,
         'stride': [8, 16, 32],  # P3, P4, P5
         # neck
         'neck': 'csp_sppf',
@@ -114,17 +117,89 @@ yolo_free_v2_cfg = {
         'neck_norm': 'BN',
         'neck_depthwise': False,
         # fpn
-        'fpn': 'yolov7_pafpn',
+        'fpn': 'yolo_pafpn',
         'fpn_reduce_layer': 'Conv',
-        'fpn_downsample_layer': 'DSBlock',
-        'fpn_core_block': 'ELANBlock',
-        'fpn_head_conv': 'RepConv',
+        'fpn_downsample_layer': 'Conv',
+        'fpn_core_block': 'ELAN_CSPBlock',
         'fpn_act': 'silu',
         'fpn_norm': 'BN',
         'fpn_depthwise': False,
-        'nbranch': 2.0,       # number of branch in ELANBlockFPN
-        'depth': 1.0,         # depth factor of each branch in ELANBlockFPN
-        'width': 0.5,         # width factor of channel in FPN
+        # head
+        'head': 'decoupled_head',
+        'head_act': 'silu',
+        'head_norm': 'BN',
+        'num_cls_head': 2,
+        'num_reg_head': 2,
+        'head_depthwise': False,
+        # matcher
+        'matcher': {'soft_center_radius': 3.0,
+                    'topk_candicate': 13,
+                    'iou_weight': 3.0},
+        # loss weight
+        'loss_cls_weight': 1.0,
+        'loss_box_weight': 2.0,
+        # training configuration
+        'no_aug_epoch': 20,
+        # optimizer
+        'optimizer': 'sgd',        # optional: sgd, adam, adamw
+        'momentum': 0.937,         # SGD: 0.937;    AdamW: invalid
+        'weight_decay': 5e-4,      # SGD: 5e-4;     AdamW: 5e-2
+        'clip_grad': 10,           # SGD: 10.0;     AdamW: -1
+        # model EMA
+        'ema_decay': 0.9999,       # SGD: 0.9999;   AdamW: 0.9998
+        'ema_tau': 2000,
+        # lr schedule
+        'scheduler': 'linear',
+        'lr0': 0.01,               # SGD: 0.01;     AdamW: 0.001
+        'lrf': 0.01,               # SGD: 0.01;     AdamW: 0.01
+        'warmup_momentum': 0.8,
+        'warmup_bias_lr': 0.1,
+        },
+
+    'yolo_free_v2_medium': {
+        # input
+        'multi_scale': [0.5, 1.25],
+        'trans_config': {# Basic Augment
+                          'degrees': 0.0,
+                          'translate': 0.2,
+                          'scale': 0.9,
+                          'shear': 0.0,
+                          'perspective': 0.0,
+                          'hsv_h': 0.015,
+                          'hsv_s': 0.7,
+                          'hsv_v': 0.4,
+                          # Mosaic & Mixup
+                          'mosaic_prob': 1.0,
+                          'mixup_prob': 0.05,
+                          'mosaic_type': 'yolov5_mosaic',
+                          'mixup_type': 'yolov5_mixup',
+                          'mixup_scale': [0.5, 1.5],
+                          },
+        # model
+        'backbone': 'elan_cspnet',
+        'pretrained': True,
+        'bk_act': 'silu',
+        'bk_norm': 'BN',
+        'bk_dpw': False,
+        'width': 0.75,
+        'depth': 0.67,
+        'ratio': 1.5,
+        'stride': [8, 16, 32],  # P3, P4, P5
+        # neck
+        'neck': 'csp_sppf',
+        'expand_ratio': 0.5,
+        'pooling_size': 5,
+        'neck_act': 'silu',
+        'neck_norm': 'BN',
+        'neck_depthwise': False,
+        # fpn
+        'fpn': 'yolo_pafpn',
+        'fpn_reduce_layer': 'Conv',
+        'fpn_downsample_layer': 'Conv',
+        'fpn_core_block': 'ELAN_CSPBlock',
+        'fpn_act': 'silu',
+        'fpn_norm': 'BN',
+        'fpn_depthwise': False,
         # head
         'head': 'decoupled_head',
         'head_act': 'silu',
@@ -177,11 +252,14 @@ yolo_free_v2_cfg = {
                           'mixup_scale': [0.5, 1.5],
                           },
         # model
-        'backbone': 'elannet_large',
-        'pretrained': True,
+        'backbone': 'elan_cspnet',
+        'pretrained': False,
         'bk_act': 'silu',
         'bk_norm': 'BN',
         'bk_dpw': False,
+        'width': 1.0,
+        'depth': 1.0,
+        'ratio': 1.0,
         'stride': [8, 16, 32],  # P3, P4, P5
         # neck
         'neck': 'csp_sppf',
@@ -191,17 +269,13 @@ yolo_free_v2_cfg = {
         'neck_norm': 'BN',
         'neck_depthwise': False,
         # fpn
-        'fpn': 'yolov7_pafpn',
+        'fpn': 'yolo_pafpn',
         'fpn_reduce_layer': 'Conv',
-        'fpn_downsample_layer': 'DSBlock',
-        'fpn_core_block': 'ELANBlock',
-        'fpn_head_conv': 'RepConv',
+        'fpn_downsample_layer': 'Conv',
+        'fpn_core_block': 'ELAN_CSPBlock',
         'fpn_act': 'silu',
         'fpn_norm': 'BN',
         'fpn_depthwise': False,
-        'nbranch': 4.0,       # number of branch in ELANBlockFPN
-        'depth': 1.0,         # depth factor of each branch in ELANBlockFPN
-        'width': 1.0,         # width factor of channel in FPN
         # head
         'head': 'decoupled_head',
         'head_act': 'silu',
@@ -259,6 +333,9 @@ yolo_free_v2_cfg = {
         'bk_act': 'silu',
         'bk_norm': 'BN',
         'bk_dpw': False,
+        'width': 1.25,
+        'depth': 1.0,
+        'ratio': 1.0,
         'stride': [8, 16, 32],  # P3, P4, P5
         # neck
         'neck': 'csp_sppf',
@@ -268,17 +345,13 @@ yolo_free_v2_cfg = {
         'neck_norm': 'BN',
         'neck_depthwise': False,
         # fpn
-        'fpn': 'yolov7_pafpn',
+        'fpn': 'yolo_pafpn',
         'fpn_reduce_layer': 'Conv',
-        'fpn_downsample_layer': 'DSBlock',
-        'fpn_core_block': 'ELANBlock',
-        'fpn_head_conv': 'RepConv',
+        'fpn_downsample_layer': 'Conv',
+        'fpn_core_block': 'ELAN_CSPBlock',
         'fpn_act': 'silu',
         'fpn_norm': 'BN',
         'fpn_depthwise': False,
-        'nbranch': 4.0,        # number of branch in ELANBlockFPN
-        'depth': 2.0,          # depth factor of each branch in ELANBlockFPN
-        'width': 1.25,         # width factor of channel in FPN
         # head
         'head': 'decoupled_head',
         'head_act': 'silu',

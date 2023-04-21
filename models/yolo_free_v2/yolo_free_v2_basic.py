@@ -172,6 +172,62 @@ class DownSample(nn.Module):
         return out
 
 
+# ---------------------------- YOLOv8 Modules ----------------------------
+## BottleNeck
+class Bottleneck(nn.Module):
+    def __init__(self,
+                 in_dim,
+                 out_dim,
+                 expand_ratio=0.5,
+                 shortcut=False,
+                 depthwise=False,
+                 act_type='silu',
+                 norm_type='BN'):
+        super(Bottleneck, self).__init__()
+        inter_dim = int(out_dim * expand_ratio)  # hidden channels            
+        self.cv1 = Conv(in_dim, inter_dim, k=3, p=1, norm_type=norm_type, act_type=act_type, depthwise=depthwise)
+        self.cv2 = Conv(inter_dim, out_dim, k=3, p=1, norm_type=norm_type, act_type=act_type, depthwise=depthwise)
+        self.shortcut = shortcut and in_dim == out_dim
+
+    def forward(self, x):
+        h = self.cv2(self.cv1(x))
+
+        return x + h if self.shortcut else h
+
+
+## ELAN-CSP-Block
+class ELAN_CSP_Block(nn.Module):
+    def __init__(self,
+                 in_dim,
+                 out_dim,
+                 expand_ratio=0.5,
+                 nblocks=1,
+                 shortcut=False,
+                 depthwise=False,
+                 act_type='silu',
+                 norm_type='BN'):
+        super(ELAN_CSP_Block, self).__init__()
+        inter_dim = int(out_dim * expand_ratio)
+        self.cv1 = Conv(in_dim, inter_dim, k=1, norm_type=norm_type, act_type=act_type)
+        self.cv2 = Conv(in_dim, inter_dim, k=1, norm_type=norm_type, act_type=act_type)
+        self.m = nn.Sequential(*(
+            Bottleneck(inter_dim, inter_dim, 1.0, shortcut, depthwise, act_type, norm_type)
+            for _ in range(nblocks)))
+        self.cv3 = Conv((2 + nblocks) * inter_dim, out_dim, k=1, act_type=act_type, norm_type=norm_type)
+
+
+    def forward(self, x):
+        x1 = self.cv1(x)
+        x2 = self.cv2(x)
+        out = list([x1, x2])
+
+        out.extend(m(out[-1]) for m in self.m)
+
+        out = self.cv3(torch.cat(out, dim=1))
+
+        return out
+
+
 # ---------------------------- RepConv Modules ----------------------------
 class RepConv(nn.Module):
     """
@@ -361,6 +417,16 @@ def build_fpn_block(cfg, in_dim, out_dim):
                              norm_type=cfg['fpn_norm'],
                              depthwise=cfg['fpn_depthwise']
                              )
+    elif cfg['fpn_core_block'] == 'ELAN_CSPBlock':
+        layer = ELAN_CSP_Block(in_dim=in_dim,
+                               out_dim=out_dim,
+                               expand_ratio=cfg['expand_ratio'],
+                               nblocks=round(3*cfg['depth']),
+                               shortcut=False,
+                               act_type=cfg['fpn_act'],
+                               norm_type=cfg['fpn_norm'],
+                               depthwise=cfg['fpn_depthwise']
+                               )
         
     return layer
 
@@ -381,13 +447,4 @@ def build_downsample_layer(cfg, in_dim, out_dim):
                             norm_type=cfg['fpn_norm'],
                             depthwise=cfg['fpn_depthwise'])
         
-    return layer
-
-## build fpn's head conv layer
-def build_fpn_head_conv(cfg, in_dim, out_dim, deploy=False):
-    if cfg['fpn_head_conv'] == 'RepConv':
-        layer = RepConv(in_dim, out_dim, k=3, s=1, p=1, act_type=cfg['fpn_act'])
-    elif cfg['fpn_head_conv'] == 'Conv':
-        layer = Conv(in_dim, out_dim, k=3, s=1, p=1, act_type=cfg['fpn_act'], norm_type=cfg['fpn_norm'])
-
     return layer

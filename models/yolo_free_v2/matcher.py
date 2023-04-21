@@ -38,20 +38,16 @@ class AlignedSimOTA(object):
         # check gt
         if num_gt == 0 or gt_bboxes.max().item() == 0.:
             return {
-                'assigned_labels':
-                gt_labels.new_full(
-                    pred_cls[..., 0].shape,
-                    self.num_classes,
-                    dtype=torch.long),
-                'assigned_bboxes':
-                gt_bboxes.new_full(pred_box.shape, 0),
-                'assign_metrics':
-                gt_bboxes.new_full(pred_cls[..., 0].shape, 0)
+                'assigned_labels': gt_labels.new_full(pred_cls[..., 0].shape,
+                                                      self.num_classes,
+                                                      dtype=torch.long),
+                'assigned_bboxes': gt_bboxes.new_full(pred_box.shape, 0),
+                'assign_metrics': gt_bboxes.new_full(pred_cls[..., 0].shape, 0)
             }
         
         # get inside points: [N, M]
         is_in_gt = self.find_inside_points(gt_bboxes, anchors)
-        valid_mask = is_in_gt.sum(dim=0) > 0
+        valid_mask = is_in_gt.sum(dim=0) > 0  # [M,]
 
         # ----------------------------------- soft center prior -----------------------------------
         gt_center = (gt_bboxes[..., :2] + gt_bboxes[..., 2:]) / 2.0
@@ -66,7 +62,7 @@ class AlignedSimOTA(object):
 
         # ----------------------------------- classification cost -----------------------------------
         ## select the predicted scores corresponded to the gt_labels
-        pairwise_pred_scores = pred_cls.permute(1, 0)
+        pairwise_pred_scores = pred_cls.permute(1, 0)  # [M, C] -> [C, M]
         pairwise_pred_scores = pairwise_pred_scores[gt_labels.long(), :].float()   # [N, M]
         ## scale factor
         scale_factor = (pair_wise_ious - pairwise_pred_scores.sigmoid()).abs().pow(2.0)
@@ -80,7 +76,7 @@ class AlignedSimOTA(object):
         ## foreground cost matrix
         cost_matrix = pair_wise_cls_loss + pair_wise_ious_loss + soft_center_prior
         max_pad_value = torch.ones_like(cost_matrix) * 1e9
-        cost_matrix = torch.where(valid_mask[None].repeat(num_gt, 1),
+        cost_matrix = torch.where(valid_mask[None].repeat(num_gt, 1),   # [N, M]
                                   cost_matrix, max_pad_value)
 
         # ----------------------------------- dynamic label assignment -----------------------------------
