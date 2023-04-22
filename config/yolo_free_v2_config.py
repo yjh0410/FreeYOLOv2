@@ -234,7 +234,7 @@ yolo_free_v2_cfg = {
 
     'yolo_free_v2_large': {
         # input
-        'multi_scale': [0.5, 1.25],
+        'multi_scale': [0.5, 1.5],
         'trans_config': {# Basic Augment
                           'degrees': 0.0,
                           'translate': 0.2,
