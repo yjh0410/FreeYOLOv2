@@ -39,7 +39,6 @@ At least, please make sure your torch is version 1.x.
 | Warmup Scheduler        | Linear                     |
 | Lr Scheduler            | Linear                     |
 | Optimizer               | SGD                        |
-| Train from scratch      | True                       |
 | Multi Scale Train       | True                       |
 | Mosaic                  | True                       |
 | Mixup                   | True                       |
@@ -64,7 +63,7 @@ python dataset/coco.py
 
 For example:
 ```Shell
-python train.py --cuda -d coco -v yolo_free_v2_tiny -bs 16 --max_epoch 300 --wp_epoch 3 --eval_epoch 10 --fp16 --ema --root path/to/COCO
+python train.py --cuda -d coco -v yolo_free_v2_nano -bs 16 --max_epoch 300 --wp_epoch 3 --eval_epoch 10 --fp16 --ema --root path/to/COCO
 ```
 
 **P5-Model on COCO:**
@@ -115,7 +114,7 @@ python dataset/widerface.py
 - Train on WiderFace
 For example:
 ```Shell
-python train.py --cuda -d widerface --root path/to/WiderFace -v yolo_free_v2_tiny -bs 16 --max_epoch 100 --wp_epoch 1 --eval_epoch 10 --fp16 --ema --pretrained path/to/coco/yolo_free_v2_tiny_coco.pth --mosaic 0.5 --mixup 0.0 --min_box_size 1
+python train.py --cuda -d widerface --root path/to/WiderFace -v yolo_free_v2_nano -bs 16 --max_epoch 100 --wp_epoch 1 --eval_epoch 10 --fp16 --ema --pretrained path/to/coco/yolo_free_v2_nano_coco.pth --mosaic 0.5 --mixup 0.0 --min_box_size 1
 ```
 
 Main results on WiderFace-val:
@@ -172,7 +171,7 @@ python dataset/crowdhuman.py
 
 For example:
 ```Shell
-python train.py --cuda -d crowdhuman -v yolo_free_v2_tiny -bs 16 --max_epoch 100 --wp_epoch 1 --eval_epoch 10 --fp16 --ema --root path/to/CrowdHuman --pretrained path/to/coco/yolo_free_v2_tiny.pth
+python train.py --cuda -d crowdhuman -v yolo_free_v2_nano -bs 16 --max_epoch 100 --wp_epoch 1 --eval_epoch 10 --fp16 --ema --root path/to/CrowdHuman --pretrained path/to/coco/yolo_free_v2_nano.pth
 ```
 
 Main results on CrowdHuman-val:
@@ -370,7 +369,7 @@ For example:
 
 ```Shell
 cd <FreeYOLOv2_HOME>
-python train.py --root path/to/OurDataset/ -d ourdataset -v yolo_free_v2_tiny -bs 16 --max_epoch 100 --wp_epoch 1 --eval_epoch 5 -p path/to/yolo_free_tiny_coco.pth
+python train.py --root path/to/OurDataset/ -d ourdataset -v yolo_free_v2_nano -bs 16 --max_epoch 100 --wp_epoch 1 --eval_epoch 5 -p path/to/yolo_free_tiny_coco.pth
 ```
 
 - Step-6 **Test**
@@ -379,7 +378,7 @@ For example:
 
 ```Shell
 cd <FreeYOLOv2_HOME>
-python test.py --root path/to/OurDataset/ -d ourdataset -v yolo_free_v2_tiny --weight path/to/checkpoint --show
+python test.py --root path/to/OurDataset/ -d ourdataset -v yolo_free_v2_nano --weight path/to/checkpoint --show
 ```
 
 - Step-7 **Eval**
@@ -388,7 +387,7 @@ For example:
 
 ```Shell
 cd <FreeYOLOv2_HOME>
-python eval.py --root path/to/OurDataset/ -d ourdataset -v yolo_free_v2_tiny --weight path/to/checkpoint
+python eval.py --root path/to/OurDataset/ -d ourdataset -v yolo_free_v2_nano --weight path/to/checkpoint
 ```
 
 ## Deployment

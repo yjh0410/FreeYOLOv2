@@ -37,7 +37,6 @@ pip install -r requirements.txt
 | Warnmup策略            | 线性warmup策略              |
 | 学习率策略              | 余弦退火                    |
 | 训练优化器              | SGD                        |
-| 从头训练                | True                       |
 | 多尺度训练              | True                       |
 | 马赛克增强              | True                       |
 | 混合增强                | True                       |
@@ -117,12 +116,13 @@ python train.py --cuda -d widerface --root path/to/WiderFace -v yolo_free_v2_tin
 
 Main results on WiderFace-val:
 
-| Model            |  Scale  |    AP    |    AP50    |  Weight  |
-|------------------|---------|----------|------------|----------|
-| FreeYOLOv2-Nano  |  640    |      |        |  |
-| FreeYOLOv2-Tiny  |  640    |      |        |  |
-| FreeYOLOv2-Large |  640    |      |        |  |
-| FreeYOLOv2-Huge  |  640    |      |        |  |
+| Model             |  Scale  |    AP    |    AP50    |  Weight  |
+|-------------------|---------|----------|------------|----------|
+| FreeYOLOv2-Nano   |  640    |      |        |  |
+| FreeYOLOv2-Small  |  640    |      |        |  |
+| FreeYOLOv2-Medium |  640    |      |        |  |
+| FreeYOLOv2-Large  |  640    |      |        |  |
+| FreeYOLOv2-Huge   |  640    |      |        |  |
 
 ### CrowdHuman
 - 下载 [CrowdHuman](https://www.crowdhuman.org/).
@@ -174,12 +174,13 @@ python train.py --cuda -d crowdhuman -v yolo_free_v2_tiny -bs 16 --max_epoch 100
 
 Main results on CrowdHuman-val:
 
-| Model            |  Scale  |    AP    |    AP50    |  Weight  |
-|------------------|---------|----------|------------|----------|
-| FreeYOLOv2-Nano  |  640    |      |        |  |
-| FreeYOLOv2-Tiny  |  640    |      |        |  |
-| FreeYOLOv2-Large |  640    |      |        |  |
-| FreeYOLOv2-Huge  |  640    |      |        |  |
+| Model             |  Scale  |    AP    |    AP50    |  Weight  |
+|-------------------|---------|----------|------------|----------|
+| FreeYOLOv2-Nano   |  640    |      |        |  |
+| FreeYOLOv2-Small  |  640    |      |        |  |
+| FreeYOLOv2-Medium |  640    |      |        |  |
+| FreeYOLOv2-Large  |  640    |      |        |  |
+| FreeYOLOv2-Huge   |  640    |      |        |  |
 
 ## 训练
 ### 使用单个GPU来训练
