@@ -33,13 +33,13 @@ def parse_args():
                         type=str, help='The path to video files')
     parser.add_argument('--path_to_save', default='det_results/demos/',
                         type=str, help='The path to save the detection results')
-    parser.add_argument('-vs', '--visual_threshold', default=0.3, type=float,
+    parser.add_argument('-vt', '--vis_thresh', default=0.3, type=float,
                         help='Final confidence threshold for visualization')
     parser.add_argument('--show', action='store_true', default=False,
                         help='show visualization')
 
     # model
-    parser.add_argument('-v', '--version', default='yolo_free_v2_large', type=str,
+    parser.add_argument('-v', '--version', default='yolo_free_v2_nano', type=str,
                         help='build yolo_free_v2')
     parser.add_argument('--weight', default=None,
                         type=str, help='Trained state_dict file path to open')
@@ -221,17 +221,8 @@ def run():
                         trainable=False)
 
     # load trained weight
-    model = load_weight(model=model, path_to_ckpt=args.weight)
+    model = load_weight(model, args.weight, args.fuse_conv_bn, args.fuse_repconv)
     model.to(device).eval()
-
-    # fuse repconv
-    if args.fuse_repconv:
-        model.fpn.fuse_repconv()
-
-    # fuse conv bn
-    if args.fuse_conv_bn:
-        print('Fusing Conv & BN ...')
-        model = fuse_conv_bn.fuse_conv_bn(model)
 
     # transform
     transform = build_transform(args.img_size, max_stride=max(cfg['stride']), is_train=False)
@@ -244,7 +235,7 @@ def run():
             path_to_img=args.path_to_img,
             path_to_vid=args.path_to_vid,
             path_to_save=args.path_to_save,
-            vis_thresh=args.visual_threshold)
+            vis_thresh=args.vis_thresh)
 
 
 if __name__ == '__main__':

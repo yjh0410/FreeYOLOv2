@@ -19,16 +19,18 @@ def parse_args():
     # Model
     parser.add_argument('-v', '--version', default='yolo_free_v2_large', type=str,
                         help='build yolo_free_v2')
-    parser.add_argument('--fuse_conv_bn', action='store_true', default=False,
-                        help='fuse conv and bn')
-    parser.add_argument('--conf_thresh', default=0.1, type=float,
+    parser.add_argument('-ct', '--conf_thresh', default=0.1, type=float,
                         help='confidence threshold')
-    parser.add_argument('--nms_thresh', default=0.45, type=float,
+    parser.add_argument('-nt', '--nms_thresh', default=0.5, type=float,
                         help='NMS threshold')
     parser.add_argument('--topk', default=100, type=int,
                         help='NMS threshold')
     parser.add_argument("--no_decode", action="store_true", default=False,
                         help="not decode in inference or yes")
+    parser.add_argument('--fuse_repconv', action='store_true', default=False,
+                        help='fuse RepConv')
+    parser.add_argument('--fuse_conv_bn', action='store_true', default=False,
+                        help='fuse Conv & BN')
 
     # data root
     parser.add_argument('--root', default='/mnt/share/ssd2/dataset',
@@ -121,15 +123,7 @@ if __name__ == '__main__':
                         trainable=False)
 
     # load trained weight
-    model = load_weight(device=device, 
-                        model=model, 
-                        path_to_ckpt=args.weight)
-
-
-    # fuse conv bn
-    if args.fuse_conv_bn:
-        print('fuse conv and bn ...')
-        model = fuse_conv_bn.fuse_conv_bn(model)
+    model = load_weight(model, args.weight, args.fuse_conv_bn, args.fuse_repconv)
 
     # transform
     transform = ValTransforms(img_size=args.img_size)

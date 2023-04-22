@@ -84,15 +84,12 @@ class Criterion(object):
         cls_preds = torch.cat(outputs['pred_cls'], dim=1)
         box_preds = torch.cat(outputs['pred_box'], dim=1)
 
-        # label assignment
         cls_targets = []
         box_targets = []
         assign_metrics = []
-
         for batch_idx in range(bs):
             tgt_labels = targets[batch_idx]["labels"].to(device)  # [N,]
             tgt_bboxes = targets[batch_idx]["boxes"].to(device)   # [N, 4]
-
             # label assignment
             assigned_result = self.matcher(fpn_strides=fpn_strides,
                                            anchors=anchors,
@@ -101,7 +98,6 @@ class Criterion(object):
                                            gt_labels=tgt_labels,
                                            gt_bboxes=tgt_bboxes
                                            )
-
             cls_targets.append(assigned_result['assigned_labels'])
             box_targets.append(assigned_result['assigned_bboxes'])
             assign_metrics.append(assigned_result['assign_metrics'])

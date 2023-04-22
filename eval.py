@@ -177,7 +177,7 @@ if __name__ == '__main__':
                         trainable=False)
 
     # load trained weight
-    model = load_weight(model=model, path_to_ckpt=args.weight)
+    model = load_weight(model, args.weight, args.fuse_conv_bn, args.fuse_repconv)
     model.to(device).eval()
 
     # compute FLOPs and Params
@@ -189,15 +189,6 @@ if __name__ == '__main__':
         img_size=args.img_size, 
         device=device)
     del model_copy
-
-    # fuse repconv
-    if args.fuse_repconv:
-        model.fpn.fuse_repconv()
-
-    # fuse conv bn
-    if args.fuse_conv_bn:
-        print('Fusing Conv & BN ...')
-        model = fuse_conv_bn.fuse_conv_bn(model)
 
     # transform
     transform = build_transform(args.img_size, max_stride=max(cfg['stride']), is_train=False)

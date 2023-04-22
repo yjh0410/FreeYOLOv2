@@ -26,7 +26,7 @@ def parse_args():
                         help='the max size of input image')
     parser.add_argument('--cuda', action='store_true', default=False, 
                         help='use cuda.')
-    parser.add_argument('-vs', '--visual_threshold', default=0.3, type=float,
+    parser.add_argument('-vt', '--vis_thresh', default=0.3, type=float,
                         help='Final confidence threshold')
     parser.add_argument('-ws', '--window_scale', default=1.0, type=float,
                         help='resize window of cv2 for visualization.')
@@ -38,7 +38,7 @@ def parse_args():
                         help='Dir to save results')
 
     # model
-    parser.add_argument('-m', '--model', default='yolo_free_v2_large', type=str,
+    parser.add_argument('-m', '--model', default='yolo_free_v2_nano', type=str,
                         help='build yolo_free_v2')
     parser.add_argument('--weight', default=None,
                         type=str, help='Trained state_dict file path to open')
@@ -154,7 +154,7 @@ def test(args,
                             bboxes=bboxes,
                             scores=scores,
                             labels=labels,
-                            vis_thresh=args.visual_threshold,
+                            vis_thresh=args.vis_thresh,
                             class_colors=class_colors,
                             class_names=class_names,
                             class_indexs=class_indexs,
@@ -201,7 +201,7 @@ if __name__ == '__main__':
                         trainable=False)
 
     # load trained weight
-    model = load_weight(model=model, path_to_ckpt=args.weight)
+    model = load_weight(model, args.weight, args.fuse_conv_bn, args.fuse_repconv)
     model.to(device).eval()
 
     # compute FLOPs and Params
@@ -213,15 +213,6 @@ if __name__ == '__main__':
         img_size=args.img_size, 
         device=device)
     del model_copy
-
-    # fuse repconv
-    if args.fuse_repconv:
-        model.fpn.fuse_repconv()
-
-    # fuse conv bn
-    if args.fuse_conv_bn:
-        print('Fusing Conv & BN ...')
-        model = fuse_conv_bn.fuse_conv_bn(model)
 
     # transform
     transform = build_transform(args.img_size, max_stride=max(cfg['stride']), is_train=False)

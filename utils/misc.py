@@ -1,6 +1,5 @@
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 from torch.utils.data import DataLoader, DistributedSampler
 
 import os
@@ -18,8 +17,10 @@ from dataset.coco import COCODataset, coco_class_index, coco_class_labels
 from dataset.widerface import WiderFaceDataset, widerface_class_labels
 from dataset.crowdhuman import CrowdHumanDataset, crowd_class_labels
 from dataset.ourdataset import OurDataset, our_class_labels
-
 from dataset.transforms import build_transform
+
+from utils import fuse_conv_bn
+from models.yolo_free_v2.yolo_free_v2_basic import RepConv
 
 
 # ---------------------------- For Dataset ----------------------------
@@ -226,7 +227,7 @@ class CollateFunc(object):
 
 # ---------------------------- For Model ----------------------------
 ## load trained weight
-def load_weight(model, path_to_ckpt):
+def load_weight(model, path_to_ckpt, fuse_cbn=False, fuse_repconv=False):
     # check ckpt file
     if path_to_ckpt is None:
         print('no weight file ...')
@@ -238,6 +239,18 @@ def load_weight(model, path_to_ckpt):
     model.load_state_dict(checkpoint_state_dict)
 
     print('Finished loading model!')
+
+    # fuse repconv
+    if fuse_repconv:
+        print('Fusing RepConv block ...')
+        for m in model.modules():
+            if isinstance(m, RepConv):
+                m.fuse_repvgg_block()
+
+    # fuse conv & bn
+    if fuse_cbn:
+        print('Fusing Conv & BN ...')
+        model = fuse_conv_bn.fuse_conv_bn(model)
 
     return model
 
