@@ -21,7 +21,7 @@ class FreeYOLOv2(nn.Module):
                  topk = 1000,
                  no_decode = False):
         super(FreeYOLOv2, self).__init__()
-        # --------- Basic Parameters ----------
+        # ---------------------- Basic Parameters ----------------------
         self.cfg = cfg
         self.device = device
         self.stride = cfg['stride']
@@ -32,7 +32,7 @@ class FreeYOLOv2(nn.Module):
         self.topk = topk
         self.no_decode = no_decode
         
-        # --------- Network Parameters ----------
+        # ---------------------- Network Parameters ----------------------
         ## backbone
         self.backbone, feats_dim = build_backbone(cfg, trainable&cfg['pretrained'])
 
@@ -60,35 +60,9 @@ class FreeYOLOv2(nn.Module):
                                 for head in self.non_shared_heads
                               ])                 
 
-        # --------- Network Initialization ----------
-        # init bias
-        self.init_yolo()
 
-
-    def init_yolo(self): 
-        # Init yolo
-        for m in self.modules():
-            if isinstance(m, nn.BatchNorm2d):
-                m.eps = 1e-3
-                m.momentum = 0.03    
-        # Init bias
-        init_prob = 0.01
-        bias_value = -torch.log(torch.tensor((1. - init_prob) / init_prob))
-        # cls pred
-        for cls_pred in self.cls_preds:
-            b = cls_pred.bias.view(1, -1)
-            b.data.fill_(bias_value.item())
-            cls_pred.bias = torch.nn.Parameter(b.view(-1), requires_grad=True)
-        # reg pred
-        for reg_pred in self.reg_preds:
-            b = reg_pred.bias.view(-1, )
-            b.data.fill_(1.0)
-            reg_pred.bias = torch.nn.Parameter(b.view(-1), requires_grad=True)
-            w = reg_pred.weight
-            w.data.fill_(0.)
-            reg_pred.weight = torch.nn.Parameter(w, requires_grad=True)
-
-
+    # ---------------------- Basic Functions ----------------------
+    ## generate anchor points
     def generate_anchors(self, level, fmp_size):
         """
             fmp_size: (List) [H, W]
@@ -104,7 +78,7 @@ class FreeYOLOv2(nn.Module):
 
         return anchors
         
-
+    ## decode predicted bboxes
     def decode_boxes(self, anchors, reg_pred, stride):
         """
             anchors:  (List[Tensor]) [1, M, 2] or [M, 2]
@@ -121,7 +95,7 @@ class FreeYOLOv2(nn.Module):
 
         return pred_box
 
-
+    ## post-process
     def post_process(self, cls_preds, reg_preds, anchors):
         """
         Input:
@@ -178,7 +152,7 @@ class FreeYOLOv2(nn.Module):
 
         return bboxes, scores, labels
 
-
+    # ---------------------- Main Process for Inference ----------------------
     @torch.no_grad()
     def inference_single_image(self, x):
         # backbone
@@ -232,7 +206,7 @@ class FreeYOLOv2(nn.Module):
             
             return bboxes, scores, labels
 
-
+    # ---------------------- Main Process for Training ----------------------
     def forward(self, x):
         if not self.trainable:
             return self.inference_single_image(x)

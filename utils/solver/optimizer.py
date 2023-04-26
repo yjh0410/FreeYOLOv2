@@ -19,11 +19,9 @@ def build_optimizer(cfg, model, base_lr=0.01, resume=None):
         elif hasattr(v, 'weight') and isinstance(v.weight, nn.Parameter):  # weight (with decay)
             g[0].append(v.weight)
 
-    if cfg['optimizer'] == 'adam':
-        optimizer = torch.optim.Adam(g[2], lr=base_lr)  # adjust beta1 to momentum
-    elif cfg['optimizer'] == 'adamw':
+    if cfg['optimizer'] == 'AdamW':
         optimizer = torch.optim.AdamW(g[2], lr=base_lr, weight_decay=0.0)
-    elif cfg['optimizer'] == 'sgd':
+    elif cfg['optimizer'] == 'SGD':
         optimizer = torch.optim.SGD(g[2], lr=base_lr, momentum=cfg['momentum'], nesterov=True)
     else:
         raise NotImplementedError('Optimizer {} not implemented.'.format(cfg['optimizer']))

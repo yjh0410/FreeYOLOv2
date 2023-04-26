@@ -10,8 +10,8 @@ import torch.distributed as dist
 from torch.nn.parallel import DistributedDataParallel as DDP
 
 from utils import distributed_utils
-from utils.com_flops_params import FLOPs_and_Params
 from utils.misc import ModelEMA, CollateFunc, build_dataset, build_dataloader
+from utils.misc import compute_flops
 from utils.solver.optimizer import build_optimizer
 from utils.solver.lr_scheduler import build_lr_scheduler
 
@@ -161,9 +161,9 @@ def train():
         model_copy = deepcopy(model_without_ddp)
         model_copy.trainable = False
         model_copy.eval()
-        FLOPs_and_Params(model=model_copy, 
-                         img_size=args.img_size, 
-                         device=device)
+        compute_flops(model=model_copy,
+                      img_size=args.img_size,
+                      device=device)
         del model_copy
     if args.distributed:
         # wait for all processes to synchronize
@@ -180,6 +180,7 @@ def train():
     # optimizer
     cfg['weight_decay'] *= total_bs * accumulate / 64
     optimizer, start_epoch = build_optimizer(cfg, model_without_ddp, cfg['lr0'], args.resume)
+    optimizer.zero_grad()
 
     # Scheduler
     total_epochs = args.wp_epoch + args.max_epoch
@@ -191,7 +192,7 @@ def train():
     # EMA
     if args.ema and distributed_utils.get_rank() in [-1, 0]:
         print('Build ModelEMA ...')
-        ema = ModelEMA(model, decay=cfg['ema_decay'], tau=cfg['ema_tau'], updates=start_epoch * len(dataloader))
+        ema = ModelEMA(model, cfg['ema_decay'], cfg['ema_tau'], start_epoch * len(dataloader))
     else:
         ema = None
 
@@ -199,7 +200,6 @@ def train():
     best_map = -1.0
     last_opt_step = -1
     heavy_eval = False
-    optimizer.zero_grad()
     
     # eval before training
     if args.eval_first and distributed_utils.is_main_process():

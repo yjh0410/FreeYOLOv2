@@ -255,7 +255,7 @@ if __name__ == "__main__":
         # Basic Augment
         'degrees': 0.0,
         'translate': 0.2,
-        'scale': 0.9,
+        'scale': [0.1, 2.0],
         'shear': 0.0,
         'perspective': 0.0,
         'hsv_h': 0.015,
@@ -264,7 +264,7 @@ if __name__ == "__main__":
         # Mosaic & Mixup
         'mosaic_prob': 1.0,
         'mosaic_9x_prob': 0.2,
-        'mixup_prob': 0.15,
+        'mixup_prob': 0.5,
         'mosaic_type': 'yolov5_mosaic',
         'mixup_type': 'yolov5_mixup',
         'mixup_scale': [0.5, 1.5]

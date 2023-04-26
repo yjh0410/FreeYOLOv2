@@ -9,7 +9,7 @@ yolo_free_v2_cfg = {
         'trans_config': {# Basic Augment
                           'degrees': 0.0,
                           'translate': 0.1,
-                          'scale': 0.5,
+                          'scale': [0.5, 2.0],
                           'shear': 0.0,
                           'perspective': 0.0,
                           'hsv_h': 0.015,
@@ -17,7 +17,8 @@ yolo_free_v2_cfg = {
                           'hsv_v': 0.4,
                           # Mosaic & Mixup
                           'mosaic_prob': 1.0,
-                          'mixup_prob': 0.0,
+                          'mosaic_9x_prob': 0.2,
+                          'mixup_prob': 0.2,
                           'mosaic_type': 'yolov5_mosaic',
                           'mixup_type': 'yolov5_mixup',
                           'mixup_scale': [0.5, 1.5],
@@ -64,16 +65,16 @@ yolo_free_v2_cfg = {
         # training configuration
         'no_aug_epoch': 20,
         # optimizer
-        'optimizer': 'sgd',        # optional: sgd, adam, adamw
-        'momentum': 0.937,         # SGD: 0.937;    AdamW: invalid
-        'weight_decay': 5e-4,      # SGD: 5e-4;     AdamW: 5e-2
+        'optimizer': 'AdamW',      # optional: SGD, AdamW
+        'momentum': None,          # SGD: 0.937;    AdamW: None
+        'weight_decay': 5e-2,      # SGD: 5e-4;     AdamW: 5e-2
         'clip_grad': 10,           # SGD: 10.0;     AdamW: -1
         # model EMA
-        'ema_decay': 0.9999,       # SGD: 0.9999;   AdamW: 0.9998
+        'ema_decay': 0.9998,       # SGD: 0.9999;   AdamW: 0.9998
         'ema_tau': 2000,
         # lr schedule
         'scheduler': 'linear',
-        'lr0': 0.01,               # SGD: 0.01;     AdamW: 0.001
+        'lr0': 0.001,              # SGD: 0.01;     AdamW: 0.001
         'lrf': 0.01,               # SGD: 0.01;     AdamW: 0.01
         'warmup_momentum': 0.8,
         'warmup_bias_lr': 0.1,
@@ -85,7 +86,7 @@ yolo_free_v2_cfg = {
         'trans_config': {# Basic Augment
                           'degrees': 0.0,
                           'translate': 0.2,
-                          'scale': 0.9,
+                          'scale': [0.1, 2.0],
                           'shear': 0.0,
                           'perspective': 0.0,
                           'hsv_h': 0.015,
@@ -93,7 +94,8 @@ yolo_free_v2_cfg = {
                           'hsv_v': 0.4,
                           # Mosaic & Mixup
                           'mosaic_prob': 1.0,
-                          'mixup_prob': 0.05,
+                          'mosaic_9x_prob': 0.2,
+                          'mixup_prob': 0.5,
                           'mosaic_type': 'yolov5_mosaic',
                           'mixup_type': 'yolov5_mixup',
                           'mixup_scale': [0.5, 1.5],
@@ -140,16 +142,16 @@ yolo_free_v2_cfg = {
         # training configuration
         'no_aug_epoch': 20,
         # optimizer
-        'optimizer': 'sgd',        # optional: sgd, adam, adamw
-        'momentum': 0.937,         # SGD: 0.937;    AdamW: invalid
-        'weight_decay': 5e-4,      # SGD: 5e-4;     AdamW: 5e-2
+        'optimizer': 'AdamW',      # optional: SGD, AdamW
+        'momentum': None,          # SGD: 0.937;    AdamW: None
+        'weight_decay': 5e-2,      # SGD: 5e-4;     AdamW: 5e-2
         'clip_grad': 10,           # SGD: 10.0;     AdamW: -1
         # model EMA
-        'ema_decay': 0.9999,       # SGD: 0.9999;   AdamW: 0.9998
+        'ema_decay': 0.9998,       # SGD: 0.9999;   AdamW: 0.9998
         'ema_tau': 2000,
         # lr schedule
         'scheduler': 'linear',
-        'lr0': 0.01,               # SGD: 0.01;     AdamW: 0.001
+        'lr0': 0.001,              # SGD: 0.01;     AdamW: 0.001
         'lrf': 0.01,               # SGD: 0.01;     AdamW: 0.01
         'warmup_momentum': 0.8,
         'warmup_bias_lr': 0.1,
@@ -161,7 +163,7 @@ yolo_free_v2_cfg = {
         'trans_config': {# Basic Augment
                           'degrees': 0.0,
                           'translate': 0.2,
-                          'scale': 0.9,
+                          'scale': [0.1, 2.0],
                           'shear': 0.0,
                           'perspective': 0.0,
                           'hsv_h': 0.015,
@@ -169,7 +171,8 @@ yolo_free_v2_cfg = {
                           'hsv_v': 0.4,
                           # Mosaic & Mixup
                           'mosaic_prob': 1.0,
-                          'mixup_prob': 0.05,
+                          'mosaic_9x_prob': 0.2,
+                          'mixup_prob': 0.5,
                           'mosaic_type': 'yolov5_mosaic',
                           'mixup_type': 'yolov5_mixup',
                           'mixup_scale': [0.5, 1.5],
@@ -216,16 +219,16 @@ yolo_free_v2_cfg = {
         # training configuration
         'no_aug_epoch': 20,
         # optimizer
-        'optimizer': 'sgd',        # optional: sgd, adam, adamw
-        'momentum': 0.937,         # SGD: 0.937;    AdamW: invalid
-        'weight_decay': 5e-4,      # SGD: 5e-4;     AdamW: 5e-2
+        'optimizer': 'AdamW',      # optional: SGD, AdamW
+        'momentum': None,          # SGD: 0.937;    AdamW: None
+        'weight_decay': 5e-2,      # SGD: 5e-4;     AdamW: 5e-2
         'clip_grad': 10,           # SGD: 10.0;     AdamW: -1
         # model EMA
-        'ema_decay': 0.9999,       # SGD: 0.9999;   AdamW: 0.9998
+        'ema_decay': 0.9998,       # SGD: 0.9999;   AdamW: 0.9998
         'ema_tau': 2000,
         # lr schedule
         'scheduler': 'linear',
-        'lr0': 0.01,               # SGD: 0.01;     AdamW: 0.001
+        'lr0': 0.001,              # SGD: 0.01;     AdamW: 0.001
         'lrf': 0.01,               # SGD: 0.01;     AdamW: 0.01
         'warmup_momentum': 0.8,
         'warmup_bias_lr': 0.1,
@@ -237,7 +240,7 @@ yolo_free_v2_cfg = {
         'trans_config': {# Basic Augment
                           'degrees': 0.0,
                           'translate': 0.2,
-                          'scale': 0.9,
+                          'scale': [0.1, 2.0],
                           'shear': 0.0,
                           'perspective': 0.0,
                           'hsv_h': 0.015,
@@ -245,7 +248,8 @@ yolo_free_v2_cfg = {
                           'hsv_v': 0.4,
                           # Mosaic & Mixup
                           'mosaic_prob': 1.0,
-                          'mixup_prob': 0.15,
+                          'mosaic_9x_prob': 0.2,
+                          'mixup_prob': 0.5,
                           'mosaic_type': 'yolov5_mosaic',
                           'mixup_type': 'yolov5_mixup',
                           'mixup_scale': [0.5, 1.5],
@@ -292,16 +296,16 @@ yolo_free_v2_cfg = {
         # training configuration
         'no_aug_epoch': 20,
         # optimizer
-        'optimizer': 'sgd',        # optional: sgd, adam, adamw
-        'momentum': 0.937,         # SGD: 0.937;    AdamW: invalid
-        'weight_decay': 5e-4,      # SGD: 5e-4;     AdamW: 5e-2
+        'optimizer': 'AdamW',      # optional: SGD, AdamW
+        'momentum': None,          # SGD: 0.937;    AdamW: None
+        'weight_decay': 5e-2,      # SGD: 5e-4;     AdamW: 5e-2
         'clip_grad': 10,           # SGD: 10.0;     AdamW: -1
         # model EMA
-        'ema_decay': 0.9999,       # SGD: 0.9999;   AdamW: 0.9998
+        'ema_decay': 0.9998,       # SGD: 0.9999;   AdamW: 0.9998
         'ema_tau': 2000,
         # lr schedule
         'scheduler': 'linear',
-        'lr0': 0.01,               # SGD: 0.01;     AdamW: 0.001
+        'lr0': 0.001,              # SGD: 0.01;     AdamW: 0.001
         'lrf': 0.01,               # SGD: 0.01;     AdamW: 0.01
         'warmup_momentum': 0.8,
         'warmup_bias_lr': 0.1,
@@ -313,7 +317,7 @@ yolo_free_v2_cfg = {
         'trans_config': {# Basic Augment
                           'degrees': 0.0,
                           'translate': 0.2,
-                          'scale': 0.9,
+                          'scale': [0.1, 2.0],
                           'shear': 0.0,
                           'perspective': 0.0,
                           'hsv_h': 0.015,
@@ -321,7 +325,8 @@ yolo_free_v2_cfg = {
                           'hsv_v': 0.4,
                           # Mosaic & Mixup
                           'mosaic_prob': 1.0,
-                          'mixup_prob': 0.15,
+                          'mosaic_9x_prob': 0.2,
+                          'mixup_prob': 0.5,
                           'mosaic_type': 'yolov5_mosaic',
                           'mixup_type': 'yolov5_mixup',
                           'mixup_scale': [0.5, 1.5],
@@ -368,16 +373,16 @@ yolo_free_v2_cfg = {
         # training configuration
         'no_aug_epoch': 20,
         # optimizer
-        'optimizer': 'sgd',        # optional: sgd, adam, adamw
-        'momentum': 0.937,         # SGD: 0.937;    AdamW: invalid
-        'weight_decay': 5e-4,      # SGD: 5e-4;     AdamW: 5e-2
+        'optimizer': 'AdamW',      # optional: SGD, AdamW
+        'momentum': None,          # SGD: 0.937;    AdamW: None
+        'weight_decay': 5e-2,      # SGD: 5e-4;     AdamW: 5e-2
         'clip_grad': 10,           # SGD: 10.0;     AdamW: -1
         # model EMA
-        'ema_decay': 0.9999,       # SGD: 0.9999;   AdamW: 0.9998
+        'ema_decay': 0.9998,       # SGD: 0.9999;   AdamW: 0.9998
         'ema_tau': 2000,
         # lr schedule
         'scheduler': 'linear',
-        'lr0': 0.01,               # SGD: 0.01;     AdamW: 0.001
+        'lr0': 0.001,              # SGD: 0.01;     AdamW: 0.001
         'lrf': 0.01,               # SGD: 0.01;     AdamW: 0.01
         'warmup_momentum': 0.8,
         'warmup_bias_lr': 0.1,
