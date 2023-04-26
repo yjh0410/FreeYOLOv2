@@ -11,7 +11,7 @@ from dataset.transforms import build_transform
 
 # load some utils
 from utils.misc import build_dataset, load_weight
-from utils.com_flops_params import FLOPs_and_Params
+from utils.misc import compute_flops
 
 from config import build_config
 from models import build_model
@@ -207,7 +207,7 @@ if __name__ == '__main__':
     model_copy = deepcopy(model)
     model_copy.trainable = False
     model_copy.eval()
-    FLOPs_and_Params(
+    compute_flops(
         model=model_copy,
         img_size=args.img_size, 
         device=device)

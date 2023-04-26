@@ -12,8 +12,7 @@ import sys
 sys.path.append('../../')
 
 import onnxruntime
-from utils.pre_process import PreProcessor
-from utils.post_process import PostProcessor
+from utils.misc import PreProcessor, PostProcessor
 from utils.vis_tools import visualize
 
 

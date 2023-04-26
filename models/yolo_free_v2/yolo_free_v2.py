@@ -6,7 +6,7 @@ from .yolo_free_v2_neck import build_neck
 from .yolo_free_v2_pafpn import build_fpn
 from .yolo_free_v2_head import build_head
 
-from utils.nms import multiclass_nms
+from utils.misc import multiclass_nms
 
 
 # Anchor-free YOLO
