@@ -47,8 +47,6 @@ class COCODataset(Dataset):
                  data_dir=None, 
                  image_set='train2017',
                  transform=None,
-                 mosaic_prob=0.0,
-                 mixup_prob=0.0,
                  trans_config=None):
         """
         COCO dataset initialization. Annotation data are read into memory by COCO API.
@@ -73,9 +71,14 @@ class COCODataset(Dataset):
 
         # augmentation
         self.transform = transform
-        self.mosaic_prob = mosaic_prob
-        self.mixup_prob = mixup_prob
+        self.mosaic_prob = 0
+        self.mosaic_9x_prob = 0
+        self.mixup_prob = 0
         self.trans_config = trans_config
+        if trans_config is not None:
+            self.mosaic_prob = trans_config['mosaic_prob']
+            self.mosaic_9x_prob = trans_config['mosaic_9x_prob']
+            self.mixup_prob = trans_config['mixup_prob']
 
         print('==============================')
         print('Image Set: {}'.format(image_set))
@@ -110,7 +113,7 @@ class COCODataset(Dataset):
 
 
     def load_mosaic(self, index):
-        if random.random() < 0.8:
+        if random.random() > self.mosaic_9x_prob:
             load_mosaic_4x = True
             # load 4x mosaic image
             index_list = np.arange(index).tolist() + np.arange(index+1, len(self.ids)).tolist()
@@ -260,6 +263,7 @@ if __name__ == "__main__":
         'hsv_v': 0.4,
         # Mosaic & Mixup
         'mosaic_prob': 1.0,
+        'mosaic_9x_prob': 0.2,
         'mixup_prob': 0.15,
         'mosaic_type': 'yolov5_mosaic',
         'mixup_type': 'yolov5_mixup',
@@ -272,8 +276,6 @@ if __name__ == "__main__":
         data_dir=args.root,
         image_set='val2017',
         transform=transform,
-        mosaic_prob=trans_config['mosaic_prob'],
-        mixup_prob=trans_config['mixup_prob'],
         trans_config=trans_config,
         )
     

@@ -5,7 +5,7 @@ yolo_free_v2_cfg = {
     # P5
     'yolo_free_v2_nano': {
         # input
-        'multi_scale': [0.5, 1.5],
+        'multi_scale': [0.5, 1.25],
         'trans_config': {# Basic Augment
                           'degrees': 0.0,
                           'translate': 0.1,
@@ -22,7 +22,6 @@ yolo_free_v2_cfg = {
                           'mixup_type': 'yolov5_mixup',
                           'mixup_scale': [0.5, 1.5],
                           },
-        
         # model
         'backbone': 'elan_cspnet',
         'pretrained': True,
@@ -82,7 +81,7 @@ yolo_free_v2_cfg = {
 
     'yolo_free_v2_small': {
         # input
-        'multi_scale': [0.5, 1.5],
+        'multi_scale': [0.5, 1.25],
         'trans_config': {# Basic Augment
                           'degrees': 0.0,
                           'translate': 0.2,
@@ -158,7 +157,7 @@ yolo_free_v2_cfg = {
 
     'yolo_free_v2_medium': {
         # input
-        'multi_scale': [0.5, 1.5],
+        'multi_scale': [0.5, 1.25],
         'trans_config': {# Basic Augment
                           'degrees': 0.0,
                           'translate': 0.2,
@@ -234,7 +233,7 @@ yolo_free_v2_cfg = {
 
     'yolo_free_v2_large': {
         # input
-        'multi_scale': [0.5, 1.5],
+        'multi_scale': [0.5, 1.25],
         'trans_config': {# Basic Augment
                           'degrees': 0.0,
                           'translate': 0.2,
@@ -310,7 +309,7 @@ yolo_free_v2_cfg = {
 
     'yolo_free_v2_huge': {
         # input
-        'multi_scale': [0.5, 1.5],
+        'multi_scale': [0.5, 1.25],
         'trans_config': {# Basic Augment
                           'degrees': 0.0,
                           'translate': 0.2,

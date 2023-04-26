@@ -247,7 +247,6 @@ class RepConv(nn.Module):
         # -------------- Network parameters --------------
         if deploy:
             self.rbr_reparam = nn.Conv2d(c1, c2, k, s, p, groups=g, bias=True)
-            print(1234)
 
         else:
             self.rbr_identity = (nn.BatchNorm2d(num_features=c1) if c2 == c1 and s == 1 else None)

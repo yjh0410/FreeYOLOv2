@@ -10,8 +10,8 @@ except:
 # ---------------------------- ImageNet pretrained weights ----------------------------
 model_urls = {
     'elan_cspnet_nano': "https://github.com/yjh0410/image_classification_pytorch/releases/download/weight/elan_cspnet_nano.pth",
-    'elan_cspnet_small': None,
-    'elan_cspnet_medium': None,
+    'elan_cspnet_small': "https://github.com/yjh0410/image_classification_pytorch/releases/download/weight/elan_cspnet_small.pth",
+    'elan_cspnet_medium': "https://github.com/yjh0410/image_classification_pytorch/releases/download/weight/elan_cspnet_medium.pth",
     'elan_cspnet_large': "https://github.com/yjh0410/image_classification_pytorch/releases/download/weight/elan_cspnet_large.pth",
     'elan_cspnet_huge': None,
 }

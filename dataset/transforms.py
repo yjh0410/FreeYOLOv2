@@ -417,10 +417,7 @@ class TrainTransforms(object):
             img = cv2.resize(image, new_shape, interpolation=interp)
         else:
             img = image
-
-        # rescale bboxes
-        if target is not None:
-            img_h, img_w = img.shape[:2]
+        img_h, img_w = img.shape[:2]
 
         # hsv augment
         augment_hsv(img, hgain=self.trans_config['hsv_h'], 
@@ -458,10 +455,8 @@ class TrainTransforms(object):
 
         # to tensor
         img_tensor = torch.from_numpy(img).permute(2, 0, 1).contiguous().float()
-
-        if target is not None:
-            target["boxes"] = torch.as_tensor(target["boxes"]).float()
-            target["labels"] = torch.as_tensor(target["labels"]).long()
+        target["boxes"] = torch.as_tensor(target["boxes"]).float()
+        target["labels"] = torch.as_tensor(target["labels"]).long()
 
         # pad img
         img_h0, img_w0 = img_tensor.shape[1:]
@@ -492,23 +487,10 @@ class ValTransforms(object):
             img = cv2.resize(image, new_shape, interpolation=cv2.INTER_LINEAR)
         else:
             img = image
-
         img_h, img_w = img.shape[:2]
 
         # to tensor
         img_tensor = torch.from_numpy(img).permute(2, 0, 1).contiguous().float()
-
-        # rescale bboxes
-        if target is not None:
-            # rescale bbox
-            boxes_ = target["boxes"].copy()
-            boxes_[:, [0, 2]] = boxes_[:, [0, 2]] / img_w0 * img_w
-            boxes_[:, [1, 3]] = boxes_[:, [1, 3]] / img_h0 * img_h
-            target["boxes"] = boxes_
-
-            # to tensor
-            target["boxes"] = torch.as_tensor(target["boxes"]).float()
-            target["labels"] = torch.as_tensor(target["labels"]).long()
 
         # pad img
         img_h0, img_w0 = img_tensor.shape[1:]
@@ -521,6 +503,18 @@ class ValTransforms(object):
         pad_img_w = img_w0 + dw
         pad_image = torch.ones([img_tensor.size(0), pad_img_h, pad_img_w]).float() * 114.
         pad_image[:, :img_h0, :img_w0] = img_tensor
+
+        # rescale bboxes
+        if target is not None:
+            # rescale bbox
+            boxes_ = target["boxes"].copy()
+            boxes_[:, [0, 2]] = boxes_[:, [0, 2]] / img_w0 * img_w
+            boxes_[:, [1, 3]] = boxes_[:, [1, 3]] / img_h0 * img_h
+            target["boxes"] = boxes_
+
+            # to tensor
+            target["boxes"] = torch.as_tensor(target["boxes"]).float()
+            target["labels"] = torch.as_tensor(target["labels"]).long()
 
         return pad_image, target, [dw, dh]
 

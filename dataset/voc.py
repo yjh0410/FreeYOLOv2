@@ -91,8 +91,6 @@ class VOCDetection(data.Dataset):
                  data_dir=None,
                  image_sets=[('2007', 'trainval'), ('2012', 'trainval')],
                  transform=None, 
-                 mosaic_prob=0.0,
-                 mixup_prob=0.0,
                  trans_config=None):
         self.root = data_dir
         self.img_size = img_size
@@ -107,9 +105,15 @@ class VOCDetection(data.Dataset):
                 self.ids.append((rootpath, line.strip()))
         # augmentation
         self.transform = transform
-        self.mosaic_prob = mosaic_prob
-        self.mixup_prob = mixup_prob
+        self.mosaic_prob = 0
+        self.mosaic_9x_prob = 0
+        self.mixup_prob = 0
         self.trans_config = trans_config
+        if trans_config is not None:
+            self.mosaic_prob = trans_config['mosaic_prob']
+            self.mosaic_9x_prob = trans_config['mosaic_9x_prob']
+            self.mixup_prob = trans_config['mixup_prob']
+
         print('==============================')
         print('use Mosaic Augmentation: {}'.format(self.mosaic_prob))
         print('use Mixup Augmentation: {}'.format(self.mixup_prob))
@@ -148,7 +152,7 @@ class VOCDetection(data.Dataset):
 
 
     def load_mosaic(self, index):
-        if random.random() < 0.8:
+        if random.random() > self.mosaic_9x_prob:
             load_mosaic_4x = True
             # load 4x mosaic image
             index_list = np.arange(index).tolist() + np.arange(index+1, len(self.ids)).tolist()
@@ -275,6 +279,7 @@ if __name__ == "__main__":
         'hsv_v': 0.4,
         # Mosaic & Mixup
         'mosaic_prob': 1.0,
+        'mosaic_9x_prob': 0.2,
         'mixup_prob': 0.15,
         'mosaic_type': 'yolov5_mosaic',
         'mixup_type': 'yolov5_mixup',
@@ -286,8 +291,6 @@ if __name__ == "__main__":
         img_size=img_size,
         data_dir=args.root,
         transform=transform,
-        mosaic_prob=trans_config['mosaic_prob'],
-        mixup_prob=trans_config['mixup_prob'],
         trans_config=trans_config,
         )
     

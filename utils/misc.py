@@ -5,6 +5,7 @@ from torch.utils.data import DataLoader, DistributedSampler
 import os
 import math
 from copy import deepcopy
+from thop import profile
 
 from evaluator.coco_evaluator import COCOAPIEvaluator
 from evaluator.voc_evaluator import VOCAPIEvaluator
@@ -39,15 +40,15 @@ def build_dataset(cfg, args, device, is_train=False):
 
     # mosaic prob.
     if args.mosaic is not None:
-        mosaic_prob=args.mosaic if is_train else 0.0
+        trans_config['mosaic_prob']=args.mosaic if is_train else 0.0
     else:
-        mosaic_prob=trans_config['mosaic_prob'] if is_train else 0.0
+        trans_config['mosaic_prob']=trans_config['mosaic_prob'] if is_train else 0.0
 
     # mixup prob.
     if args.mixup is not None:
-        mixup_prob=args.mixup if is_train else 0.0
+        trans_config['mixup_prob']=args.mixup if is_train else 0.0
     else:
-        mixup_prob=trans_config['mixup_prob']  if is_train else 0.0
+        trans_config['mixup_prob']=trans_config['mixup_prob']  if is_train else 0.0
 
     # dataset
     if args.dataset == 'voc':
@@ -62,8 +63,6 @@ def build_dataset(cfg, args, device, is_train=False):
             data_dir=data_dir,
             image_sets=[('2007', 'trainval'), ('2012', 'trainval')] if is_train else [('2007', 'test')],
             transform=transform,
-            mosaic_prob=mosaic_prob,
-            mixup_prob=mixup_prob,
             trans_config=trans_config
             )
         # evaluator
@@ -87,8 +86,6 @@ def build_dataset(cfg, args, device, is_train=False):
             data_dir=data_dir,
             image_set='train2017' if is_train else 'val2017',
             transform=transform,
-            mosaic_prob=mosaic_prob,
-            mixup_prob=mixup_prob,
             trans_config=trans_config
             )
         # evaluator
@@ -113,8 +110,6 @@ def build_dataset(cfg, args, device, is_train=False):
             img_size=args.img_size,
             image_set='train' if is_train else 'val',
             transform=transform,
-            mosaic_prob=mosaic_prob,
-            mixup_prob=mixup_prob,
             trans_config=trans_config,
             )
         # evaluator
@@ -140,8 +135,6 @@ def build_dataset(cfg, args, device, is_train=False):
             img_size=args.img_size,
             image_set='train' if is_train else 'val',
             transform=transform,
-            mosaic_prob=mosaic_prob,
-            mixup_prob=mixup_prob,
             trans_config=trans_config,
             )
         # evaluator
@@ -167,8 +160,6 @@ def build_dataset(cfg, args, device, is_train=False):
             img_size=args.img_size,
             image_set='train' if is_train else 'val',
             transform=transform,
-            mosaic_prob=mosaic_prob,
-            mixup_prob=mixup_prob,
             trans_config=trans_config,
             )
         # evaluator
@@ -254,7 +245,7 @@ def load_weight(model, path_to_ckpt, fuse_cbn=False, fuse_repconv=False):
 
     return model
 
-##
+## replace module
 def replace_module(module, replaced_module_type, new_module_type, replace_func=None) -> nn.Module:
     """
     Replace given type in module to a new type. mostly used in deploy.
@@ -285,6 +276,14 @@ def replace_module(module, replaced_module_type, new_module_type, replace_func=N
                 model.add_module(name, new_child)
 
     return model
+
+## compute FLOPs & Parameters
+def compute_flops(model, img_size, device):
+    x = torch.randn(1, 3, img_size, img_size).to(device)
+    print('==============================')
+    flops, params = profile(model, inputs=(x, ), verbose=False)
+    print('GFLOPs : {:.2f}'.format(flops / 1e9))
+    print('Params : {:.2f} M'.format(params / 1e6))
 
 ## Model EMA
 class ModelEMA(object):

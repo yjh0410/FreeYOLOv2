@@ -1,5 +1,4 @@
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
 from .matcher import AlignedSimOTA
 from utils.box_ops import get_ious

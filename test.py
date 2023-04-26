@@ -12,7 +12,6 @@ from dataset.transforms import build_transform
 # load some utils
 from utils.misc import build_dataset, load_weight
 from utils.com_flops_params import FLOPs_and_Params
-from utils import fuse_conv_bn
 
 from config import build_config
 from models import build_model
