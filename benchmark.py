@@ -6,8 +6,8 @@ import torch
 
 from dataset.transforms import ValTransforms
 from dataset.coco import COCODataset, coco_class_index, coco_class_labels
-from utils.com_flops_params import FLOPs_and_Params
-from utils import fuse_conv_bn
+
+from utils.misc import compute_flops
 from utils.misc import load_weight
 
 from config import build_config
@@ -36,7 +36,7 @@ def parse_args():
     parser.add_argument('--root', default='/mnt/share/ssd2/dataset',
                         help='data root')
     # basic
-    parser.add_argument('-size', '--img_size', default=608, type=int,
+    parser.add_argument('-size', '--img_size', default=640, type=int,
                         help='the min size of input image')
     parser.add_argument('--weight', default=None,
                         type=str, help='Trained state_dict file path to open')
@@ -49,7 +49,7 @@ def parse_args():
 
 def test(net, device, img_size, testset, transform):
     # Step-1: Compute FLOPs and Params
-    FLOPs_and_Params(model=net, 
+    compute_flops(model=net, 
                      img_size=img_size, 
                      device=device)
 
