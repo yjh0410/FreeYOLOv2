@@ -31,7 +31,7 @@ yolo_free_v2_cfg = {
         'fpn_norm': 'BN',
         'fpn_depthwise': False,
         ## Decoder
-        'head': 'decoupled_head',
+        'head': 'rep_decoupled_head',
         'head_act': 'silu',
         'head_norm': 'BN',
         'num_cls_head': 2,
@@ -112,7 +112,7 @@ yolo_free_v2_cfg = {
         'fpn_norm': 'BN',
         'fpn_depthwise': False,
         ## Decoder
-        'head': 'decoupled_head',
+        'head': 'rep_decoupled_head',
         'head_act': 'silu',
         'head_norm': 'BN',
         'num_cls_head': 2,
@@ -193,7 +193,7 @@ yolo_free_v2_cfg = {
         'fpn_norm': 'BN',
         'fpn_depthwise': False,
         ## Decoder
-        'head': 'decoupled_head',
+        'head': 'rep_decoupled_head',
         'head_act': 'silu',
         'head_norm': 'BN',
         'num_cls_head': 2,
@@ -274,7 +274,7 @@ yolo_free_v2_cfg = {
         'fpn_norm': 'BN',
         'fpn_depthwise': False,
         ## Decoder
-        'head': 'decoupled_head',
+        'head': 'rep_decoupled_head',
         'head_act': 'silu',
         'head_norm': 'BN',
         'num_cls_head': 2,
@@ -355,7 +355,7 @@ yolo_free_v2_cfg = {
         'fpn_norm': 'BN',
         'fpn_depthwise': False,
         ## Decoder
-        'head': 'decoupled_head',
+        'head': 'rep_decoupled_head',
         'head_act': 'silu',
         'head_norm': 'BN',
         'num_cls_head': 2,

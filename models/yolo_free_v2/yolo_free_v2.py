@@ -46,7 +46,7 @@ class FreeYOLOv2(nn.Module):
 
         ## non-shared heads
         self.non_shared_heads = nn.ModuleList(
-            [build_head(cfg, head_dim, head_dim, num_classes) 
+            [build_head(cfg, head_dim, head_dim, num_classes, deploy=not trainable) 
             for head_dim in self.head_dim
             ])
 

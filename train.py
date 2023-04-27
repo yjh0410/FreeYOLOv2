@@ -245,6 +245,7 @@ def train():
             last_opt_step=last_opt_step)
 
         # eval
+        model_eval = deepcopy(ema.ema if ema else model_without_ddp)
         if heavy_eval:
             best_map = val_one_epoch(
                             args=args, 
@@ -264,7 +265,8 @@ def train():
                                 epoch=epoch,
                                 best_map=best_map,
                                 path_to_save=path_to_save)
-
+        del model_eval
+        
     # Empty cache after train loop
     if args.cuda:
         torch.cuda.empty_cache()

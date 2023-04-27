@@ -38,16 +38,17 @@ def build_dataset(cfg, args, device, is_train=False):
     trans_config=cfg['trans_config'] if is_train else None
 
     # mosaic prob.
-    if args.mosaic is not None:
-        trans_config['mosaic_prob']=args.mosaic if is_train else 0.0
-    else:
-        trans_config['mosaic_prob']=trans_config['mosaic_prob'] if is_train else 0.0
+    if trans_config is not None:
+        if args.mosaic is not None:
+            trans_config['mosaic_prob']=args.mosaic if is_train else 0.0
+        else:
+            trans_config['mosaic_prob']=trans_config['mosaic_prob'] if is_train else 0.0
 
-    # mixup prob.
-    if args.mixup is not None:
-        trans_config['mixup_prob']=args.mixup if is_train else 0.0
-    else:
-        trans_config['mixup_prob']=trans_config['mixup_prob']  if is_train else 0.0
+        # mixup prob.
+        if args.mixup is not None:
+            trans_config['mixup_prob']=args.mixup if is_train else 0.0
+        else:
+            trans_config['mixup_prob']=trans_config['mixup_prob']  if is_train else 0.0
 
     # dataset
     if args.dataset == 'voc':
