@@ -132,8 +132,8 @@ yolo_free_v2_cfg = {
                           'hsv_v': 0.4,
                           # Mosaic & Mixup
                           'mosaic_prob': 1.0,
-                          'mosaic_9x_prob': 0.5,
-                          'mixup_prob': 0.2,
+                          'mosaic_9x_prob': 0.2,
+                          'mixup_prob': 0.3,
                           'mosaic_type': 'yolov5_mosaic',
                           'mixup_type': 'yolov5_mixup',
                           'mixup_scale': [0.5, 1.5],
@@ -213,8 +213,8 @@ yolo_free_v2_cfg = {
                           'hsv_v': 0.4,
                           # Mosaic & Mixup
                           'mosaic_prob': 1.0,
-                          'mosaic_9x_prob': 0.5,
-                          'mixup_prob': 0.2,
+                          'mosaic_9x_prob': 0.2,
+                          'mixup_prob': 0.4,
                           'mosaic_type': 'yolov5_mosaic',
                           'mixup_type': 'yolov5_mixup',
                           'mixup_scale': [0.5, 1.5],
@@ -294,8 +294,8 @@ yolo_free_v2_cfg = {
                           'hsv_v': 0.4,
                           # Mosaic & Mixup
                           'mosaic_prob': 1.0,
-                          'mosaic_9x_prob': 0.5,
-                          'mixup_prob': 0.2,
+                          'mosaic_9x_prob': 0.2,
+                          'mixup_prob': 0.5,
                           'mosaic_type': 'yolov5_mosaic',
                           'mixup_type': 'yolov5_mixup',
                           'mixup_scale': [0.5, 1.5],
@@ -375,8 +375,8 @@ yolo_free_v2_cfg = {
                           'hsv_v': 0.4,
                           # Mosaic & Mixup
                           'mosaic_prob': 1.0,
-                          'mosaic_9x_prob': 0.5,
-                          'mixup_prob': 0.2,
+                          'mosaic_9x_prob': 0.2,
+                          'mixup_prob': 0.5,
                           'mosaic_type': 'yolov5_mosaic',
                           'mixup_type': 'yolov5_mixup',
                           'mixup_scale': [0.5, 1.5],
