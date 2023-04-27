@@ -31,7 +31,7 @@ yolo_free_v2_cfg = {
         'fpn_norm': 'BN',
         'fpn_depthwise': False,
         ## Decoder
-        'head': 'rep_decoupled_head',
+        'head': 'decoupled_head',
         'head_act': 'silu',
         'head_norm': 'BN',
         'num_cls_head': 2,
@@ -39,7 +39,7 @@ yolo_free_v2_cfg = {
         'head_depthwise': False,
         # ---------------- Train config ----------------
         ## input
-        'multi_scale': [0.5, 1.25],
+        'multi_scale': [0.5, 1.5],
         'trans_config': {# Basic Augment
                           'degrees': 0.0,
                           'translate': 0.1,
@@ -52,7 +52,7 @@ yolo_free_v2_cfg = {
                           # Mosaic & Mixup
                           'mosaic_prob': 1.0,
                           'mosaic_9x_prob': 0.2,
-                          'mixup_prob': 0.2,
+                          'mixup_prob': 0.0,
                           'mosaic_type': 'yolov5_mosaic',
                           'mixup_type': 'yolov5_mixup',
                           'mixup_scale': [0.5, 1.5],
@@ -67,18 +67,18 @@ yolo_free_v2_cfg = {
         'loss_box_weight': 2.0,
         # ---------------- Train config ----------------
         ## close strong augmentation
-        'no_aug_epoch': 20,
+        'no_aug_epoch': 10,
         ## optimizer
-        'optimizer': 'AdamW',      # optional: SGD, AdamW
-        'momentum': None,          # SGD: 0.937;    AdamW: None
-        'weight_decay': 5e-2,      # SGD: 5e-4;     AdamW: 5e-2
+        'optimizer': 'SGD',        # optional: SGD, AdamW
+        'momentum': 0.937,         # SGD: 0.937;    AdamW: None
+        'weight_decay': 5e-4,      # SGD: 5e-4;     AdamW: 5e-2
         'clip_grad': 10,           # SGD: 10.0;     AdamW: -1
         ## model EMA
-        'ema_decay': 0.9998,       # SGD: 0.9999;   AdamW: 0.9998
+        'ema_decay': 0.9999,       # SGD: 0.9999;   AdamW: 0.9998
         'ema_tau': 2000,
         ## lr schedule
         'scheduler': 'linear',
-        'lr0': 0.001,              # SGD: 0.01;     AdamW: 0.001
+        'lr0': 0.01,              # SGD: 0.01;     AdamW: 0.001
         'lrf': 0.01,               # SGD: 0.01;     AdamW: 0.01
         'warmup_momentum': 0.8,
         'warmup_bias_lr': 0.1,
@@ -112,7 +112,7 @@ yolo_free_v2_cfg = {
         'fpn_norm': 'BN',
         'fpn_depthwise': False,
         ## Decoder
-        'head': 'rep_decoupled_head',
+        'head': 'decoupled_head',
         'head_act': 'silu',
         'head_norm': 'BN',
         'num_cls_head': 2,
@@ -120,7 +120,7 @@ yolo_free_v2_cfg = {
         'head_depthwise': False,
         # ---------------- Train config ----------------
         ## input
-        'multi_scale': [0.5, 1.25],
+        'multi_scale': [0.5, 1.5],
         'trans_config': {# Basic Augment
                           'degrees': 0.0,
                           'translate': 0.2,
@@ -133,7 +133,7 @@ yolo_free_v2_cfg = {
                           # Mosaic & Mixup
                           'mosaic_prob': 1.0,
                           'mosaic_9x_prob': 0.2,
-                          'mixup_prob': 0.3,
+                          'mixup_prob': 0.05,
                           'mosaic_type': 'yolov5_mosaic',
                           'mixup_type': 'yolov5_mixup',
                           'mixup_scale': [0.5, 1.5],
@@ -148,18 +148,18 @@ yolo_free_v2_cfg = {
         'loss_box_weight': 2.0,
         # ---------------- Train config ----------------
         ## close strong augmentation
-        'no_aug_epoch': 20,
+        'no_aug_epoch': 10,
         ## optimizer
-        'optimizer': 'AdamW',      # optional: SGD, AdamW
-        'momentum': None,          # SGD: 0.937;    AdamW: None
-        'weight_decay': 5e-2,      # SGD: 5e-4;     AdamW: 5e-2
+        'optimizer': 'SGD',        # optional: SGD, AdamW
+        'momentum': 0.937,         # SGD: 0.937;    AdamW: None
+        'weight_decay': 5e-4,      # SGD: 5e-4;     AdamW: 5e-2
         'clip_grad': 10,           # SGD: 10.0;     AdamW: -1
         ## model EMA
-        'ema_decay': 0.9998,       # SGD: 0.9999;   AdamW: 0.9998
+        'ema_decay': 0.9999,       # SGD: 0.9999;   AdamW: 0.9998
         'ema_tau': 2000,
         ## lr schedule
         'scheduler': 'linear',
-        'lr0': 0.001,              # SGD: 0.01;     AdamW: 0.001
+        'lr0': 0.01,              # SGD: 0.01;     AdamW: 0.001
         'lrf': 0.01,               # SGD: 0.01;     AdamW: 0.01
         'warmup_momentum': 0.8,
         'warmup_bias_lr': 0.1,
@@ -193,7 +193,7 @@ yolo_free_v2_cfg = {
         'fpn_norm': 'BN',
         'fpn_depthwise': False,
         ## Decoder
-        'head': 'rep_decoupled_head',
+        'head': 'decoupled_head',
         'head_act': 'silu',
         'head_norm': 'BN',
         'num_cls_head': 2,
@@ -201,7 +201,7 @@ yolo_free_v2_cfg = {
         'head_depthwise': False,
         # ---------------- Train config ----------------
         ## input
-        'multi_scale': [0.5, 1.25],
+        'multi_scale': [0.5, 1.5],
         'trans_config': {# Basic Augment
                           'degrees': 0.0,
                           'translate': 0.2,
@@ -214,7 +214,7 @@ yolo_free_v2_cfg = {
                           # Mosaic & Mixup
                           'mosaic_prob': 1.0,
                           'mosaic_9x_prob': 0.2,
-                          'mixup_prob': 0.4,
+                          'mixup_prob': 0.1,
                           'mosaic_type': 'yolov5_mosaic',
                           'mixup_type': 'yolov5_mixup',
                           'mixup_scale': [0.5, 1.5],
@@ -229,18 +229,18 @@ yolo_free_v2_cfg = {
         'loss_box_weight': 2.0,
         # ---------------- Train config ----------------
         ## close strong augmentation
-        'no_aug_epoch': 20,
+        'no_aug_epoch': 10,
         ## optimizer
-        'optimizer': 'AdamW',      # optional: SGD, AdamW
-        'momentum': None,          # SGD: 0.937;    AdamW: None
-        'weight_decay': 5e-2,      # SGD: 5e-4;     AdamW: 5e-2
+        'optimizer': 'SGD',        # optional: SGD, AdamW
+        'momentum': 0.937,         # SGD: 0.937;    AdamW: None
+        'weight_decay': 5e-4,      # SGD: 5e-4;     AdamW: 5e-2
         'clip_grad': 10,           # SGD: 10.0;     AdamW: -1
         ## model EMA
-        'ema_decay': 0.9998,       # SGD: 0.9999;   AdamW: 0.9998
+        'ema_decay': 0.9999,       # SGD: 0.9999;   AdamW: 0.9998
         'ema_tau': 2000,
         ## lr schedule
         'scheduler': 'linear',
-        'lr0': 0.001,              # SGD: 0.01;     AdamW: 0.001
+        'lr0': 0.01,              # SGD: 0.01;     AdamW: 0.001
         'lrf': 0.01,               # SGD: 0.01;     AdamW: 0.01
         'warmup_momentum': 0.8,
         'warmup_bias_lr': 0.1,
@@ -274,7 +274,7 @@ yolo_free_v2_cfg = {
         'fpn_norm': 'BN',
         'fpn_depthwise': False,
         ## Decoder
-        'head': 'rep_decoupled_head',
+        'head': 'decoupled_head',
         'head_act': 'silu',
         'head_norm': 'BN',
         'num_cls_head': 2,
@@ -295,7 +295,7 @@ yolo_free_v2_cfg = {
                           # Mosaic & Mixup
                           'mosaic_prob': 1.0,
                           'mosaic_9x_prob': 0.2,
-                          'mixup_prob': 0.5,
+                          'mixup_prob': 0.15,
                           'mosaic_type': 'yolov5_mosaic',
                           'mixup_type': 'yolov5_mixup',
                           'mixup_scale': [0.5, 1.5],
@@ -310,18 +310,18 @@ yolo_free_v2_cfg = {
         'loss_box_weight': 2.0,
         # ---------------- Train config ----------------
         ## close strong augmentation
-        'no_aug_epoch': 20,
+        'no_aug_epoch': 10,
         ## optimizer
-        'optimizer': 'AdamW',      # optional: SGD, AdamW
-        'momentum': None,          # SGD: 0.937;    AdamW: None
-        'weight_decay': 5e-2,      # SGD: 5e-4;     AdamW: 5e-2
+        'optimizer': 'SGD',        # optional: SGD, AdamW
+        'momentum': 0.937,         # SGD: 0.937;    AdamW: None
+        'weight_decay': 5e-4,      # SGD: 5e-4;     AdamW: 5e-2
         'clip_grad': 10,           # SGD: 10.0;     AdamW: -1
         ## model EMA
-        'ema_decay': 0.9998,       # SGD: 0.9999;   AdamW: 0.9998
+        'ema_decay': 0.9999,       # SGD: 0.9999;   AdamW: 0.9998
         'ema_tau': 2000,
         ## lr schedule
         'scheduler': 'linear',
-        'lr0': 0.001,              # SGD: 0.01;     AdamW: 0.001
+        'lr0': 0.01,              # SGD: 0.01;     AdamW: 0.001
         'lrf': 0.01,               # SGD: 0.01;     AdamW: 0.01
         'warmup_momentum': 0.8,
         'warmup_bias_lr': 0.1,
@@ -355,7 +355,7 @@ yolo_free_v2_cfg = {
         'fpn_norm': 'BN',
         'fpn_depthwise': False,
         ## Decoder
-        'head': 'rep_decoupled_head',
+        'head': 'decoupled_head',
         'head_act': 'silu',
         'head_norm': 'BN',
         'num_cls_head': 2,
@@ -376,7 +376,7 @@ yolo_free_v2_cfg = {
                           # Mosaic & Mixup
                           'mosaic_prob': 1.0,
                           'mosaic_9x_prob': 0.2,
-                          'mixup_prob': 0.5,
+                          'mixup_prob': 0.2,
                           'mosaic_type': 'yolov5_mosaic',
                           'mixup_type': 'yolov5_mixup',
                           'mixup_scale': [0.5, 1.5],
@@ -391,18 +391,18 @@ yolo_free_v2_cfg = {
         'loss_box_weight': 2.0,
         # ---------------- Train config ----------------
         ## close strong augmentation
-        'no_aug_epoch': 20,
+        'no_aug_epoch': 10,
         ## optimizer
-        'optimizer': 'AdamW',      # optional: SGD, AdamW
-        'momentum': None,          # SGD: 0.937;    AdamW: None
-        'weight_decay': 5e-2,      # SGD: 5e-4;     AdamW: 5e-2
+        'optimizer': 'SGD',        # optional: SGD, AdamW
+        'momentum': 0.937,         # SGD: 0.937;    AdamW: None
+        'weight_decay': 5e-4,      # SGD: 5e-4;     AdamW: 5e-2
         'clip_grad': 10,           # SGD: 10.0;     AdamW: -1
         ## model EMA
-        'ema_decay': 0.9998,       # SGD: 0.9999;   AdamW: 0.9998
+        'ema_decay': 0.9999,       # SGD: 0.9999;   AdamW: 0.9998
         'ema_tau': 2000,
         ## lr schedule
         'scheduler': 'linear',
-        'lr0': 0.001,              # SGD: 0.01;     AdamW: 0.001
+        'lr0': 0.01,              # SGD: 0.01;     AdamW: 0.001
         'lrf': 0.01,               # SGD: 0.01;     AdamW: 0.01
         'warmup_momentum': 0.8,
         'warmup_bias_lr': 0.1,

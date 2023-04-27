@@ -236,23 +236,27 @@ class RepConv(nn.Module):
     # Represented convolution
     # https://arxiv.org/abs/2101.03697
 
-    def __init__(self, c1, c2, k=3, s=1, p=1, g=1, act_type='silu', deploy=False):
+    def __init__(self, c1, c2, k=3, s=1, p=1, act_type='silu', depthwise=False, deploy=False):
         super(RepConv, self).__init__()
         # -------------- Basic parameters --------------
         self.deploy = deploy
-        self.groups = g
         self.in_channels = c1
         self.out_channels = c2
+        if depthwise and c1 == c2:
+            self.groups = c1
+        else:
+            self.groups = 1
+
 
         # -------------- Network parameters --------------
         if deploy:
-            self.rbr_reparam = nn.Conv2d(c1, c2, k, s, p, groups=g, bias=True)
+            self.rbr_reparam = nn.Conv2d(c1, c2, k, s, p, groups=self.groups, bias=True)
 
         else:
             self.rbr_identity = (nn.BatchNorm2d(num_features=c1) if c2 == c1 and s == 1 else None)
 
             self.rbr_dense = nn.Sequential(
-                nn.Conv2d(c1, c2, k, s, p, groups=g, bias=False),
+                nn.Conv2d(c1, c2, k, s, p, groups=self.groups, bias=False),
                 nn.BatchNorm2d(num_features=c2),
             )
 
