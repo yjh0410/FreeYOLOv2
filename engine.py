@@ -176,12 +176,13 @@ def val_one_epoch(args,
                   best_map,
                   path_to_save):
     if distributed_utils.is_main_process():
-        # Fuse RepConv layers
-        print('Fusing RepConv layers ...')
-        for m in model.modules():
-            if isinstance(m, RepConv):
-                m.fuse_repvgg_block()
-    # check evaluator
+        # # Fuse RepConv layers
+        # print('Fusing RepConv layers ...')
+        # for m in model.modules():
+        #     if isinstance(m, RepConv):
+        #         m.fuse_repvgg_block()
+        
+        # check evaluator
         if evaluator is None:
             print('No evaluator ... save model and go on training.')
             print('Saving state, epoch: {}'.format(epoch + 1))
