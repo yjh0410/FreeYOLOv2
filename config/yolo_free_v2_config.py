@@ -39,7 +39,7 @@ yolo_free_v2_cfg = {
         'head_depthwise': False,
         # ---------------- Train config ----------------
         ## input
-        'multi_scale': [0.5, 1.5],
+        'multi_scale': [0.5, 1.25],
         'trans_config': {# Basic Augment
                           'degrees': 0.0,
                           'translate': 0.1,
@@ -64,7 +64,7 @@ yolo_free_v2_cfg = {
         # ---------------- Loss config ----------------
         ## loss weight
         'loss_cls_weight': 1.0,
-        'loss_box_weight': 5.0,
+        'loss_box_weight': 2.0,
         # ---------------- Train config ----------------
         ## close strong augmentation
         'no_aug_epoch': 10,
@@ -120,7 +120,7 @@ yolo_free_v2_cfg = {
         'head_depthwise': False,
         # ---------------- Train config ----------------
         ## input
-        'multi_scale': [0.5, 1.5],
+        'multi_scale': [0.5, 1.25],
         'trans_config': {# Basic Augment
                           'degrees': 0.0,
                           'translate': 0.2,
@@ -201,7 +201,7 @@ yolo_free_v2_cfg = {
         'head_depthwise': False,
         # ---------------- Train config ----------------
         ## input
-        'multi_scale': [0.5, 1.5],
+        'multi_scale': [0.5, 1.25],
         'trans_config': {# Basic Augment
                           'degrees': 0.0,
                           'translate': 0.2,
