@@ -35,21 +35,21 @@ class Criterion(object):
         """
         label, score = target
         pred_sigmoid = pred_cls.sigmoid()
-        scale_factor = pred_sigmoid
-        zerolabel = scale_factor.new_zeros(pred_cls.shape)
+        # scale_factor = pred_sigmoid
+        zerolabel = pred_sigmoid.new_zeros(pred_cls.shape)
 
         ce_loss = F.binary_cross_entropy_with_logits(
-            pred_cls, zerolabel, reduction='none') * scale_factor.pow(beta)
+            pred_cls, zerolabel, reduction='none')# * scale_factor.pow(beta)
         
         bg_class_ind = pred_cls.shape[-1]
         pos = ((label >= 0) & (label < bg_class_ind)).nonzero().squeeze(1)
         pos_label = label[pos].long()
 
-        scale_factor = score[pos] - pred_sigmoid[pos, pos_label]
+        # scale_factor = score[pos] - pred_sigmoid[pos, pos_label]
 
         ce_loss[pos, pos_label] = F.binary_cross_entropy_with_logits(
             pred_cls[pos, pos_label], score[pos],
-            reduction='none') * scale_factor.abs().pow(beta)
+            reduction='none')# * scale_factor.abs().pow(beta)
 
         return ce_loss
 

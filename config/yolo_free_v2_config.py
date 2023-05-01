@@ -64,7 +64,7 @@ yolo_free_v2_cfg = {
         # ---------------- Loss config ----------------
         ## loss weight
         'loss_cls_weight': 1.0,
-        'loss_box_weight': 2.0,
+        'loss_box_weight': 5.0,
         # ---------------- Train config ----------------
         ## close strong augmentation
         'no_aug_epoch': 10,
