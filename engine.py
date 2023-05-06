@@ -8,7 +8,6 @@ import random
 
 from utils import distributed_utils
 from utils.vis_tools import vis_data
-from models.yolo_free_v2.yolo_free_v2_basic import RepConv
 
 
 def rescale_image_targets(images, targets, stride, min_box_size, multi_scale_range=[0.5, 1.5]):
@@ -175,13 +174,7 @@ def val_one_epoch(args,
                   epoch,
                   best_map,
                   path_to_save):
-    if distributed_utils.is_main_process():
-        # # Fuse RepConv layers
-        # print('Fusing RepConv layers ...')
-        # for m in model.modules():
-        #     if isinstance(m, RepConv):
-        #         m.fuse_repvgg_block()
-        
+    if distributed_utils.is_main_process():        
         # check evaluator
         if evaluator is None:
             print('No evaluator ... save model and go on training.')

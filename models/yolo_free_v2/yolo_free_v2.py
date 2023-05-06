@@ -78,64 +78,40 @@ class FreeYOLOv2(nn.Module):
 
         return anchors
         
-    ## decode predicted bboxes
-    def decode_boxes(self, anchors, reg_pred, stride):
-        """
-            anchors:  (List[Tensor]) [1, M, 2] or [M, 2]
-            reg_pred: (List[Tensor]) [B, M, 4] or [M, 4]
-        """
-        # center of bbox
-        pred_ctr_xy = anchors + reg_pred[..., :2] * stride
-        # size of bbox
-        pred_box_wh = reg_pred[..., 2:].exp() * stride
-
-        pred_x1y1 = pred_ctr_xy - 0.5 * pred_box_wh
-        pred_x2y2 = pred_ctr_xy + 0.5 * pred_box_wh
-        pred_box = torch.cat([pred_x1y1, pred_x2y2], dim=-1)
-
-        return pred_box
-
     ## post-process
-    def post_process(self, cls_preds, reg_preds, anchors):
+    def post_process(self, cls_preds, box_preds):
         """
         Input:
             cls_preds: List(Tensor) [[H x W, C], ...]
-            reg_preds: List(Tensor) [[H x W, 4], ...]
-            anchors:  List(Tensor) [[H x W, 2], ...]
+            box_preds: List(Tensor) [[H x W, 4], ...]
         """
         all_scores = []
         all_labels = []
         all_bboxes = []
         
-        for level, (cls_pred_i, reg_pred_i, anchors_i) in enumerate(zip(cls_preds, reg_preds, anchors)):
+        for cls_pred_i, box_pred_i in zip(cls_preds, box_preds):
             # (H x W x C,)
             scores_i = cls_pred_i.sigmoid().flatten()
 
-            # Keep top k top scoring indices only.
-            num_topk = min(self.topk, reg_pred_i.size(0))
+            # filter out the proposals with low confidence score
+            keep_idxs = scores_i > self.conf_thresh
+            scores_i = scores_i[keep_idxs]
+            box_pred_i = box_pred_i[keep_idxs]
+            anchors_i = anchors_i[keep_idxs]
 
-            # torch.sort is actually faster than .topk (at least on GPUs)
+            # Keep top k top scoring indices only.
+            num_topk = min(self.topk, box_pred_i.size(0))
             predicted_prob, topk_idxs = scores_i.sort(descending=True)
             topk_scores = predicted_prob[:num_topk]
             topk_idxs = topk_idxs[:num_topk]
 
-            # filter out the proposals with low confidence score
-            keep_idxs = topk_scores > self.conf_thresh
-            scores = topk_scores[keep_idxs]
-            topk_idxs = topk_idxs[keep_idxs]
-
             anchor_idxs = torch.div(topk_idxs, self.num_classes, rounding_mode='floor')
-            labels = topk_idxs % self.num_classes
+            topk_labels = topk_idxs % self.num_classes
+            topk_bboxes = box_pred_i[anchor_idxs]
 
-            reg_pred_i = reg_pred_i[anchor_idxs]
-            anchors_i = anchors_i[anchor_idxs]
-
-            # decode box: [M, 4]
-            bboxes = self.decode_boxes(anchors_i, reg_pred_i, self.stride[level])
-
-            all_scores.append(scores)
-            all_labels.append(labels)
-            all_bboxes.append(bboxes)
+            all_scores.append(topk_scores)
+            all_labels.append(topk_labels)
+            all_bboxes.append(topk_bboxes)
 
         scores = torch.cat(all_scores)
         labels = torch.cat(all_labels)
@@ -166,7 +142,7 @@ class FreeYOLOv2(nn.Module):
 
         # non-shared heads
         all_cls_preds = []
-        all_reg_preds = []
+        all_box_preds = []
         all_anchors = []
         for level, (feat, head) in enumerate(zip(pyramid_feats, self.non_shared_heads)):
             cls_feat, reg_feat = head(feat)
@@ -175,34 +151,38 @@ class FreeYOLOv2(nn.Module):
             cls_pred = self.cls_preds[level](cls_feat)
             reg_pred = self.reg_preds[level](reg_feat)
 
-            if self.no_decode:
-                anchors = None
-            else:
-                # anchors: [M, 2]
-                fmp_size = cls_pred.shape[-2:]
-                anchors = self.generate_anchors(level, fmp_size)
+            # anchors: [M, 2]
+            fmp_size = cls_pred.shape[-2:]
+            anchors = self.generate_anchors(level, fmp_size)
 
             # [1, C, H, W] -> [H, W, C] -> [M, C]
             cls_pred = cls_pred[0].permute(1, 2, 0).contiguous().view(-1, self.num_classes)
             reg_pred = reg_pred[0].permute(1, 2, 0).contiguous().view(-1, 4)
 
+            # decode bbox
+            ctr_pred = reg_pred[..., :2] * self.stride[level] + anchors[..., :2]
+            wh_pred = torch.exp(reg_pred[..., 2:]) * self.stride[level]
+            pred_x1y1 = ctr_pred - wh_pred * 0.5
+            pred_x2y2 = ctr_pred + wh_pred * 0.5
+            box_pred = torch.cat([pred_x1y1, pred_x2y2], dim=-1)
+
             all_cls_preds.append(cls_pred)
-            all_reg_preds.append(reg_pred)
+            all_box_preds.append(box_pred)
             all_anchors.append(anchors)
 
         if self.no_decode:
             # no post process
             cls_preds = torch.cat(all_cls_preds, dim=0)
-            reg_preds = torch.cat(all_reg_preds, dim=0)
+            box_pred = torch.cat(all_box_preds, dim=0)
             # [n_anchors_all, 4 + C]
-            outputs = torch.cat([reg_preds, cls_preds.sigmoid()], dim=-1)
+            outputs = torch.cat([box_pred, cls_preds.sigmoid()], dim=-1)
 
             return outputs
 
         else:
             # post process
             bboxes, scores, labels = self.post_process(
-                all_cls_preds, all_reg_preds, all_anchors)
+                all_cls_preds, all_box_preds, all_anchors)
             
             return bboxes, scores, labels
 
@@ -240,8 +220,12 @@ class FreeYOLOv2(nn.Module):
                 cls_pred = cls_pred.permute(0, 2, 3, 1).contiguous().view(B, -1, self.num_classes)
                 reg_pred = reg_pred.permute(0, 2, 3, 1).contiguous().view(B, -1, 4)
 
-                # decode box: [M, 4]
-                box_pred = self.decode_boxes(anchors, reg_pred, self.stride[level])
+                # decode bbox
+                ctr_pred = reg_pred[..., :2] * self.stride[level] + anchors[..., :2]
+                wh_pred = torch.exp(reg_pred[..., 2:]) * self.stride[level]
+                pred_x1y1 = ctr_pred - wh_pred * 0.5
+                pred_x2y2 = ctr_pred + wh_pred * 0.5
+                box_pred = torch.cat([pred_x1y1, pred_x2y2], dim=-1)
 
                 all_cls_preds.append(cls_pred)
                 all_box_preds.append(box_pred)
