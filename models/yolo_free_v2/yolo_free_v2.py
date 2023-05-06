@@ -93,17 +93,18 @@ class FreeYOLOv2(nn.Module):
             # (H x W x C,)
             scores_i = cls_pred_i.sigmoid().flatten()
 
-            # filter out the proposals with low confidence score
-            keep_idxs = scores_i > self.conf_thresh
-            scores_i = scores_i[keep_idxs]
-            box_pred_i = box_pred_i[keep_idxs]
-            anchors_i = anchors_i[keep_idxs]
-
             # Keep top k top scoring indices only.
             num_topk = min(self.topk, box_pred_i.size(0))
+
+            # torch.sort is actually faster than .topk (at least on GPUs)
             predicted_prob, topk_idxs = scores_i.sort(descending=True)
             topk_scores = predicted_prob[:num_topk]
             topk_idxs = topk_idxs[:num_topk]
+
+            # filter out the proposals with low confidence score
+            keep_idxs = topk_scores > self.conf_thresh
+            scores = topk_scores[keep_idxs]
+            topk_idxs = topk_idxs[keep_idxs]
 
             anchor_idxs = torch.div(topk_idxs, self.num_classes, rounding_mode='floor')
             topk_labels = topk_idxs % self.num_classes
