@@ -33,24 +33,24 @@ class FreeYOLOv2(nn.Module):
         self.no_decode = no_decode
         
         # ---------------------- Network Parameters ----------------------
-        ## backbone
+        ## Backbone
         self.backbone, feats_dim = build_backbone(cfg, trainable&cfg['pretrained'])
 
-        ## neck
+        ## Neck
         self.neck = build_neck(cfg=cfg, in_dim=feats_dim[-1], out_dim=feats_dim[-1])
         feats_dim[-1] = self.neck.out_dim
         
-        ## fpn
+        ## FPN
         self.fpn = build_fpn(cfg=cfg, in_dims=feats_dim, out_dim=round(256*cfg['width']))
         self.head_dim = self.fpn.out_dim
 
-        ## non-shared heads
+        ## Heads
         self.non_shared_heads = nn.ModuleList(
             [build_head(cfg, head_dim, head_dim, num_classes, deploy=not trainable) 
             for head_dim in self.head_dim
             ])
 
-        ## pred
+        ## Pred
         self.cls_preds = nn.ModuleList(
                             [nn.Conv2d(head.cls_out_dim, self.num_classes, kernel_size=1) 
                                 for head in self.non_shared_heads
