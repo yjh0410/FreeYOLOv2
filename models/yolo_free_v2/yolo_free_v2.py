@@ -181,8 +181,7 @@ class FreeYOLOv2(nn.Module):
 
         else:
             # post process
-            bboxes, scores, labels = self.post_process(
-                all_cls_preds, all_box_preds, all_anchors)
+            bboxes, scores, labels = self.post_process(all_cls_preds, all_box_preds)
             
             return bboxes, scores, labels
 
