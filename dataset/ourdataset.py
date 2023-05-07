@@ -12,9 +12,9 @@ except:
     print("It seems that the COCOAPI is not installed.")
 
 try:
-    from .transforms import yolov5_mosaic_augment, yolov5_mosaic_augment_9x, yolov5_mixup_augment, yolox_mixup_augment
+    from .transforms import yolov5_mosaic_augment, yolov5_mosaic_augment_9x, yolov5_mixup_augment
 except:
-    from transforms import yolov5_mosaic_augment, yolov5_mosaic_augment_9x, yolov5_mixup_augment, yolox_mixup_augment
+    from transforms import yolov5_mosaic_augment, yolov5_mosaic_augment_9x, yolov5_mixup_augment
 
 # please define our class labels
 our_class_labels = ('cat',)
@@ -118,30 +118,22 @@ class OurDataset(Dataset):
             target_list.append(target_i)
 
         # Mosaic Augment
-        if self.trans_config['mosaic_type'] == 'yolov5_mosaic':
-            if load_mosaic_4x:
-                image, target = yolov5_mosaic_augment(
-                    image_list, target_list, self.img_size, self.trans_config)
-            else:
-                image, target = yolov5_mosaic_augment_9x(
-                    image_list, target_list, self.img_size, self.trans_config)
+        if load_mosaic_4x:
+            image, target = yolov5_mosaic_augment(
+                image_list, target_list, self.img_size, self.trans_config)
+        else:
+            image, target = yolov5_mosaic_augment_9x(
+                image_list, target_list, self.img_size, self.trans_config)
                 
         return image, target
 
         
     def load_mixup(self, origin_image, origin_target):
         # YOLOv5 type Mixup
-        if self.trans_config['mixup_type'] == 'yolov5_mixup':
-            new_index = np.random.randint(0, len(self.ids))
-            new_image, new_target = self.load_mosaic(new_index)
-            image, target = yolov5_mixup_augment(
-                origin_image, origin_target, new_image, new_target)
-        # YOLOX type Mixup
-        elif self.trans_config['mixup_type'] == 'yolox_mixup':
-            new_index = np.random.randint(0, len(self.ids))
-            new_image, new_target = self.load_image_target(new_index)
-            image, target = yolox_mixup_augment(
-                origin_image, origin_target, new_image, new_target, self.img_size, self.trans_config['mixup_scale'])
+        new_index = np.random.randint(0, len(self.ids))
+        new_image, new_target = self.load_mosaic(new_index)
+        image, target = yolov5_mixup_augment(
+            origin_image, origin_target, new_image, new_target)
 
         return image, target
     

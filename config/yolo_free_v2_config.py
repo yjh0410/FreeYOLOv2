@@ -53,9 +53,6 @@ yolo_free_v2_cfg = {
                           'mosaic_prob': 1.0,
                           'mosaic_9x_prob': 0.2,
                           'mixup_prob': 0.0,
-                          'mosaic_type': 'yolov5_mosaic',
-                          'mixup_type': 'yolov5_mixup',
-                          'mixup_scale': [0.5, 1.5],
                           },
         # ---------------- Assignment config ----------------
         'matcher': {'soft_center_radius': 3.0,
@@ -134,9 +131,6 @@ yolo_free_v2_cfg = {
                           'mosaic_prob': 1.0,
                           'mosaic_9x_prob': 0.2,
                           'mixup_prob': 0.05,
-                          'mosaic_type': 'yolov5_mosaic',
-                          'mixup_type': 'yolov5_mixup',
-                          'mixup_scale': [0.5, 1.5],
                           },
         # ---------------- Assignment config ----------------
         'matcher': {'soft_center_radius': 3.0,
@@ -215,9 +209,6 @@ yolo_free_v2_cfg = {
                           'mosaic_prob': 1.0,
                           'mosaic_9x_prob': 0.2,
                           'mixup_prob': 0.1,
-                          'mosaic_type': 'yolov5_mosaic',
-                          'mixup_type': 'yolov5_mixup',
-                          'mixup_scale': [0.5, 1.5],
                           },
         # ---------------- Assignment config ----------------
         'matcher': {'soft_center_radius': 3.0,
@@ -296,9 +287,6 @@ yolo_free_v2_cfg = {
                           'mosaic_prob': 1.0,
                           'mosaic_9x_prob': 0.2,
                           'mixup_prob': 0.15,
-                          'mosaic_type': 'yolov5_mosaic',
-                          'mixup_type': 'yolov5_mixup',
-                          'mixup_scale': [0.5, 1.5],
                           },
         # ---------------- Assignment config ----------------
         'matcher': {'soft_center_radius': 3.0,
@@ -377,9 +365,6 @@ yolo_free_v2_cfg = {
                           'mosaic_prob': 1.0,
                           'mosaic_9x_prob': 0.2,
                           'mixup_prob': 0.2,
-                          'mosaic_type': 'yolov5_mosaic',
-                          'mixup_type': 'yolov5_mixup',
-                          'mixup_scale': [0.5, 1.5],
                           },
         # ---------------- Assignment config ----------------
         'matcher': {'soft_center_radius': 3.0,
