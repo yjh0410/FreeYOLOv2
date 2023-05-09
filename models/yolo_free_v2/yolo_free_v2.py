@@ -19,7 +19,7 @@ class FreeYOLOv2(nn.Module):
                  nms_thresh = 0.6,
                  trainable = False, 
                  topk = 1000,
-                 no_decode = False):
+                 deploy = False):
         super(FreeYOLOv2, self).__init__()
         # ---------------------- Basic Parameters ----------------------
         self.cfg = cfg
@@ -30,7 +30,7 @@ class FreeYOLOv2(nn.Module):
         self.conf_thresh = conf_thresh
         self.nms_thresh = nms_thresh
         self.topk = topk
-        self.no_decode = no_decode
+        self.deploy = deploy
         
         # ---------------------- Network Parameters ----------------------
         ## Backbone
@@ -171,7 +171,7 @@ class FreeYOLOv2(nn.Module):
             all_box_preds.append(box_pred)
             all_anchors.append(anchors)
 
-        if self.no_decode:
+        if self.deploy:
             # no post process
             cls_preds = torch.cat(all_cls_preds, dim=0)
             box_pred = torch.cat(all_box_preds, dim=0)

@@ -37,7 +37,7 @@ yolo_free_v2_cfg = {
         'num_cls_head': 2,
         'num_reg_head': 2,
         'head_depthwise': False,
-        # ---------------- Train config ----------------
+        # ---------------- Preprocess ----------------
         ## input
         'multi_scale': [0.5, 1.25],
         'trans_config': {# Basic Augment
@@ -115,7 +115,7 @@ yolo_free_v2_cfg = {
         'num_cls_head': 2,
         'num_reg_head': 2,
         'head_depthwise': False,
-        # ---------------- Train config ----------------
+        # ---------------- Preprocess ----------------
         ## input
         'multi_scale': [0.5, 1.25],
         'trans_config': {# Basic Augment
@@ -193,7 +193,7 @@ yolo_free_v2_cfg = {
         'num_cls_head': 2,
         'num_reg_head': 2,
         'head_depthwise': False,
-        # ---------------- Train config ----------------
+        # ---------------- Preprocess ----------------
         ## input
         'multi_scale': [0.5, 1.25],
         'trans_config': {# Basic Augment
@@ -271,7 +271,7 @@ yolo_free_v2_cfg = {
         'num_cls_head': 2,
         'num_reg_head': 2,
         'head_depthwise': False,
-        # ---------------- Train config ----------------
+        # ---------------- Preprocess ----------------
         ## input
         'multi_scale': [0.5, 1.25],
         'trans_config': {# Basic Augment
@@ -349,7 +349,7 @@ yolo_free_v2_cfg = {
         'num_cls_head': 2,
         'num_reg_head': 2,
         'head_depthwise': False,
-        # ---------------- Train config ----------------
+        # ---------------- Preprocess ----------------
         ## input
         'multi_scale': [0.5, 1.25],
         'trans_config': {# Basic Augment

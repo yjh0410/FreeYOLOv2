@@ -25,8 +25,8 @@ def parse_args():
                         help='NMS threshold')
     parser.add_argument('--topk', default=100, type=int,
                         help='NMS threshold')
-    parser.add_argument("--no_decode", action="store_true", default=False,
-                        help="not decode in inference or yes")
+    parser.add_argument("--deploy", action="store_true", default=False,
+                        help="deploy mode or not")
     parser.add_argument('--fuse_repconv', action='store_true', default=False,
                         help='fuse RepConv')
     parser.add_argument('--fuse_conv_bn', action='store_true', default=False,

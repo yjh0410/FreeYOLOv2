@@ -25,7 +25,7 @@ def build_yolo_free_v2(args, cfg, device, num_classes=80, trainable=False):
         conf_thresh=args.conf_thresh,
         nms_thresh=args.nms_thresh,
         topk=args.topk,
-        no_decode=args.no_decode
+        deploy=args.deploy
         )
 
     # -------------- Initialize YOLO --------------
