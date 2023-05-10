@@ -1,9 +1,9 @@
 import torch
 import torch.nn as nn
 try:
-    from .yolo_free_v2_basic import Conv, RepConv
+    from .yolo_free_v2_basic import Conv
 except:
-    from yolo_free_v2_basic import Conv, RepConv
+    from yolo_free_v2_basic import Conv
 
 
 class DecoupledHead(nn.Module):
@@ -69,7 +69,7 @@ class DecoupledHead(nn.Module):
     
 
 # build detection head
-def build_head(cfg, in_dim, out_dim, num_classes=80, deploy=False):
+def build_head(cfg, in_dim, out_dim, num_classes=80):
     if cfg['head'] == 'decoupled_head':
         head = DecoupledHead(cfg, in_dim, out_dim, num_classes) 
 

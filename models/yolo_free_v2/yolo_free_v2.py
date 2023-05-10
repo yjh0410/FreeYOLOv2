@@ -46,7 +46,7 @@ class FreeYOLOv2(nn.Module):
 
         ## Heads
         self.non_shared_heads = nn.ModuleList(
-            [build_head(cfg, head_dim, head_dim, num_classes, deploy=not trainable) 
+            [build_head(cfg, head_dim, head_dim, num_classes) 
             for head_dim in self.head_dim
             ])
 
@@ -129,6 +129,7 @@ class FreeYOLOv2(nn.Module):
 
         return bboxes, scores, labels
 
+
     # ---------------------- Main Process for Inference ----------------------
     @torch.no_grad()
     def inference_single_image(self, x):
@@ -144,7 +145,6 @@ class FreeYOLOv2(nn.Module):
         # non-shared heads
         all_cls_preds = []
         all_box_preds = []
-        all_anchors = []
         for level, (feat, head) in enumerate(zip(pyramid_feats, self.non_shared_heads)):
             cls_feat, reg_feat = head(feat)
 
@@ -169,7 +169,6 @@ class FreeYOLOv2(nn.Module):
 
             all_cls_preds.append(cls_pred)
             all_box_preds.append(box_pred)
-            all_anchors.append(anchors)
 
         if self.deploy:
             # no post process
@@ -185,6 +184,7 @@ class FreeYOLOv2(nn.Module):
             bboxes, scores, labels = self.post_process(all_cls_preds, all_box_preds)
             
             return bboxes, scores, labels
+
 
     # ---------------------- Main Process for Training ----------------------
     def forward(self, x):
