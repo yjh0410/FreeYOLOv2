@@ -15,14 +15,14 @@ yolo_free_v2_cfg = {
         'depth': 0.34,
         'ratio': 2.0,
         'stride': [8, 16, 32],  # P3, P4, P5
-        ## Neck
+        ## Neck: SPP
         'neck': 'csp_sppf',
         'expand_ratio': 0.5,
         'pooling_size': 5,
         'neck_act': 'silu',
         'neck_norm': 'BN',
         'neck_depthwise': False,
-        ## CSFM
+        ## Neck: PaFPN
         'fpn': 'yolo_pafpn',
         'fpn_reduce_layer': 'Conv',
         'fpn_downsample_layer': 'Conv',
@@ -30,7 +30,7 @@ yolo_free_v2_cfg = {
         'fpn_act': 'silu',
         'fpn_norm': 'BN',
         'fpn_depthwise': False,
-        ## Decoder
+        ## Head
         'head': 'decoupled_head',
         'head_act': 'silu',
         'head_norm': 'BN',
@@ -38,7 +38,6 @@ yolo_free_v2_cfg = {
         'num_reg_head': 2,
         'head_depthwise': False,
         # ---------------- Preprocess ----------------
-        ## input
         'multi_scale': [0.5, 1.25],
         'trans_config': {# Basic Augment
                           'degrees': 0.0,
@@ -64,7 +63,7 @@ yolo_free_v2_cfg = {
         'loss_box_weight': 2.0,
         # ---------------- Train config ----------------
         ## close strong augmentation
-        'no_aug_epoch': 10,
+        'no_aug_epoch': 20,
         ## optimizer
         'optimizer': 'SGD',        # optional: SGD, AdamW
         'momentum': 0.937,         # SGD: 0.937;    AdamW: None
@@ -93,14 +92,14 @@ yolo_free_v2_cfg = {
         'depth': 0.34,
         'ratio': 2.0,
         'stride': [8, 16, 32],  # P3, P4, P5
-        ## Neck
+        ## Neck: SPP
         'neck': 'csp_sppf',
         'expand_ratio': 0.5,
         'pooling_size': 5,
         'neck_act': 'silu',
         'neck_norm': 'BN',
         'neck_depthwise': False,
-        ## CSFM
+        ## Neck: PaFPN
         'fpn': 'yolo_pafpn',
         'fpn_reduce_layer': 'Conv',
         'fpn_downsample_layer': 'Conv',
@@ -108,7 +107,7 @@ yolo_free_v2_cfg = {
         'fpn_act': 'silu',
         'fpn_norm': 'BN',
         'fpn_depthwise': False,
-        ## Decoder
+        ## Head
         'head': 'decoupled_head',
         'head_act': 'silu',
         'head_norm': 'BN',
@@ -116,7 +115,6 @@ yolo_free_v2_cfg = {
         'num_reg_head': 2,
         'head_depthwise': False,
         # ---------------- Preprocess ----------------
-        ## input
         'multi_scale': [0.5, 1.25],
         'trans_config': {# Basic Augment
                           'degrees': 0.0,
@@ -130,7 +128,7 @@ yolo_free_v2_cfg = {
                           # Mosaic & Mixup
                           'mosaic_prob': 1.0,
                           'mosaic_9x_prob': 0.2,
-                          'mixup_prob': 0.05,
+                          'mixup_prob': 0.15,
                           },
         # ---------------- Assignment config ----------------
         'matcher': {'soft_center_radius': 3.0,
@@ -142,7 +140,7 @@ yolo_free_v2_cfg = {
         'loss_box_weight': 2.0,
         # ---------------- Train config ----------------
         ## close strong augmentation
-        'no_aug_epoch': 10,
+        'no_aug_epoch': 20,
         ## optimizer
         'optimizer': 'SGD',        # optional: SGD, AdamW
         'momentum': 0.937,         # SGD: 0.937;    AdamW: None
@@ -171,14 +169,14 @@ yolo_free_v2_cfg = {
         'depth': 0.67,
         'ratio': 1.50,
         'stride': [8, 16, 32],  # P3, P4, P5
-        ## Neck
+        ## Neck: SPP
         'neck': 'csp_sppf',
         'expand_ratio': 0.5,
         'pooling_size': 5,
         'neck_act': 'silu',
         'neck_norm': 'BN',
         'neck_depthwise': False,
-        ## CSFM
+        ## Neck: PaFPN
         'fpn': 'yolo_pafpn',
         'fpn_reduce_layer': 'Conv',
         'fpn_downsample_layer': 'Conv',
@@ -186,7 +184,7 @@ yolo_free_v2_cfg = {
         'fpn_act': 'silu',
         'fpn_norm': 'BN',
         'fpn_depthwise': False,
-        ## Decoder
+        ## Head
         'head': 'decoupled_head',
         'head_act': 'silu',
         'head_norm': 'BN',
@@ -194,7 +192,6 @@ yolo_free_v2_cfg = {
         'num_reg_head': 2,
         'head_depthwise': False,
         # ---------------- Preprocess ----------------
-        ## input
         'multi_scale': [0.5, 1.25],
         'trans_config': {# Basic Augment
                           'degrees': 0.0,
@@ -208,7 +205,7 @@ yolo_free_v2_cfg = {
                           # Mosaic & Mixup
                           'mosaic_prob': 1.0,
                           'mosaic_9x_prob': 0.2,
-                          'mixup_prob': 0.1,
+                          'mixup_prob': 0.15,
                           },
         # ---------------- Assignment config ----------------
         'matcher': {'soft_center_radius': 3.0,
@@ -220,7 +217,7 @@ yolo_free_v2_cfg = {
         'loss_box_weight': 2.0,
         # ---------------- Train config ----------------
         ## close strong augmentation
-        'no_aug_epoch': 10,
+        'no_aug_epoch': 20,
         ## optimizer
         'optimizer': 'SGD',        # optional: SGD, AdamW
         'momentum': 0.937,         # SGD: 0.937;    AdamW: None
@@ -249,14 +246,14 @@ yolo_free_v2_cfg = {
         'depth': 1.0,
         'ratio': 1.0,
         'stride': [8, 16, 32],  # P3, P4, P5
-        ## Neck
+        ## Neck: SPP
         'neck': 'csp_sppf',
         'expand_ratio': 0.5,
         'pooling_size': 5,
         'neck_act': 'silu',
         'neck_norm': 'BN',
         'neck_depthwise': False,
-        ## CSFM
+        ## Neck: PaFPN
         'fpn': 'yolo_pafpn',
         'fpn_reduce_layer': 'Conv',
         'fpn_downsample_layer': 'Conv',
@@ -264,7 +261,7 @@ yolo_free_v2_cfg = {
         'fpn_act': 'silu',
         'fpn_norm': 'BN',
         'fpn_depthwise': False,
-        ## Decoder
+        ## Head
         'head': 'decoupled_head',
         'head_act': 'silu',
         'head_norm': 'BN',
@@ -272,7 +269,6 @@ yolo_free_v2_cfg = {
         'num_reg_head': 2,
         'head_depthwise': False,
         # ---------------- Preprocess ----------------
-        ## input
         'multi_scale': [0.5, 1.25],
         'trans_config': {# Basic Augment
                           'degrees': 0.0,
@@ -298,7 +294,7 @@ yolo_free_v2_cfg = {
         'loss_box_weight': 2.0,
         # ---------------- Train config ----------------
         ## close strong augmentation
-        'no_aug_epoch': 10,
+        'no_aug_epoch': 20,
         ## optimizer
         'optimizer': 'SGD',        # optional: SGD, AdamW
         'momentum': 0.937,         # SGD: 0.937;    AdamW: None
@@ -327,14 +323,14 @@ yolo_free_v2_cfg = {
         'depth': 1.0,
         'ratio': 1.0,
         'stride': [8, 16, 32],  # P3, P4, P5
-        ## Neck
+        ## Neck: SPP
         'neck': 'csp_sppf',
         'expand_ratio': 0.5,
         'pooling_size': 5,
         'neck_act': 'silu',
         'neck_norm': 'BN',
         'neck_depthwise': False,
-        ## CSFM
+        ## Neck: PaFPN
         'fpn': 'yolo_pafpn',
         'fpn_reduce_layer': 'Conv',
         'fpn_downsample_layer': 'Conv',
@@ -342,7 +338,7 @@ yolo_free_v2_cfg = {
         'fpn_act': 'silu',
         'fpn_norm': 'BN',
         'fpn_depthwise': False,
-        ## Decoder
+        ## Head
         'head': 'decoupled_head',
         'head_act': 'silu',
         'head_norm': 'BN',
@@ -350,7 +346,6 @@ yolo_free_v2_cfg = {
         'num_reg_head': 2,
         'head_depthwise': False,
         # ---------------- Preprocess ----------------
-        ## input
         'multi_scale': [0.5, 1.25],
         'trans_config': {# Basic Augment
                           'degrees': 0.0,
@@ -376,7 +371,7 @@ yolo_free_v2_cfg = {
         'loss_box_weight': 2.0,
         # ---------------- Train config ----------------
         ## close strong augmentation
-        'no_aug_epoch': 10,
+        'no_aug_epoch': 20,
         ## optimizer
         'optimizer': 'SGD',        # optional: SGD, AdamW
         'momentum': 0.937,         # SGD: 0.937;    AdamW: None
