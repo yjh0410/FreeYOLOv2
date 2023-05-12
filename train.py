@@ -174,11 +174,9 @@ def train():
 
     # batch size
     total_bs = args.batch_size
-    accumulate = max(1, round(64 / total_bs))
-    print('Grad_Accumulate: ', accumulate)
 
     # optimizer
-    cfg['weight_decay'] *= total_bs * accumulate / 64
+    cfg['lr0'] *= total_bs / 64
     optimizer, start_epoch = build_optimizer(cfg, model_without_ddp, cfg['lr0'], args.resume)
     optimizer.zero_grad()
 
@@ -198,7 +196,6 @@ def train():
 
     # start training loop
     best_map = -1.0
-    last_opt_step = -1
     heavy_eval = False
     
     # eval before training
@@ -228,21 +225,20 @@ def train():
                 heavy_eval = True
 
         # train one epoch
-        last_opt_step = train_one_epoch(
+        train_one_epoch(
             epoch=epoch,
             total_epochs=total_epochs,
             args=args, 
+            cfg=cfg, 
             device=device,
             ema=ema, 
             model=model,
             criterion=criterion,
-            cfg=cfg, 
             dataloader=dataloader, 
             optimizer=optimizer,
             scheduler=scheduler,
             lf=lf,
-            scaler=scaler,
-            last_opt_step=last_opt_step)
+            scaler=scaler)
 
         # eval
         model_eval = deepcopy(ema.ema if ema else model_without_ddp)
