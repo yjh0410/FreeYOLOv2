@@ -106,6 +106,7 @@ def train_one_epoch(epoch,
         scaler.scale(losses).backward()
 
         # Clip gradients
+        total_norm = None
         if cfg['clip_grad'] > 0:
             scaler.unscale_(optimizer)
             total_norm = torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=cfg['clip_grad'])
@@ -136,9 +137,11 @@ def train_one_epoch(epoch,
                     log += '[{}: {:.2f}]'.format(k, loss_dict[k])
 
             # other infor
-            log += '[g-norm: {:.2f}]'.format(total_norm)
             log += '[time: {:.2f}]'.format(t1 - t0)
             log += '[size: {}]'.format(img_size)
+            # grad-norm
+            if total_norm is not None:
+                log += '[g-norm: {:.2f}]'.format(total_norm)
 
             # print log infor
             print(log, flush=True)
