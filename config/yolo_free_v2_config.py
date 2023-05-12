@@ -51,7 +51,7 @@ yolo_free_v2_cfg = {
                           # Mosaic & Mixup
                           'mosaic_prob': 1.0,
                           'mosaic_9x_prob': 0.2,
-                          'mixup_prob': 0.0,
+                          'mixup_prob': 0.05,
                           },
         # ---------------- Assignment config ----------------
         'matcher': {'soft_center_radius': 3.0,
@@ -68,7 +68,7 @@ yolo_free_v2_cfg = {
         'optimizer': 'AdamW',      # optional: SGD, AdamW
         'momentum': None,          # SGD: 0.937;    AdamW: None
         'weight_decay': 5e-2,      # SGD: 5e-4;     AdamW: 5e-2
-        'clip_grad': 10,           # SGD: 10.0;     AdamW: -1
+        'clip_grad': 35,           # SGD: 10.0;     AdamW: -1
         ## model EMA
         'ema_decay': 0.9998,       # SGD: 0.9999;   AdamW: 0.9998
         'ema_tau': 2000,
@@ -145,7 +145,7 @@ yolo_free_v2_cfg = {
         'optimizer': 'AdamW',      # optional: SGD, AdamW
         'momentum': None,          # SGD: 0.937;    AdamW: None
         'weight_decay': 5e-2,      # SGD: 5e-4;     AdamW: 5e-2
-        'clip_grad': 10,           # SGD: 10.0;     AdamW: -1
+        'clip_grad': 35,           # SGD: 10.0;     AdamW: -1
         ## model EMA
         'ema_decay': 0.9998,       # SGD: 0.9999;   AdamW: 0.9998
         'ema_tau': 2000,
@@ -222,7 +222,7 @@ yolo_free_v2_cfg = {
         'optimizer': 'AdamW',      # optional: SGD, AdamW
         'momentum': None,          # SGD: 0.937;    AdamW: None
         'weight_decay': 5e-2,      # SGD: 5e-4;     AdamW: 5e-2
-        'clip_grad': 10,           # SGD: 10.0;     AdamW: -1
+        'clip_grad': 35,           # SGD: 10.0;     AdamW: -1
         ## model EMA
         'ema_decay': 0.9998,       # SGD: 0.9999;   AdamW: 0.9998
         'ema_tau': 2000,
@@ -299,7 +299,7 @@ yolo_free_v2_cfg = {
         'optimizer': 'AdamW',      # optional: SGD, AdamW
         'momentum': None,          # SGD: 0.937;    AdamW: None
         'weight_decay': 5e-2,      # SGD: 5e-4;     AdamW: 5e-2
-        'clip_grad': 10,           # SGD: 10.0;     AdamW: -1
+        'clip_grad': 35,           # SGD: 10.0;     AdamW: -1
         ## model EMA
         'ema_decay': 0.9998,       # SGD: 0.9999;   AdamW: 0.9998
         'ema_tau': 2000,
@@ -376,7 +376,7 @@ yolo_free_v2_cfg = {
         'optimizer': 'AdamW',      # optional: SGD, AdamW
         'momentum': None,          # SGD: 0.937;    AdamW: None
         'weight_decay': 5e-2,      # SGD: 5e-4;     AdamW: 5e-2
-        'clip_grad': 10,           # SGD: 10.0;     AdamW: -1
+        'clip_grad': 35,           # SGD: 10.0;     AdamW: -1
         ## model EMA
         'ema_decay': 0.9998,       # SGD: 0.9999;   AdamW: 0.9998
         'ema_tau': 2000,

@@ -87,7 +87,7 @@ def train_one_epoch(epoch,
         # to device
         images = images.to(device, non_blocking=True).float() / 255.
 
-        # multi scale
+        # Multi scale
         if args.multi_scale:
             images, targets, img_size = rescale_image_targets(
                 images, targets, model.stride, args.min_box_size, cfg['multi_scale'])
@@ -95,19 +95,20 @@ def train_one_epoch(epoch,
         # Inference
         with torch.cuda.amp.autocast(enabled=args.fp16):
             outputs = model(images)
-            # loss
+            # Loss
             loss_dict = criterion(outputs=outputs, targets=targets)
             losses = loss_dict['losses']
 
-            # reduce            
+            # reduce among all GPUs
             loss_dict_reduced = distributed_utils.reduce_dict(loss_dict)
 
         # Backward
         scaler.scale(losses).backward()
 
+        # Clip gradients
         if cfg['clip_grad'] > 0:
             scaler.unscale_(optimizer)
-            torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=cfg['clip_grad'])
+            total_norm = torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=cfg['clip_grad'])
 
         # Optimize
         scaler.step(optimizer)
@@ -135,6 +136,7 @@ def train_one_epoch(epoch,
                     log += '[{}: {:.2f}]'.format(k, loss_dict[k])
 
             # other infor
+            log += '[g-norm: {:.2f}]'.format(total_norm)
             log += '[time: {:.2f}]'.format(t1 - t0)
             log += '[size: {}]'.format(img_size)
 
