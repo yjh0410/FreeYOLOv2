@@ -172,11 +172,8 @@ def train():
     # amp
     scaler = torch.cuda.amp.GradScaler(enabled=args.fp16)
 
-    # batch size
-    total_bs = args.batch_size
-
     # optimizer
-    cfg['lr0'] *= total_bs / 64
+    cfg['lr0'] *= args.batch_size / 64   # linear LR scaling
     optimizer, start_epoch = build_optimizer(cfg, model_without_ddp, cfg['lr0'], args.resume)
     optimizer.zero_grad()
 
