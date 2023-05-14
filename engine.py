@@ -10,7 +10,7 @@ from utils import distributed_utils
 from utils.vis_tools import vis_data
 
 
-def rescale_image_targets(images, targets, stride, min_box_size, multi_scale_range=[0.5, 1.5]):
+def rescale_image_targets(args, images, targets, stride, min_box_size, multi_scale_range=[0.5, 1.5]):
     """
         Deployed for Multi scale trick.
     """
@@ -20,16 +20,21 @@ def rescale_image_targets(images, targets, stride, min_box_size, multi_scale_ran
         max_stride = max(stride)
 
     # During training phase, the shape of input image is square.
-    old_img_size = images.shape[-1]
-    new_img_size = random.randrange(old_img_size * multi_scale_range[0], old_img_size * multi_scale_range[1] + max_stride)
-    new_img_size = new_img_size // max_stride * max_stride  # size
-    if new_img_size / old_img_size != 1:
-        # interpolate
-        images = torch.nn.functional.interpolate(
-                            input=images, 
-                            size=new_img_size, 
-                            mode='bilinear', 
-                            align_corners=False)
+    if args.multi_scale:
+        old_img_size = images.shape[-1]
+        new_img_size = random.randrange(old_img_size * multi_scale_range[0], old_img_size * multi_scale_range[1] + max_stride)
+        new_img_size = new_img_size // max_stride * max_stride  # size
+        if new_img_size / old_img_size != 1:
+            # interpolate
+            images = torch.nn.functional.interpolate(
+                                input=images, 
+                                size=new_img_size, 
+                                mode='bilinear', 
+                                align_corners=False)
+    else:
+        old_img_size = images.shape[-1]
+        new_img_size = old_img_size
+
     # rescale targets
     for tgt in targets:
         boxes = tgt["boxes"].clone()
@@ -80,18 +85,17 @@ def train_one_epoch(epoch,
                 if 'momentum' in x:
                     x['momentum'] = np.interp(ni, xi, [cfg['warmup_momentum'], cfg['momentum']])
                             
-        # Visualize targets
-        if args.vis_tgt:
-            vis_data(images, targets)
-
         # to device
         images = images.to(device, non_blocking=True).float() / 255.
 
         # Multi scale
-        if args.multi_scale:
-            images, targets, img_size = rescale_image_targets(
-                images, targets, model.stride, args.min_box_size, cfg['multi_scale'])
+        images, targets, img_size = rescale_image_targets(
+            args, images, targets, model.stride, args.min_box_size, cfg['multi_scale'])
             
+        # Visualize targets
+        if args.vis_tgt:
+            vis_data(images*255., targets)
+
         # Inference
         with torch.cuda.amp.autocast(enabled=args.fp16):
             outputs = model(images)

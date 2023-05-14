@@ -50,8 +50,9 @@ yolo_free_v2_cfg = {
                           'hsv_v': 0.4,
                           # Mosaic & Mixup
                           'mosaic_prob': 1.0,
-                          'mosaic_9x_prob': 0.0,
-                          'mixup_prob': 0.2,
+                          'mosaic_9x_prob': 0.2,
+                          'mixup_prob': 0.5,
+                          'mixup_scale': [0.5, 1.5],
                           },
         # ---------------- Assignment config ----------------
         'matcher': {'soft_center_radius': 3.0,
@@ -127,8 +128,9 @@ yolo_free_v2_cfg = {
                           'hsv_v': 0.4,
                           # Mosaic & Mixup
                           'mosaic_prob': 1.0,
-                          'mosaic_9x_prob': 0.0,
-                          'mixup_prob': 0.5,
+                          'mosaic_9x_prob': 0.2,
+                          'mixup_prob': 1.0,
+                          'mixup_scale': [0.5, 1.5],
                           },
         # ---------------- Assignment config ----------------
         'matcher': {'soft_center_radius': 3.0,
@@ -204,8 +206,9 @@ yolo_free_v2_cfg = {
                           'hsv_v': 0.4,
                           # Mosaic & Mixup
                           'mosaic_prob': 1.0,
-                          'mosaic_9x_prob': 0.0,
-                          'mixup_prob': 0.5,
+                          'mosaic_9x_prob': 0.2,
+                          'mixup_prob': 1.0,
+                          'mixup_scale': [0.5, 1.5],
                           },
         # ---------------- Assignment config ----------------
         'matcher': {'soft_center_radius': 3.0,
@@ -281,8 +284,9 @@ yolo_free_v2_cfg = {
                           'hsv_v': 0.4,
                           # Mosaic & Mixup
                           'mosaic_prob': 1.0,
-                          'mosaic_9x_prob': 0.0,
-                          'mixup_prob': 0.5,
+                          'mosaic_9x_prob': 0.2,
+                          'mixup_prob': 1.0,
+                          'mixup_scale': [0.5, 1.5],
                           },
         # ---------------- Assignment config ----------------
         'matcher': {'soft_center_radius': 3.0,
@@ -358,8 +362,9 @@ yolo_free_v2_cfg = {
                           'hsv_v': 0.4,
                           # Mosaic & Mixup
                           'mosaic_prob': 1.0,
-                          'mosaic_9x_prob': 0.0,
-                          'mixup_prob': 0.5,
+                          'mosaic_9x_prob': 0.2,
+                          'mixup_prob': 1.0,
+                          'mixup_scale': [0.5, 1.5],
                           },
         # ---------------- Assignment config ----------------
         'matcher': {'soft_center_radius': 3.0,
