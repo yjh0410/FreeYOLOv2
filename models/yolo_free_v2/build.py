@@ -49,7 +49,9 @@ def build_yolo_free_v2(args, cfg, device, num_classes=80, trainable=False):
         w = reg_pred.weight
         w.data.fill_(0.)
         reg_pred.weight = torch.nn.Parameter(w, requires_grad=True)
-
+    proj = nn.Parameter(torch.linspace(0, cfg['reg_max'], cfg['reg_max']), requires_grad=False)
+    model.proj_conv.weight = nn.Parameter(proj.view([1, cfg['reg_max'], 1, 1]).clone().detach(),
+                                                requires_grad=False)
 
     # -------------- Build criterion --------------
     criterion = None
