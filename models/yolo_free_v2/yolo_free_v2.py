@@ -33,24 +33,24 @@ class FreeYOLOv2(nn.Module):
         self.deploy = deploy
         
         # ---------------------- Network Parameters ----------------------
-        ## Backbone
+        ## --------------- Backbone ---------------
         self.backbone, feats_dim = build_backbone(cfg, trainable&cfg['pretrained'])
 
-        ## Neck
+        ## --------------- Neck: SPP ---------------
         self.neck = build_neck(cfg=cfg, in_dim=feats_dim[-1], out_dim=feats_dim[-1])
         feats_dim[-1] = self.neck.out_dim
         
-        ## FPN
+        ## --------------- Neck: PaFPN ---------------
         self.fpn = build_fpn(cfg=cfg, in_dims=feats_dim, out_dim=round(256*cfg['width']))
         self.head_dim = self.fpn.out_dim
 
-        ## Heads
+        ## --------------- Heads ---------------
         self.non_shared_heads = nn.ModuleList(
             [build_head(cfg, head_dim, head_dim, num_classes) 
             for head_dim in self.head_dim
             ])
 
-        ## Pred
+        ## --------------- Pred layer ---------------
         self.cls_preds = nn.ModuleList(
                             [nn.Conv2d(head.cls_out_dim, self.num_classes, kernel_size=1) 
                                 for head in self.non_shared_heads
@@ -133,16 +133,16 @@ class FreeYOLOv2(nn.Module):
     # ---------------------- Main Process for Inference ----------------------
     @torch.no_grad()
     def inference_single_image(self, x):
-        # backbone
+        # --------------- Backbone ---------------
         pyramid_feats = self.backbone(x)
 
-        # neck
+        # --------------- Neck: SPP ---------------
         pyramid_feats[-1] = self.neck(pyramid_feats[-1])
 
-        # fpn
+        # --------------- Neck: PaFPN ---------------
         pyramid_feats = self.fpn(pyramid_feats)
 
-        # non-shared heads
+        # --------------- Heads ---------------
         all_cls_preds = []
         all_box_preds = []
         for level, (feat, head) in enumerate(zip(pyramid_feats, self.non_shared_heads)):
@@ -160,7 +160,7 @@ class FreeYOLOv2(nn.Module):
             cls_pred = cls_pred[0].permute(1, 2, 0).contiguous().view(-1, self.num_classes)
             reg_pred = reg_pred[0].permute(1, 2, 0).contiguous().view(-1, 4)
 
-            # decode bbox
+            # --------------- Decode bbox ---------------
             ctr_pred = reg_pred[..., :2] * self.stride[level] + anchors[..., :2]
             wh_pred = torch.exp(reg_pred[..., 2:]) * self.stride[level]
             pred_x1y1 = ctr_pred - wh_pred * 0.5
@@ -180,7 +180,7 @@ class FreeYOLOv2(nn.Module):
             return outputs
 
         else:
-            # post process
+            # --------------- Post-process ---------------
             bboxes, scores, labels = self.post_process(all_cls_preds, all_box_preds)
             
             return bboxes, scores, labels
@@ -191,16 +191,16 @@ class FreeYOLOv2(nn.Module):
         if not self.trainable:
             return self.inference_single_image(x)
         else:
-            # backbone
+            # --------------- Backbone ---------------
             pyramid_feats = self.backbone(x)
 
-            # neck
+            # --------------- Neck: SPP ---------------
             pyramid_feats[-1] = self.neck(pyramid_feats[-1])
 
-            # fpn
+            # --------------- Neck: PaFPN ---------------
             pyramid_feats = self.fpn(pyramid_feats)
 
-            # non-shared heads
+            # --------------- Heads ---------------
             all_anchors = []
             all_cls_preds = []
             all_box_preds = []
@@ -220,7 +220,7 @@ class FreeYOLOv2(nn.Module):
                 cls_pred = cls_pred.permute(0, 2, 3, 1).contiguous().view(B, -1, self.num_classes)
                 reg_pred = reg_pred.permute(0, 2, 3, 1).contiguous().view(B, -1, 4)
 
-                # decode bbox
+                # --------------- decode bbox ---------------
                 ctr_pred = reg_pred[..., :2] * self.stride[level] + anchors[..., :2]
                 wh_pred = torch.exp(reg_pred[..., 2:]) * self.stride[level]
                 pred_x1y1 = ctr_pred - wh_pred * 0.5
