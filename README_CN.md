@@ -67,13 +67,13 @@ python train.py --cuda -d coco -v yolo_free_v2_tiny -bs 16 --max_epoch 300 --wp_
 
 **P5-Model on COCO:**
 
-| Model             | Scale | FPS<sup>3090<br>FP32-bs1 | AP<sup>test<br>0.5:0.95 | AP<sup>val<br>0.5:0.95 | FLOPs<br><sup>(G) | Params<br><sup>(M) | Weight |
-|-------------------|-------|--------------------------|-------------------------|------------------------|-------------------|--------------------|--------|
-| FreeYOLOv2-Nano   |  640  |                          |                         |                        |                   |                    |  |
-| FreeYOLOv2-Small  |  640  |                          |                         |                        |                   |                    |  |
-| FreeYOLOv2-Medium |  640  |                          |                         |                        |                   |                    |  |
-| FreeYOLOv2-Large  |  640  |                          |                         |                        |                   |                    |  |
-| FreeYOLOv2-Huge   |  640  |                          |                         |                        |                   |                    |  |
+| Model             | Scale | FPS<sup>3090<br>FP32-bs1 | AP<sup>val<br>0.5:0.95 | FLOPs<br><sup>(G) | Params<br><sup>(M) | Weight |
+|-------------------|-------|--------------------------|------------------------|-------------------|--------------------|--------|
+| FreeYOLOv2-Nano   |  640  |                          |                        |       9.3         |       2.7          |  |
+| FreeYOLOv2-Small  |  640  |                          |                        |                   |                    |  |
+| FreeYOLOv2-Medium |  640  |                          |                        |                   |                    |  |
+| FreeYOLOv2-Large  |  640  |                          |                        |                   |                    |  |
+| FreeYOLOv2-Huge   |  640  |                          |                        |                   |                    |  |
 
 
 ### WiderFace

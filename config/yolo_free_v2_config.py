@@ -38,7 +38,7 @@ yolo_free_v2_cfg = {
         'head_depthwise': False,
         'reg_max': 16,
         # ---------------- Preprocess ----------------
-        'multi_scale': [0.5, 1.25],
+        'multi_scale': [0.5, 1.5],
         'trans_config': {# Basic Augment
                           'degrees': 0.0,
                           'translate': 0.1,
@@ -117,7 +117,7 @@ yolo_free_v2_cfg = {
         'head_depthwise': False,
         'reg_max': 16,
         # ---------------- Preprocess ----------------
-        'multi_scale': [0.5, 1.25],
+        'multi_scale': [0.5, 1.5],
         'trans_config': {# Basic Augment
                           'degrees': 0.0,
                           'translate': 0.2,
@@ -196,7 +196,7 @@ yolo_free_v2_cfg = {
         'head_depthwise': False,
         'reg_max': 16,
         # ---------------- Preprocess ----------------
-        'multi_scale': [0.5, 1.25],
+        'multi_scale': [0.5, 1.5],
         'trans_config': {# Basic Augment
                           'degrees': 0.0,
                           'translate': 0.2,
@@ -275,7 +275,7 @@ yolo_free_v2_cfg = {
         'head_depthwise': False,
         'reg_max': 16,
         # ---------------- Preprocess ----------------
-        'multi_scale': [0.5, 1.25],
+        'multi_scale': [0.5, 1.4],
         'trans_config': {# Basic Augment
                           'degrees': 0.0,
                           'translate': 0.2,
@@ -354,7 +354,7 @@ yolo_free_v2_cfg = {
         'head_depthwise': False,
         'reg_max': 16,
         # ---------------- Preprocess ----------------
-        'multi_scale': [0.5, 1.25],
+        'multi_scale': [0.5, 1.4],
         'trans_config': {# Basic Augment
                           'degrees': 0.0,
                           'translate': 0.2,
