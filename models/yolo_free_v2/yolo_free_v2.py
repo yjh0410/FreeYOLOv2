@@ -241,9 +241,9 @@ class FreeYOLOv2(nn.Module):
                 ## [B, M, 4*(reg_max)] -> [B, M, 4, reg_max] -> [B, 4, M, reg_max]
                 reg_pred_ = reg_pred.reshape([B, M, 4, self.reg_max])
                 ## [B, M, 4, reg_max] -> [B, reg_max, 4, M]
-                reg_pred_ = reg_pred.permute(0, 3, 2, 1).contiguous()
+                reg_pred_ = reg_pred_.permute(0, 3, 2, 1).contiguous()
                 ## [B, reg_max, 4, M] -> [B, 1, 4, M]
-                reg_pred_ = self.proj_conv(F.softmax(reg_pred, dim=1))
+                reg_pred_ = self.proj_conv(F.softmax(reg_pred_, dim=1))
                 ## [B, 1, 4, M] -> [B, 4, M] -> [B, M, 4]
                 reg_pred_ = reg_pred_.view(B, 4, M).permute(0, 2, 1).contiguous()    
                 ## tlbr -> xyxy
