@@ -11,9 +11,9 @@ except:
     print("It seems that the COCOAPI is not installed.")
 
 try:
-    from .transforms import yolov5_mosaic_augment, yolov5_mosaic_augment_9x, yolox_mixup_augment
+    from .transforms import yolov5_mosaic_augment, yolov5_mosaic_augment_9x, yolov5_mixup_augment
 except:
-    from transforms import yolov5_mosaic_augment, yolov5_mosaic_augment_9x, yolox_mixup_augment
+    from transforms import yolov5_mosaic_augment, yolov5_mosaic_augment_9x, yolov5_mixup_augment
 
 
 crowd_class_labels = ('person',)
@@ -129,9 +129,9 @@ class CrowdHumanDataset(Dataset):
         
     def load_mixup(self, origin_image, origin_target):
         new_index = np.random.randint(0, len(self.ids))
-        new_image, new_target = self.load_image_target(new_index)
-        image, target = yolox_mixup_augment(
-            origin_image, origin_target, new_image, new_target, self.img_size, self.trans_config['mixup_scale'])
+        new_image, new_target = self.load_mosaic(new_index)
+        image, target = yolov5_mixup_augment(
+            origin_image, origin_target, new_image, new_target)
 
         return image, target
     
