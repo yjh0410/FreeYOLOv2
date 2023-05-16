@@ -181,8 +181,8 @@ class FreeYOLOv2(nn.Module):
             x2y2_pred = anchors + reg_pred[..., 2:] * self.stride[level]
             box_pred = torch.cat([x1y1_pred, x2y2_pred], dim=-1)
 
-            all_cls_preds.append(cls_pred)
-            all_box_preds.append(box_pred)
+            all_cls_preds.append(cls_pred[0])
+            all_box_preds.append(box_pred[0])
 
         if self.deploy:
             # no post process
@@ -239,16 +239,16 @@ class FreeYOLOv2(nn.Module):
                 # ----------------------- Decode bbox -----------------------
                 B, M = cls_pred.shape[:2]
                 ## [B, M, 4*(reg_max)] -> [B, M, 4, reg_max] -> [B, 4, M, reg_max]
-                reg_pred = reg_pred.reshape([B, M, 4, self.reg_max])
+                reg_pred_ = reg_pred.reshape([B, M, 4, self.reg_max])
                 ## [B, M, 4, reg_max] -> [B, reg_max, 4, M]
-                reg_pred = reg_pred.permute(0, 3, 2, 1).contiguous()
+                reg_pred_ = reg_pred.permute(0, 3, 2, 1).contiguous()
                 ## [B, reg_max, 4, M] -> [B, 1, 4, M]
-                reg_pred = self.proj_conv(F.softmax(reg_pred, dim=1))
+                reg_pred_ = self.proj_conv(F.softmax(reg_pred, dim=1))
                 ## [B, 1, 4, M] -> [B, 4, M] -> [B, M, 4]
-                reg_pred = reg_pred.view(B, 4, M).permute(0, 2, 1).contiguous()    
+                reg_pred_ = reg_pred_.view(B, 4, M).permute(0, 2, 1).contiguous()    
                 ## tlbr -> xyxy
-                x1y1_pred = anchors - reg_pred[..., :2] * self.stride[level]
-                x2y2_pred = anchors + reg_pred[..., 2:] * self.stride[level]
+                x1y1_pred = anchors[None] - reg_pred_[..., :2] * self.stride[level]
+                x2y2_pred = anchors[None] + reg_pred_[..., 2:] * self.stride[level]
                 box_pred = torch.cat([x1y1_pred, x2y2_pred], dim=-1)
 
                 # stride tensor: [M, 1]
