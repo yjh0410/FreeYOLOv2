@@ -157,21 +157,25 @@ class FreeYOLOv2(nn.Module):
             cls_pred = self.cls_preds[level](cls_feat)
             reg_pred = self.reg_preds[level](reg_feat)
 
-            cls_pred = cls_pred[0].permute(1, 2, 0).contiguous().view(-1, self.num_classes)
-
             # anchors: [M, 2]
             B, _, H, W = reg_pred.size()
             fmp_size = [H, W]
             anchors = self.generate_anchors(level, fmp_size)
 
+            # [B, C, H, W] -> [B, H, W, C] -> [B, M, C]
+            cls_pred = cls_pred.permute(0, 2, 3, 1).contiguous().view(B, -1, self.num_classes)
+            reg_pred = reg_pred.permute(0, 2, 3, 1).contiguous().view(B, -1, 4*self.reg_max)
+
             # ----------------------- Decode bbox -----------------------
-            ## [B, 4*reg_max, H, W] -> [B, reg_max, 4, M]
-            reg_pred = reg_pred.reshape([B, self.reg_max, 4, -1])
+            B, M = cls_pred.shape[:2]
+            ## [B, M, 4*(reg_max)] -> [B, M, 4, reg_max] -> [B, 4, M, reg_max]
+            reg_pred = reg_pred.reshape([B, M, 4, self.reg_max])
+            ## [B, M, 4, reg_max] -> [B, reg_max, 4, M]
+            reg_pred = reg_pred.permute(0, 3, 2, 1).contiguous()
             ## [B, reg_max, 4, M] -> [B, 1, 4, M]
             reg_pred = self.proj_conv(F.softmax(reg_pred, dim=1))
             ## [B, 1, 4, M] -> [B, 4, M] -> [B, M, 4]
-            reg_pred = reg_pred.view(B, 4, H*W).permute(0, 2, 1).contiguous()
-            reg_pred = reg_pred[0]  # [M, 4]
+            reg_pred = reg_pred.view(B, 4, M).permute(0, 2, 1).contiguous()    
             ## tlbr -> xyxy
             x1y1_pred = anchors - reg_pred[..., :2] * self.stride[level]
             x2y2_pred = anchors + reg_pred[..., 2:] * self.stride[level]
@@ -228,22 +232,24 @@ class FreeYOLOv2(nn.Module):
                 # generate anchor boxes: [M, 4]
                 anchors = self.generate_anchors(level, fmp_size)
                 
-                # ----------------------- Decode bbox -----------------------
-                ## [B, 4*reg_max, H, W] -> [B, reg_max, 4, M]
-                reg_pred_ = reg_pred.reshape([B, self.reg_max, 4, -1])
-                ## [B, reg_max, 4, M] -> [B, 1, 4, M]
-                reg_pred_ = self.proj_conv(F.softmax(reg_pred_, dim=1))
-                ## [B, 1, 4, M] -> [B, 4, M] -> [B, M, 4]
-                reg_pred_ = reg_pred_.view(B, 4, H*W).permute(0, 2, 1).contiguous()
-                ## ltrb -> xyxy
-                x1y1_pred = anchors[None] - reg_pred_[..., :2] * self.stride[level]
-                x2y2_pred = anchors[None] + reg_pred_[..., 2:] * self.stride[level]
-                ## [B, M, 4]
-                box_pred = torch.cat([x1y1_pred, x2y2_pred], dim=-1)
-
                 # [B, C, H, W] -> [B, H, W, C] -> [B, M, C]
                 cls_pred = cls_pred.permute(0, 2, 3, 1).contiguous().view(B, -1, self.num_classes)
                 reg_pred = reg_pred.permute(0, 2, 3, 1).contiguous().view(B, -1, 4*self.reg_max)
+
+                # ----------------------- Decode bbox -----------------------
+                B, M = cls_pred.shape[:2]
+                ## [B, M, 4*(reg_max)] -> [B, M, 4, reg_max] -> [B, 4, M, reg_max]
+                reg_pred = reg_pred.reshape([B, M, 4, self.reg_max])
+                ## [B, M, 4, reg_max] -> [B, reg_max, 4, M]
+                reg_pred = reg_pred.permute(0, 3, 2, 1).contiguous()
+                ## [B, reg_max, 4, M] -> [B, 1, 4, M]
+                reg_pred = self.proj_conv(F.softmax(reg_pred, dim=1))
+                ## [B, 1, 4, M] -> [B, 4, M] -> [B, M, 4]
+                reg_pred = reg_pred.view(B, 4, M).permute(0, 2, 1).contiguous()    
+                ## tlbr -> xyxy
+                x1y1_pred = anchors - reg_pred[..., :2] * self.stride[level]
+                x2y2_pred = anchors + reg_pred[..., 2:] * self.stride[level]
+                box_pred = torch.cat([x1y1_pred, x2y2_pred], dim=-1)
 
                 # stride tensor: [M, 1]
                 stride_tensor = torch.ones_like(anchors[..., :1]) * self.stride[level]

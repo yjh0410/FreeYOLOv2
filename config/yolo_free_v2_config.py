@@ -15,7 +15,7 @@ yolo_free_v2_cfg = {
         'depth': 0.34,
         'stride': [8, 16, 32],  # P3, P4, P5
         ## Neck: SPP
-        'neck': 'csp_sppf',
+        'neck': 'sppf',
         'neck_expand_ratio': 0.5,
         'pooling_size': 5,
         'neck_act': 'silu',
@@ -50,7 +50,7 @@ yolo_free_v2_cfg = {
                           'hsv_v': 0.4,
                           # Mosaic & Mixup
                           'mosaic_prob': 1.0,
-                          'mosaic_9x_prob': 0.2,
+                          'mosaic_9x_prob': 0.0,
                           'mixup_prob': 0.0,
                           },
         # ---------------- Assignment config ----------------
@@ -94,7 +94,7 @@ yolo_free_v2_cfg = {
         'depth': 0.34,
         'stride': [8, 16, 32],  # P3, P4, P5
         ## Neck: SPP
-        'neck': 'csp_sppf',
+        'neck': 'sppf',
         'neck_expand_ratio': 0.5,
         'pooling_size': 5,
         'neck_act': 'silu',
@@ -129,7 +129,7 @@ yolo_free_v2_cfg = {
                           'hsv_v': 0.4,
                           # Mosaic & Mixup
                           'mosaic_prob': 1.0,
-                          'mosaic_9x_prob': 0.2,
+                          'mosaic_9x_prob': 0.0,
                           'mixup_prob': 0.05,
                           },
         # ---------------- Assignment config ----------------
@@ -173,7 +173,7 @@ yolo_free_v2_cfg = {
         'depth': 0.67,
         'stride': [8, 16, 32],  # P3, P4, P5
         ## Neck: SPP
-        'neck': 'csp_sppf',
+        'neck': 'sppf',
         'neck_expand_ratio': 0.5,
         'pooling_size': 5,
         'neck_act': 'silu',
@@ -208,7 +208,7 @@ yolo_free_v2_cfg = {
                           'hsv_v': 0.4,
                           # Mosaic & Mixup
                           'mosaic_prob': 1.0,
-                          'mosaic_9x_prob': 0.2,
+                          'mosaic_9x_prob': 0.0,
                           'mixup_prob': 0.1,
                           },
         # ---------------- Assignment config ----------------
@@ -252,7 +252,7 @@ yolo_free_v2_cfg = {
         'depth': 1.0,
         'stride': [8, 16, 32],  # P3, P4, P5
         ## Neck: SPP
-        'neck': 'csp_sppf',
+        'neck': 'sppf',
         'neck_expand_ratio': 0.5,
         'pooling_size': 5,
         'neck_act': 'silu',
@@ -287,7 +287,7 @@ yolo_free_v2_cfg = {
                           'hsv_v': 0.4,
                           # Mosaic & Mixup
                           'mosaic_prob': 1.0,
-                          'mosaic_9x_prob': 0.2,
+                          'mosaic_9x_prob': 0.0,
                           'mixup_prob': 0.15,
                           },
         # ---------------- Assignment config ----------------
@@ -331,7 +331,7 @@ yolo_free_v2_cfg = {
         'depth': 1.34,
         'stride': [8, 16, 32],  # P3, P4, P5
         ## Neck: SPP
-        'neck': 'csp_sppf',
+        'neck': 'sppf',
         'neck_neck_expand_ratio': 0.5,
         'pooling_size': 5,
         'neck_act': 'silu',
@@ -366,7 +366,7 @@ yolo_free_v2_cfg = {
                           'hsv_v': 0.4,
                           # Mosaic & Mixup
                           'mosaic_prob': 1.0,
-                          'mosaic_9x_prob': 0.2,
+                          'mosaic_9x_prob': 0.0,
                           'mixup_prob': 0.2,
                           },
         # ---------------- Assignment config ----------------
