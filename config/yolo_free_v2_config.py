@@ -37,6 +37,7 @@ yolo_free_v2_cfg = {
         'num_cls_head': 2,
         'num_reg_head': 2,
         'head_depthwise': False,
+        'reg_max': 16,
         # ---------------- Preprocess ----------------
         'multi_scale': [0.5, 1.5],
         'trans_config': {# Basic Augment
@@ -54,13 +55,15 @@ yolo_free_v2_cfg = {
                           'mixup_prob': 0.0,
                           },
         # ---------------- Assignment config ----------------
-        'matcher': {'soft_center_radius': 3.0,
-                    'topk_candicate': 13,
-                    'iou_weight': 3.0},
+        'matcher': {'topk': 10,
+                    'alpha': 0.5,
+                    'beta': 6.0},
         # ---------------- Loss config ----------------
         ## loss weight
-        'loss_cls_weight': 1.0,
-        'loss_box_weight': 2.0,
+        'cls_loss': 'bce', # vfl (optional)
+        'loss_cls_weight': 0.5,
+        'loss_iou_weight': 7.5,
+        'loss_dfl_weight': 1.5,
         # ---------------- Train config ----------------
         ## close strong augmentation
         'no_aug_epoch': 20,
@@ -114,6 +117,7 @@ yolo_free_v2_cfg = {
         'num_cls_head': 2,
         'num_reg_head': 2,
         'head_depthwise': False,
+        'reg_max': 16,
         # ---------------- Preprocess ----------------
         'multi_scale': [0.5, 1.5],
         'trans_config': {# Basic Augment
@@ -131,13 +135,15 @@ yolo_free_v2_cfg = {
                           'mixup_prob': 0.05,
                           },
         # ---------------- Assignment config ----------------
-        'matcher': {'soft_center_radius': 3.0,
-                    'topk_candicate': 13,
-                    'iou_weight': 3.0},
+        'matcher': {'topk': 10,
+                    'alpha': 0.5,
+                    'beta': 6.0},
         # ---------------- Loss config ----------------
         ## loss weight
-        'loss_cls_weight': 1.0,
-        'loss_box_weight': 2.0,
+        'cls_loss': 'bce', # vfl (optional)
+        'loss_cls_weight': 0.5,
+        'loss_iou_weight': 7.5,
+        'loss_dfl_weight': 1.5,
         # ---------------- Train config ----------------
         ## close strong augmentation
         'no_aug_epoch': 20,
@@ -191,6 +197,7 @@ yolo_free_v2_cfg = {
         'num_cls_head': 2,
         'num_reg_head': 2,
         'head_depthwise': False,
+        'reg_max': 16,
         # ---------------- Preprocess ----------------
         'multi_scale': [0.5, 1.5],
         'trans_config': {# Basic Augment
@@ -208,13 +215,15 @@ yolo_free_v2_cfg = {
                           'mixup_prob': 0.1,
                           },
         # ---------------- Assignment config ----------------
-        'matcher': {'soft_center_radius': 3.0,
-                    'topk_candicate': 13,
-                    'iou_weight': 3.0},
+        'matcher': {'topk': 10,
+                    'alpha': 0.5,
+                    'beta': 6.0},
         # ---------------- Loss config ----------------
         ## loss weight
-        'loss_cls_weight': 1.0,
-        'loss_box_weight': 2.0,
+        'cls_loss': 'bce', # vfl (optional)
+        'loss_cls_weight': 0.5,
+        'loss_iou_weight': 7.5,
+        'loss_dfl_weight': 1.5,
         # ---------------- Train config ----------------
         ## close strong augmentation
         'no_aug_epoch': 20,
@@ -268,6 +277,7 @@ yolo_free_v2_cfg = {
         'num_cls_head': 2,
         'num_reg_head': 2,
         'head_depthwise': False,
+        'reg_max': 16,
         # ---------------- Preprocess ----------------
         'multi_scale': [0.5, 1.4],
         'trans_config': {# Basic Augment
@@ -285,13 +295,15 @@ yolo_free_v2_cfg = {
                           'mixup_prob': 0.15,
                           },
         # ---------------- Assignment config ----------------
-        'matcher': {'soft_center_radius': 3.0,
-                    'topk_candicate': 13,
-                    'iou_weight': 3.0},
+        'matcher': {'topk': 10,
+                    'alpha': 0.5,
+                    'beta': 6.0},
         # ---------------- Loss config ----------------
         ## loss weight
-        'loss_cls_weight': 1.0,
-        'loss_box_weight': 2.0,
+        'cls_loss': 'bce', # vfl (optional)
+        'loss_cls_weight': 0.5,
+        'loss_iou_weight': 7.5,
+        'loss_dfl_weight': 1.5,
         # ---------------- Train config ----------------
         ## close strong augmentation
         'no_aug_epoch': 20,
@@ -345,6 +357,7 @@ yolo_free_v2_cfg = {
         'num_cls_head': 2,
         'num_reg_head': 2,
         'head_depthwise': False,
+        'reg_max': 16,
         # ---------------- Preprocess ----------------
         'multi_scale': [0.5, 1.4],
         'trans_config': {# Basic Augment
@@ -362,13 +375,15 @@ yolo_free_v2_cfg = {
                           'mixup_prob': 0.2,
                           },
         # ---------------- Assignment config ----------------
-        'matcher': {'soft_center_radius': 3.0,
-                    'topk_candicate': 13,
-                    'iou_weight': 3.0},
+        'matcher': {'topk': 10,
+                    'alpha': 0.5,
+                    'beta': 6.0},
         # ---------------- Loss config ----------------
         ## loss weight
-        'loss_cls_weight': 1.0,
-        'loss_box_weight': 2.0,
+        'cls_loss': 'bce', # vfl (optional)
+        'loss_cls_weight': 0.5,
+        'loss_iou_weight': 7.5,
+        'loss_dfl_weight': 1.5,
         # ---------------- Train config ----------------
         ## close strong augmentation
         'no_aug_epoch': 20,
