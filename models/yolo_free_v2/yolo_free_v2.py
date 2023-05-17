@@ -103,7 +103,7 @@ class FreeYOLOv2(nn.Module):
 
             # filter out the proposals with low confidence score
             keep_idxs = topk_scores > self.conf_thresh
-            scores = topk_scores[keep_idxs]
+            topk_scores = topk_scores[keep_idxs]
             topk_idxs = topk_idxs[keep_idxs]
 
             anchor_idxs = torch.div(topk_idxs, self.num_classes, rounding_mode='floor')
