@@ -31,7 +31,7 @@ class SPPFBlockCSP(nn.Module):
     """
     def __init__(self, cfg, in_dim, out_dim):
         super(SPPFBlockCSP, self).__init__()
-        inter_dim = int(in_dim * cfg['expand_ratio'])
+        inter_dim = int(in_dim * cfg['neck_expand_ratio'])
         self.out_dim = out_dim
         self.cv1 = Conv(in_dim, inter_dim, k=1, act_type=cfg['neck_act'], norm_type=cfg['neck_norm'])
         self.cv2 = Conv(in_dim, inter_dim, k=1, act_type=cfg['neck_act'], norm_type=cfg['neck_norm'])
@@ -62,8 +62,9 @@ def build_neck(cfg, in_dim, out_dim):
     print('Neck: {}'.format(model))
     # build neck
     if model == 'sppf':
-        neck = SPPF(cfg, in_dim, out_dim, cfg['expand_ratio'])
+        neck = SPPF(cfg, in_dim, out_dim, cfg['neck_expand_ratio'])
     elif model == 'csp_sppf':
         neck = SPPFBlockCSP(cfg, in_dim, out_dim)
 
     return neck
+        

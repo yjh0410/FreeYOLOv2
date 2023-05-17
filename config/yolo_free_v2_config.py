@@ -6,18 +6,17 @@ yolo_free_v2_cfg = {
     'yolo_free_v2_nano': {
         # ---------------- Model config ----------------
         ## Backbone
-        'backbone': 'elan_cspnet',
+        'backbone': 'elannet',
         'pretrained': True,
         'bk_act': 'silu',
         'bk_norm': 'BN',
         'bk_dpw': False,
         'width': 0.25,
         'depth': 0.34,
-        'ratio': 2.0,
         'stride': [8, 16, 32],  # P3, P4, P5
         ## Neck: SPP
         'neck': 'csp_sppf',
-        'expand_ratio': 0.5,
+        'neck_expand_ratio': 0.5,
         'pooling_size': 5,
         'neck_act': 'silu',
         'neck_norm': 'BN',
@@ -26,7 +25,7 @@ yolo_free_v2_cfg = {
         'fpn': 'yolo_pafpn',
         'fpn_reduce_layer': 'Conv',
         'fpn_downsample_layer': 'Conv',
-        'fpn_core_block': 'ELAN_CSPBlock',
+        'fpn_core_block': 'ELANBlock',
         'fpn_act': 'silu',
         'fpn_norm': 'BN',
         'fpn_depthwise': False,
@@ -39,7 +38,7 @@ yolo_free_v2_cfg = {
         'head_depthwise': False,
         'reg_max': 16,
         # ---------------- Preprocess ----------------
-        'multi_scale': [0.5, 1.5],
+        'multi_scale': [0.5, 1.25],
         'trans_config': {# Basic Augment
                           'degrees': 0.0,
                           'translate': 0.1,
@@ -86,18 +85,17 @@ yolo_free_v2_cfg = {
     'yolo_free_v2_small': {
         # ---------------- Model config ----------------
         ## Backbone
-        'backbone': 'elan_cspnet',
+        'backbone': 'elannet',
         'pretrained': True,
         'bk_act': 'silu',
         'bk_norm': 'BN',
         'bk_dpw': False,
         'width': 0.5,
         'depth': 0.34,
-        'ratio': 2.0,
         'stride': [8, 16, 32],  # P3, P4, P5
         ## Neck: SPP
         'neck': 'csp_sppf',
-        'expand_ratio': 0.5,
+        'neck_expand_ratio': 0.5,
         'pooling_size': 5,
         'neck_act': 'silu',
         'neck_norm': 'BN',
@@ -106,7 +104,7 @@ yolo_free_v2_cfg = {
         'fpn': 'yolo_pafpn',
         'fpn_reduce_layer': 'Conv',
         'fpn_downsample_layer': 'Conv',
-        'fpn_core_block': 'ELAN_CSPBlock',
+        'fpn_core_block': 'ELANBlock',
         'fpn_act': 'silu',
         'fpn_norm': 'BN',
         'fpn_depthwise': False,
@@ -119,7 +117,7 @@ yolo_free_v2_cfg = {
         'head_depthwise': False,
         'reg_max': 16,
         # ---------------- Preprocess ----------------
-        'multi_scale': [0.5, 1.5],
+        'multi_scale': [0.5, 1.25],
         'trans_config': {# Basic Augment
                           'degrees': 0.0,
                           'translate': 0.2,
@@ -166,18 +164,17 @@ yolo_free_v2_cfg = {
     'yolo_free_v2_medium': {
         # ---------------- Model config ----------------
         ## Backbone
-        'backbone': 'elan_cspnet',
+        'backbone': 'elannet',
         'pretrained': True,
         'bk_act': 'silu',
         'bk_norm': 'BN',
         'bk_dpw': False,
         'width': 0.75,
         'depth': 0.67,
-        'ratio': 1.50,
         'stride': [8, 16, 32],  # P3, P4, P5
         ## Neck: SPP
         'neck': 'csp_sppf',
-        'expand_ratio': 0.5,
+        'neck_expand_ratio': 0.5,
         'pooling_size': 5,
         'neck_act': 'silu',
         'neck_norm': 'BN',
@@ -186,7 +183,7 @@ yolo_free_v2_cfg = {
         'fpn': 'yolo_pafpn',
         'fpn_reduce_layer': 'Conv',
         'fpn_downsample_layer': 'Conv',
-        'fpn_core_block': 'ELAN_CSPBlock',
+        'fpn_core_block': 'ELANBlock',
         'fpn_act': 'silu',
         'fpn_norm': 'BN',
         'fpn_depthwise': False,
@@ -199,7 +196,7 @@ yolo_free_v2_cfg = {
         'head_depthwise': False,
         'reg_max': 16,
         # ---------------- Preprocess ----------------
-        'multi_scale': [0.5, 1.5],
+        'multi_scale': [0.5, 1.25],
         'trans_config': {# Basic Augment
                           'degrees': 0.0,
                           'translate': 0.2,
@@ -246,18 +243,17 @@ yolo_free_v2_cfg = {
     'yolo_free_v2_large': {
         # ---------------- Model config ----------------
         ## Backbone
-        'backbone': 'elan_cspnet',
+        'backbone': 'elannet',
         'pretrained': True,
         'bk_act': 'silu',
         'bk_norm': 'BN',
         'bk_dpw': False,
         'width': 1.0,
         'depth': 1.0,
-        'ratio': 1.0,
         'stride': [8, 16, 32],  # P3, P4, P5
         ## Neck: SPP
         'neck': 'csp_sppf',
-        'expand_ratio': 0.5,
+        'neck_expand_ratio': 0.5,
         'pooling_size': 5,
         'neck_act': 'silu',
         'neck_norm': 'BN',
@@ -266,7 +262,7 @@ yolo_free_v2_cfg = {
         'fpn': 'yolo_pafpn',
         'fpn_reduce_layer': 'Conv',
         'fpn_downsample_layer': 'Conv',
-        'fpn_core_block': 'ELAN_CSPBlock',
+        'fpn_core_block': 'ELANBlock',
         'fpn_act': 'silu',
         'fpn_norm': 'BN',
         'fpn_depthwise': False,
@@ -279,7 +275,7 @@ yolo_free_v2_cfg = {
         'head_depthwise': False,
         'reg_max': 16,
         # ---------------- Preprocess ----------------
-        'multi_scale': [0.5, 1.4],
+        'multi_scale': [0.5, 1.25],
         'trans_config': {# Basic Augment
                           'degrees': 0.0,
                           'translate': 0.2,
@@ -326,18 +322,17 @@ yolo_free_v2_cfg = {
     'yolo_free_v2_huge': {
         # ---------------- Model config ----------------
         ## Backbone
-        'backbone': 'elan_cspnet',
+        'backbone': 'elannet',
         'pretrained': True,
         'bk_act': 'silu',
         'bk_norm': 'BN',
         'bk_dpw': False,
         'width': 1.25,
-        'depth': 1.0,
-        'ratio': 1.0,
+        'depth': 1.34,
         'stride': [8, 16, 32],  # P3, P4, P5
         ## Neck: SPP
         'neck': 'csp_sppf',
-        'expand_ratio': 0.5,
+        'neck_neck_expand_ratio': 0.5,
         'pooling_size': 5,
         'neck_act': 'silu',
         'neck_norm': 'BN',
@@ -346,7 +341,7 @@ yolo_free_v2_cfg = {
         'fpn': 'yolo_pafpn',
         'fpn_reduce_layer': 'Conv',
         'fpn_downsample_layer': 'Conv',
-        'fpn_core_block': 'ELAN_CSPBlock',
+        'fpn_core_block': 'ELANBlock',
         'fpn_act': 'silu',
         'fpn_norm': 'BN',
         'fpn_depthwise': False,
@@ -359,7 +354,7 @@ yolo_free_v2_cfg = {
         'head_depthwise': False,
         'reg_max': 16,
         # ---------------- Preprocess ----------------
-        'multi_scale': [0.5, 1.4],
+        'multi_scale': [0.5, 1.25],
         'trans_config': {# Basic Augment
                           'degrees': 0.0,
                           'translate': 0.2,
