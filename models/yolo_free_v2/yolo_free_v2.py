@@ -1,16 +1,18 @@
+# --------------- Torch components ---------------
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 
+# --------------- Model components ---------------
 from .yolo_free_v2_backbone import build_backbone
 from .yolo_free_v2_neck import build_neck
 from .yolo_free_v2_pafpn import build_fpn
 from .yolo_free_v2_head import build_head
 
+# --------------- External components ---------------
 from utils.misc import multiclass_nms
 
 
-# Anchor-free YOLO
+# My Anchor-free YOLO
 class FreeYOLOv2(nn.Module):
     def __init__(self, 
                  cfg,
@@ -127,10 +129,10 @@ class FreeYOLOv2(nn.Module):
         # ---------------- Backbone ----------------
         pyramid_feats = self.backbone(x)
 
-        # ---------------- Neck ----------------
+        # ---------------- Neck: SPP ----------------
         pyramid_feats[-1] = self.neck(pyramid_feats[-1])
 
-        # ---------------- FPN ----------------
+        # ---------------- Neck: PaFPN ----------------
         pyramid_feats = self.fpn(pyramid_feats)
 
         # ---------------- Heads ----------------
@@ -182,10 +184,10 @@ class FreeYOLOv2(nn.Module):
             # ---------------- Backbone ----------------
             pyramid_feats = self.backbone(x)
 
-            # ---------------- Neck ----------------
+            # ---------------- Neck: SPP ----------------
             pyramid_feats[-1] = self.neck(pyramid_feats[-1])
 
-            # ---------------- FPN ----------------
+            # ---------------- Neck: PaFPN ----------------
             pyramid_feats = self.fpn(pyramid_feats)
 
             # ---------------- Heads ----------------
