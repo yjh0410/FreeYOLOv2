@@ -26,7 +26,6 @@ class FreeYOLOv2(nn.Module):
         self.cfg = cfg
         self.device = device
         self.stride = cfg['stride']
-        self.reg_max = cfg['reg_max']
         self.num_classes = num_classes
         self.trainable = trainable
         self.conf_thresh = conf_thresh
@@ -34,12 +33,7 @@ class FreeYOLOv2(nn.Module):
         self.topk = topk
         self.deploy = deploy
         
-        # ---------------------- Network Parameters ----------------------
-        ## ----------- proj_conv ------------
-        proj = nn.Parameter(torch.linspace(0, cfg['reg_max'], cfg['reg_max']), requires_grad=False)
-        self.proj_conv = nn.Conv2d(self.reg_max, 1, kernel_size=1, bias=False)
-        self.proj_conv.weight = nn.Parameter(proj.view([1, cfg['reg_max'], 1, 1]).clone().detach(), requires_grad=False)
-        
+        # ---------------------- Network Parameters ----------------------        
         ## ----------- Backbone -----------
         self.backbone, feats_dim = build_backbone(cfg, trainable&cfg['pretrained'])
 
@@ -52,20 +46,10 @@ class FreeYOLOv2(nn.Module):
         self.head_dim = self.fpn.out_dim
 
         ## ----------- Heads -----------
-        self.non_shared_heads = nn.ModuleList(
+        self.det_heads = nn.ModuleList(
             [build_head(cfg, head_dim, head_dim, num_classes) 
             for head_dim in self.head_dim
             ])
-
-        ## ----------- Pred -----------
-        self.cls_preds = nn.ModuleList(
-                            [nn.Conv2d(head.cls_out_dim, self.num_classes, kernel_size=1) 
-                                for head in self.non_shared_heads
-                              ]) 
-        self.reg_preds = nn.ModuleList(
-                            [nn.Conv2d(head.reg_out_dim, 4*cfg['reg_max'], kernel_size=1) 
-                                for head in self.non_shared_heads
-                              ])                 
 
 
     # ---------------------- Basic Functions ----------------------
@@ -152,40 +136,27 @@ class FreeYOLOv2(nn.Module):
         # ---------------- Heads ----------------
         all_cls_preds = []
         all_box_preds = []
-        for level, (feat, head) in enumerate(zip(pyramid_feats, self.non_shared_heads)):
-            cls_feat, reg_feat = head(feat)
-
-            # [1, C, H, W]
-            cls_pred = self.cls_preds[level](cls_feat)
-            reg_pred = self.reg_preds[level](reg_feat)
+        for level, (feat, head) in enumerate(zip(pyramid_feats, self.det_heads)):
+            cls_pred, reg_pred = head(feat)
 
             # anchors: [M, 2]
-            B, _, H, W = reg_pred.size()
-            fmp_size = [H, W]
+            fmp_size = cls_pred.shape[-2:]
             anchors = self.generate_anchors(level, fmp_size)
 
             # process preds
-            cls_pred = cls_pred.permute(0, 2, 3, 1).contiguous().view(B, -1, self.num_classes)
-            reg_pred = reg_pred.permute(0, 2, 3, 1).contiguous().view(B, -1, 4*self.reg_max)
+            cls_pred = cls_pred[0].permute(1, 2, 0).contiguous().view(-1, self.num_classes)
+            reg_pred = reg_pred[0].permute(1, 2, 0).contiguous().view(-1, 4)
 
             # ----------------------- Decode bbox -----------------------
-            B, M = reg_pred.shape[:2]
-            # [B, M, 4*(reg_max)] -> [B, M, 4, reg_max] -> [B, 4, M, reg_max]
-            reg_pred = reg_pred.reshape([B, M, 4, self.reg_max])
-            # [B, M, 4, reg_max] -> [B, reg_max, 4, M]
-            reg_pred = reg_pred.permute(0, 3, 2, 1).contiguous()
-            # [B, reg_max, 4, M] -> [B, 1, 4, M]
-            reg_pred = self.proj_conv(F.softmax(reg_pred, dim=1))
-            # [B, 1, 4, M] -> [B, 4, M] -> [B, M, 4]
-            reg_pred = reg_pred.view(B, 4, M).permute(0, 2, 1).contiguous()
-            ## tlbr -> xyxy
-            x1y1_pred = anchors[None] - reg_pred[..., :2] * self.stride[level]
-            x2y2_pred = anchors[None] + reg_pred[..., 2:] * self.stride[level]
-            box_pred = torch.cat([x1y1_pred, x2y2_pred], dim=-1)
+            ctr_pred = reg_pred[..., :2] * self.stride[level] + anchors[..., :2]
+            wh_pred = torch.exp(reg_pred[..., 2:]) * self.stride[level]
+            pred_x1y1 = ctr_pred - wh_pred * 0.5
+            pred_x2y2 = ctr_pred + wh_pred * 0.5
+            box_pred = torch.cat([pred_x1y1, pred_x2y2], dim=-1)
 
             # collect preds
-            all_cls_preds.append(cls_pred[0])
-            all_box_preds.append(box_pred[0])
+            all_cls_preds.append(cls_pred)
+            all_box_preds.append(box_pred)
 
         if self.deploy:
             # no post process
@@ -220,56 +191,35 @@ class FreeYOLOv2(nn.Module):
             # ---------------- Heads ----------------
             all_anchors = []
             all_cls_preds = []
-            all_reg_preds = []
             all_box_preds = []
-            all_strides = []
-            for level, (feat, head) in enumerate(zip(pyramid_feats, self.non_shared_heads)):
-                cls_feat, reg_feat = head(feat)
-
-                # [B, C, H, W]
-                cls_pred = self.cls_preds[level](cls_feat)
-                reg_pred = self.reg_preds[level](reg_feat)
+            for level, (feat, head) in enumerate(zip(pyramid_feats, self.det_heads)):
+                cls_pred, reg_pred = head(feat)
 
                 B, _, H, W = cls_pred.size()
                 fmp_size = [H, W]
                 # generate anchor boxes: [M, 4]
                 anchors = self.generate_anchors(level, fmp_size)
-                # stride tensor: [M, 1]
-                stride_tensor = torch.ones_like(anchors[..., :1]) * self.stride[level]
                 
                 # process preds
                 cls_pred = cls_pred.permute(0, 2, 3, 1).contiguous().view(B, -1, self.num_classes)
-                reg_pred = reg_pred.permute(0, 2, 3, 1).contiguous().view(B, -1, 4*self.reg_max)
+                reg_pred = reg_pred.permute(0, 2, 3, 1).contiguous().view(B, -1, 4)
 
                 # ----------------------- Decode bbox -----------------------
-                B, M = reg_pred.shape[:2]
-                # [B, M, 4*(reg_max)] -> [B, M, 4, reg_max] -> [B, 4, M, reg_max]
-                reg_pred_ = reg_pred.reshape([B, M, 4, self.reg_max])
-                # [B, M, 4, reg_max] -> [B, reg_max, 4, M]
-                reg_pred_ = reg_pred_.permute(0, 3, 2, 1).contiguous()
-                # [B, reg_max, 4, M] -> [B, 1, 4, M]
-                reg_pred_ = self.proj_conv(F.softmax(reg_pred_, dim=1))
-                # [B, 1, 4, M] -> [B, 4, M] -> [B, M, 4]
-                reg_pred_ = reg_pred_.view(B, 4, M).permute(0, 2, 1).contiguous()
-                ## tlbr -> xyxy
-                x1y1_pred = anchors[None] - reg_pred_[..., :2] * self.stride[level]
-                x2y2_pred = anchors[None] + reg_pred_[..., 2:] * self.stride[level]
-                box_pred = torch.cat([x1y1_pred, x2y2_pred], dim=-1)
+                ctr_pred = reg_pred[..., :2] * self.stride[level] + anchors[..., :2]
+                wh_pred = torch.exp(reg_pred[..., 2:]) * self.stride[level]
+                pred_x1y1 = ctr_pred - wh_pred * 0.5
+                pred_x2y2 = ctr_pred + wh_pred * 0.5
+                box_pred = torch.cat([pred_x1y1, pred_x2y2], dim=-1)
 
                 # collect preds
                 all_cls_preds.append(cls_pred)
-                all_reg_preds.append(reg_pred)
                 all_box_preds.append(box_pred)
                 all_anchors.append(anchors)
-                all_strides.append(stride_tensor)
             
             # output dict
             outputs = {"pred_cls": all_cls_preds,        # List(Tensor) [B, M, C]
-                       "pred_reg": all_reg_preds,        # List(Tensor) [B, M, 4*(reg_max)]
                        "pred_box": all_box_preds,        # List(Tensor) [B, M, 4]
-                       "anchors": all_anchors,           # List(Tensor) [M, 2]
-                       "strides": self.stride,           # List(Int) = [8, 16, 32]
-                       "stride_tensor": all_strides      # List(Tensor) [M, 1]
-                       }
+                       "anchors": all_anchors,           # List(Tensor) [B, M, 2]
+                       'strides': self.stride}           # List(Int) [8, 16, 32]
 
             return outputs 

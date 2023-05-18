@@ -105,14 +105,7 @@ def train():
     print("Setting Arguments.. : ", args)
     print("----------------------------------------------------------")
 
-    # config
-    cfg = build_config(args)
-
-    # path to save model
-    path_to_save = os.path.join(args.save_folder, args.dataset, args.model)
-    os.makedirs(path_to_save, exist_ok=True)
-
-    # DDP config
+    # dist
     world_size = distributed_utils.get_world_size()
     per_gpu_batch = args.batch_size // world_size
     print('World size: {}'.format(world_size))
@@ -120,7 +113,11 @@ def train():
         distributed_utils.init_distributed_mode(args)
         print("git:\n  {}\n".format(distributed_utils.get_sha()))
 
-    # CUDA
+    # path to save model
+    path_to_save = os.path.join(args.save_folder, args.dataset, args.model)
+    os.makedirs(path_to_save, exist_ok=True)
+
+    # cuda
     if args.cuda:
         print('use cuda')
         # cudnn.benchmark = True
@@ -128,12 +125,17 @@ def train():
     else:
         device = torch.device("cpu")
 
-    # Dataset & DataLoader
+    # config
+    cfg = build_config(args)
+
+    # dataset and evaluator
     dataset, dataset_info, evaluator = build_dataset(cfg, args, device, is_train=True)
-    dataloader = build_dataloader(args, dataset, per_gpu_batch, CollateFunc())
     num_classes = dataset_info[0]
 
-    # Model
+    # dataloader
+    dataloader = build_dataloader(args, dataset, per_gpu_batch, CollateFunc())
+
+    # build model
     model, criterion = build_model(
         args=args, 
         cfg=cfg,
@@ -154,7 +156,7 @@ def train():
         print('use SyncBatchNorm ...')
         model = torch.nn.SyncBatchNorm.convert_sync_batchnorm(model)
 
-    # Compute FLOPs & Params
+    # compute FLOPs and Params
     if distributed_utils.is_main_process:
         model_copy = deepcopy(model_without_ddp)
         model_copy.trainable = False
@@ -167,20 +169,16 @@ def train():
         # wait for all processes to synchronize
         dist.barrier()
 
-    # AMP
+    # amp
     scaler = torch.cuda.amp.GradScaler(enabled=args.fp16)
 
-    # Batch-size
-    total_bs = args.batch_size
-    accumulate = max(1, round(64 / total_bs))
-    print('Grad_Accumulate: ', accumulate)
-
-    # Optimizer
-    cfg['weight_decay'] *= total_bs * accumulate / 64
+    # optimizer
+    cfg['lr0'] *= args.batch_size / 64   # linear LR scaling
     optimizer, start_epoch = build_optimizer(cfg, model_without_ddp, cfg['lr0'], args.resume)
+    optimizer.zero_grad()
 
-    # LR Scheduler
-    total_epochs = args.max_epoch + args.wp_epoch
+    # Scheduler
+    total_epochs = args.wp_epoch + args.max_epoch
     scheduler, lf = build_lr_scheduler(cfg, optimizer, total_epochs)
     scheduler.last_epoch = start_epoch - 1  # do not move
     if args.resume:
@@ -195,9 +193,7 @@ def train():
 
     # start training loop
     best_map = -1.0
-    last_opt_step = -1
     heavy_eval = False
-    optimizer.zero_grad()
     
     # eval before training
     if args.eval_first and distributed_utils.is_main_process():
@@ -226,7 +222,7 @@ def train():
                 heavy_eval = True
 
         # train one epoch
-        last_opt_step = train_one_epoch(
+        train_one_epoch(
             epoch=epoch,
             total_epochs=total_epochs,
             args=args, 
@@ -239,8 +235,7 @@ def train():
             optimizer=optimizer,
             scheduler=scheduler,
             lf=lf,
-            scaler=scaler,
-            last_opt_step=last_opt_step)
+            scaler=scaler)
 
         # eval
         model_eval = deepcopy(ema.ema if ema else model_without_ddp)

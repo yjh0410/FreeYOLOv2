@@ -13,6 +13,7 @@ class DecoupledHead(nn.Module):
         print('Head: Decoupled Head')
         # --------- Basic Parameters ----------
         self.in_dim = in_dim
+        self.num_classes = num_classes
         self.num_cls_head=cfg['num_cls_head']
         self.num_reg_head=cfg['num_reg_head']
 
@@ -37,7 +38,7 @@ class DecoupledHead(nn.Module):
                         )      
         ## reg head
         reg_feats = []
-        self.reg_out_dim = max(out_dim, 4*cfg['reg_max'])
+        self.reg_out_dim = out_dim
         for i in range(cfg['num_reg_head']):
             if i == 0:
                 reg_feats.append(
@@ -53,9 +54,12 @@ class DecoupledHead(nn.Module):
                         norm_type=cfg['head_norm'],
                         depthwise=cfg['head_depthwise'])
                         )
-
         self.cls_feats = nn.Sequential(*cls_feats)
         self.reg_feats = nn.Sequential(*reg_feats)
+
+        ## Pred
+        self.cls_pred = nn.Conv2d(self.cls_out_dim, num_classes, kernel_size=1) 
+        self.reg_pred = nn.Conv2d(self.reg_out_dim, 4, kernel_size=1) 
 
 
     def forward(self, x):
@@ -65,7 +69,10 @@ class DecoupledHead(nn.Module):
         cls_feats = self.cls_feats(x)
         reg_feats = self.reg_feats(x)
 
-        return cls_feats, reg_feats
+        cls_pred = self.cls_pred(cls_feats)
+        reg_pred = self.reg_pred(reg_feats)
+
+        return cls_pred, reg_pred
     
 
 # build detection head
