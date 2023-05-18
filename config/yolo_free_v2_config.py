@@ -73,9 +73,9 @@ yolo_free_v2_cfg = {
         'ema_decay': 0.9998,       # SGD: 0.9999;   AdamW: 0.9998
         'ema_tau': 2000,
         ## lr schedule
-        'scheduler': 'linear',
+        'scheduler': 'cos_linear',
         'lr0': 0.001,              # SGD: 0.01;     AdamW: 0.001
-        'lrf': 0.01,               # SGD: 0.01;     AdamW: 0.01
+        'lrf': 0.05,               # SGD: 0.01;     AdamW: 0.01
         'warmup_momentum': 0.8,
         'warmup_bias_lr': 0.1,
         },
@@ -150,9 +150,9 @@ yolo_free_v2_cfg = {
         'ema_decay': 0.9998,       # SGD: 0.9999;   AdamW: 0.9998
         'ema_tau': 2000,
         ## lr schedule
-        'scheduler': 'linear',
+        'scheduler': 'cos_linear',
         'lr0': 0.001,              # SGD: 0.01;     AdamW: 0.001
-        'lrf': 0.01,               # SGD: 0.01;     AdamW: 0.01
+        'lrf': 0.05,               # SGD: 0.01;     AdamW: 0.01
         'warmup_momentum': 0.8,
         'warmup_bias_lr': 0.1,
         },
@@ -227,9 +227,9 @@ yolo_free_v2_cfg = {
         'ema_decay': 0.9998,       # SGD: 0.9999;   AdamW: 0.9998
         'ema_tau': 2000,
         ## lr schedule
-        'scheduler': 'linear',
+        'scheduler': 'cos_linear',
         'lr0': 0.001,              # SGD: 0.01;     AdamW: 0.001
-        'lrf': 0.01,               # SGD: 0.01;     AdamW: 0.01
+        'lrf': 0.05,               # SGD: 0.01;     AdamW: 0.01
         'warmup_momentum': 0.8,
         'warmup_bias_lr': 0.1,
         },
@@ -304,9 +304,9 @@ yolo_free_v2_cfg = {
         'ema_decay': 0.9998,       # SGD: 0.9999;   AdamW: 0.9998
         'ema_tau': 2000,
         ## lr schedule
-        'scheduler': 'linear',
+        'scheduler': 'cos_linear',
         'lr0': 0.001,              # SGD: 0.01;     AdamW: 0.001
-        'lrf': 0.01,               # SGD: 0.01;     AdamW: 0.01
+        'lrf': 0.05,               # SGD: 0.01;     AdamW: 0.01
         'warmup_momentum': 0.8,
         'warmup_bias_lr': 0.1,
         },
@@ -381,9 +381,9 @@ yolo_free_v2_cfg = {
         'ema_decay': 0.9998,       # SGD: 0.9999;   AdamW: 0.9998
         'ema_tau': 2000,
         ## lr schedule
-        'scheduler': 'linear',
+        'scheduler': 'cos_linear',
         'lr0': 0.001,              # SGD: 0.01;     AdamW: 0.001
-        'lrf': 0.01,               # SGD: 0.01;     AdamW: 0.01
+        'lrf': 0.05,               # SGD: 0.01;     AdamW: 0.01
         'warmup_momentum': 0.8,
         'warmup_bias_lr': 0.1,
         },
