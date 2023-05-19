@@ -128,6 +128,8 @@ class FreeYOLOv2(nn.Module):
             scores, labels, bboxes, self.nms_thresh, self.num_classes, False)
 
         return bboxes, scores, labels
+    
+    
     # ---------------------- Main Process for Inference ----------------------
     @torch.no_grad()
     def inference_single_image(self, x):
