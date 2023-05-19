@@ -29,9 +29,9 @@ class SPPFBlockCSP(nn.Module):
     """
         CSP Spatial Pyramid Pooling Block
     """
-    def __init__(self, cfg, in_dim, out_dim):
+    def __init__(self, cfg, in_dim, out_dim, expand_ratio):
         super(SPPFBlockCSP, self).__init__()
-        inter_dim = int(in_dim * cfg['expand_ratio'])
+        inter_dim = int(in_dim * expand_ratio)
         self.out_dim = out_dim
         self.cv1 = Conv(in_dim, inter_dim, k=1, act_type=cfg['neck_act'], norm_type=cfg['neck_norm'])
         self.cv2 = Conv(in_dim, inter_dim, k=1, act_type=cfg['neck_act'], norm_type=cfg['neck_norm'])
@@ -62,9 +62,9 @@ def build_neck(cfg, in_dim, out_dim):
     print('Neck: {}'.format(model))
     # build neck
     if model == 'sppf':
-        neck = SPPF(cfg, in_dim, out_dim, cfg['expand_ratio'])
+        neck = SPPF(cfg, in_dim, out_dim, cfg['neck_expand_ratio'])
     elif model == 'csp_sppf':
-        neck = SPPFBlockCSP(cfg, in_dim, out_dim)
+        neck = SPPFBlockCSP(cfg, in_dim, out_dim, cfg['neck_expand_ratio'])
 
     return neck
         

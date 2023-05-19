@@ -38,7 +38,7 @@ class DecoupledHead(nn.Module):
                         )      
         ## reg head
         reg_feats = []
-        self.reg_out_dim = out_dim
+        self.reg_out_dim = max(out_dim, 4*cfg['reg_max'])
         for i in range(cfg['num_reg_head']):
             if i == 0:
                 reg_feats.append(
@@ -59,7 +59,7 @@ class DecoupledHead(nn.Module):
 
         ## Pred
         self.cls_pred = nn.Conv2d(self.cls_out_dim, num_classes, kernel_size=1) 
-        self.reg_pred = nn.Conv2d(self.reg_out_dim, 4, kernel_size=1) 
+        self.reg_pred = nn.Conv2d(self.reg_out_dim, 4*cfg['reg_max'], kernel_size=1) 
 
 
     def forward(self, x):

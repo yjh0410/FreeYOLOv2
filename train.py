@@ -169,16 +169,20 @@ def train():
         # wait for all processes to synchronize
         dist.barrier()
 
-    # amp
+    # AMP
     scaler = torch.cuda.amp.GradScaler(enabled=args.fp16)
 
+    # batch size
+    total_bs = args.batch_size
+    accumulate = max(1, round(64 / total_bs))
+    print('Grad_Accumulate: ', accumulate)
+
     # optimizer
-    cfg['lr0'] *= args.batch_size / 64   # linear LR scaling
+    cfg['weight_decay'] *= total_bs * accumulate / 64
     optimizer, start_epoch = build_optimizer(cfg, model_without_ddp, cfg['lr0'], args.resume)
-    optimizer.zero_grad()
 
     # Scheduler
-    total_epochs = args.wp_epoch + args.max_epoch
+    total_epochs = args.max_epoch
     scheduler, lf = build_lr_scheduler(cfg, optimizer, total_epochs)
     scheduler.last_epoch = start_epoch - 1  # do not move
     if args.resume:
@@ -193,7 +197,9 @@ def train():
 
     # start training loop
     best_map = -1.0
+    last_opt_step = -1
     heavy_eval = False
+    optimizer.zero_grad()
     
     # eval before training
     if args.eval_first and distributed_utils.is_main_process():
@@ -222,7 +228,7 @@ def train():
                 heavy_eval = True
 
         # train one epoch
-        train_one_epoch(
+        last_opt_step = train_one_epoch(
             epoch=epoch,
             total_epochs=total_epochs,
             args=args, 
@@ -235,10 +241,10 @@ def train():
             optimizer=optimizer,
             scheduler=scheduler,
             lf=lf,
-            scaler=scaler)
+            scaler=scaler,
+            last_opt_step=last_opt_step)
 
         # eval
-        model_eval = deepcopy(ema.ema if ema else model_without_ddp)
         if heavy_eval:
             best_map = val_one_epoch(
                             args=args, 
@@ -258,7 +264,6 @@ def train():
                                 epoch=epoch,
                                 best_map=best_map,
                                 path_to_save=path_to_save)
-        del model_eval
         
     # Empty cache after train loop
     if args.cuda:

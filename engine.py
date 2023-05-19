@@ -3,6 +3,7 @@ import torch.distributed as dist
 
 import time
 import os
+import math
 import numpy as np
 import random
 
@@ -10,7 +11,23 @@ from utils import distributed_utils
 from utils.vis_tools import vis_data
 
 
-def rescale_image_targets(args, images, targets, stride, min_box_size, multi_scale_range=[0.5, 1.5]):
+def refine_targets(targets, min_box_size):
+    # rescale targets
+    for tgt in targets:
+        boxes = tgt["boxes"].clone()
+        labels = tgt["labels"].clone()
+        # refine tgt
+        tgt_boxes_wh = boxes[..., 2:] - boxes[..., :2]
+        min_tgt_size = torch.min(tgt_boxes_wh, dim=-1)[0]
+        keep = (min_tgt_size >= min_box_size)
+
+        tgt["boxes"] = boxes[keep]
+        tgt["labels"] = labels[keep]
+    
+    return targets
+
+
+def rescale_image_targets(images, targets, stride, min_box_size, multi_scale_range=[0.5, 1.5]):
     """
         Deployed for Multi scale trick.
     """
@@ -20,21 +37,16 @@ def rescale_image_targets(args, images, targets, stride, min_box_size, multi_sca
         max_stride = max(stride)
 
     # During training phase, the shape of input image is square.
-    if args.multi_scale:
-        old_img_size = images.shape[-1]
-        new_img_size = random.randrange(old_img_size * multi_scale_range[0], old_img_size * multi_scale_range[1] + max_stride)
-        new_img_size = new_img_size // max_stride * max_stride  # size
-        if new_img_size / old_img_size != 1:
-            # interpolate
-            images = torch.nn.functional.interpolate(
-                                input=images, 
-                                size=new_img_size, 
-                                mode='bilinear', 
-                                align_corners=False)
-    else:
-        old_img_size = images.shape[-1]
-        new_img_size = old_img_size
-
+    old_img_size = images.shape[-1]
+    new_img_size = random.randrange(old_img_size * multi_scale_range[0], old_img_size * multi_scale_range[1] + max_stride)
+    new_img_size = new_img_size // max_stride * max_stride  # size
+    if new_img_size / old_img_size != 1:
+        # interpolate
+        images = torch.nn.functional.interpolate(
+                            input=images, 
+                            size=new_img_size, 
+                            mode='bilinear', 
+                            align_corners=False)
     # rescale targets
     for tgt in targets:
         boxes = tgt["boxes"].clone()
@@ -57,27 +69,30 @@ def rescale_image_targets(args, images, targets, stride, min_box_size, multi_sca
 def train_one_epoch(epoch,
                     total_epochs,
                     args, 
-                    cfg, 
                     device, 
                     ema,
                     model,
                     criterion,
+                    cfg, 
                     dataloader, 
                     optimizer,
                     scheduler,
                     lf,
-                    scaler):
+                    scaler,
+                    last_opt_step):
     epoch_size = len(dataloader)
     img_size = args.img_size
     t0 = time.time()
     nw = epoch_size * args.wp_epoch
+    accumulate = accumulate = max(1, round(64 / args.batch_size))
 
-    # Train one epoch
+    # train one epoch
     for iter_i, (images, targets) in enumerate(dataloader):
         ni = iter_i + epoch * epoch_size
         # Warmup
         if ni <= nw:
             xi = [0, nw]  # x interp
+            accumulate = max(1, np.interp(ni, xi, [1, 64 / args.batch_size]).round())
             for j, x in enumerate(optimizer.param_groups):
                 # bias lr falls from 0.1 to lr0, all other lrs rise from 0.0 to lr0
                 x['lr'] = np.interp(
@@ -88,41 +103,58 @@ def train_one_epoch(epoch,
         # to device
         images = images.to(device, non_blocking=True).float() / 255.
 
-        # Multi scale
-        images, targets, img_size = rescale_image_targets(
-            args, images, targets, model.stride, args.min_box_size, cfg['multi_scale'])
+        # multi scale
+        if args.multi_scale:
+            images, targets, img_size = rescale_image_targets(
+                images, targets, model.stride, args.min_box_size, cfg['multi_scale'])
+        else:
+            targets = refine_targets(targets, args.min_box_size)
             
-        # Visualize targets
+        # visualize train targets
         if args.vis_tgt:
-            vis_data(images*255., targets)
+            vis_data(images*255, targets)
 
-        # Inference
+        # inference
         with torch.cuda.amp.autocast(enabled=args.fp16):
             outputs = model(images)
-            # Loss
+            # loss
             loss_dict = criterion(outputs=outputs, targets=targets)
             losses = loss_dict['losses']
+            losses *= images.shape[0]  # loss * bs
 
-            # reduce among all GPUs
+            # reduce            
             loss_dict_reduced = distributed_utils.reduce_dict(loss_dict)
 
-        # Backward
+            if args.distributed:
+                # gradient averaged between devices in DDP mode
+                losses *= distributed_utils.get_world_size()
+
+        # check loss
+        try:
+            if torch.isnan(losses):
+                print('loss is NAN !!')
+                continue
+        except:
+            print(loss_dict)
+
+        # backward
         scaler.scale(losses).backward()
 
-        # Clip gradients
-        total_norm = None
-        if cfg['clip_grad'] > 0:
-            scaler.unscale_(optimizer)
-            total_norm = torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=cfg['clip_grad'])
-
         # Optimize
-        scaler.step(optimizer)
-        scaler.update()
-        optimizer.zero_grad()
-
-        # Model EMA update
-        if ema:
-            ema.update(model)
+        if ni - last_opt_step >= accumulate:
+            if cfg['clip_grad'] > 0:
+                # unscale gradients
+                scaler.unscale_(optimizer)
+                # clip gradients
+                torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=cfg['clip_grad'])
+            # optimizer.step
+            scaler.step(optimizer)
+            scaler.update()
+            optimizer.zero_grad()
+            # ema
+            if ema:
+                ema.update(model)
+            last_opt_step = ni
 
         # display
         if distributed_utils.is_main_process() and iter_i % 10 == 0:
@@ -143,9 +175,6 @@ def train_one_epoch(epoch,
             # other infor
             log += '[time: {:.2f}]'.format(t1 - t0)
             log += '[size: {}]'.format(img_size)
-            # grad-norm
-            if total_norm is not None:
-                log += '[g-norm: {:.2f}]'.format(total_norm)
 
             # print log infor
             print(log, flush=True)
@@ -154,7 +183,7 @@ def train_one_epoch(epoch,
     
     scheduler.step()
 
-    return
+    return last_opt_step
 
 
 def val_one_epoch(args, 
@@ -164,7 +193,7 @@ def val_one_epoch(args,
                   epoch,
                   best_map,
                   path_to_save):
-    if distributed_utils.is_main_process():        
+    if distributed_utils.is_main_process():
         # check evaluator
         if evaluator is None:
             print('No evaluator ... save model and go on training.')

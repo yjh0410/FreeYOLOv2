@@ -9,7 +9,7 @@ def random_perspective(image,
                        targets=(),
                        degrees=10,
                        translate=.1,
-                       scale=[0.1, 2.0],
+                       scale=.1,
                        shear=10,
                        perspective=0.0,
                        border=(0, 0)):
@@ -33,7 +33,7 @@ def random_perspective(image,
     R = np.eye(3)
     a = random.uniform(-degrees, degrees)
     # a += random.choice([-180, -90, 0, 90])  # add 90deg rotations to small rotations
-    s = random.uniform(scale[0], scale[1])
+    s = random.uniform(1 - scale, 1 + scale)
     # s = 2 ** random.uniform(-scale, scale)
     R[:2] = cv2.getRotationMatrix2D(angle=a, center=(0, 0), scale=s)
 
@@ -425,6 +425,18 @@ class ValTransforms(object):
             img = image
         img_h, img_w = img.shape[:2]
 
+        # rescale bboxes
+        if target is not None:
+            # rescale bbox
+            boxes_ = target["boxes"].copy()
+            boxes_[:, [0, 2]] = boxes_[:, [0, 2]] / img_w0 * img_w
+            boxes_[:, [1, 3]] = boxes_[:, [1, 3]] / img_h0 * img_h
+            target["boxes"] = boxes_
+
+            # to tensor
+            target["boxes"] = torch.as_tensor(target["boxes"]).float()
+            target["labels"] = torch.as_tensor(target["labels"]).long()
+            
         # to tensor
         img_tensor = torch.from_numpy(img).permute(2, 0, 1).contiguous().float()
 
@@ -440,17 +452,6 @@ class ValTransforms(object):
         pad_image = torch.ones([img_tensor.size(0), pad_img_h, pad_img_w]).float() * 114.
         pad_image[:, :img_h0, :img_w0] = img_tensor
 
-        # rescale bboxes
-        if target is not None:
-            # rescale bbox
-            boxes_ = target["boxes"].copy()
-            boxes_[:, [0, 2]] = boxes_[:, [0, 2]] / img_w0 * img_w
-            boxes_[:, [1, 3]] = boxes_[:, [1, 3]] / img_h0 * img_h
-            target["boxes"] = boxes_
-
-            # to tensor
-            target["boxes"] = torch.as_tensor(target["boxes"]).float()
-            target["labels"] = torch.as_tensor(target["labels"]).long()
 
         return pad_image, target, [dw, dh]
 
