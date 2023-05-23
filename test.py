@@ -25,7 +25,7 @@ def parse_args():
                         help='the max size of input image')
     parser.add_argument('--cuda', action='store_true', default=False, 
                         help='use cuda.')
-    parser.add_argument('-vt', '--vis_thresh', default=0.3, type=float,
+    parser.add_argument('-vt', '--vis_thresh', default=0.2, type=float,
                         help='Final confidence threshold')
     parser.add_argument('-ws', '--window_scale', default=1.0, type=float,
                         help='resize window of cv2 for visualization.')

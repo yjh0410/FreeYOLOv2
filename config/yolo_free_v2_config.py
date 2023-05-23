@@ -6,14 +6,13 @@ yolo_free_v2_cfg = {
     'yolo_free_v2_nano': {
         # ---------------- Model config ----------------
         ## Backbone
-        'backbone': 'elan_cspnet',
+        'backbone': 'elannet',
         'pretrained': True,
         'bk_act': 'silu',
         'bk_norm': 'BN',
         'bk_dpw': False,
         'width': 0.25,
         'depth': 0.34,
-        'ratio': 2.0,
         'stride': [8, 16, 32],  # P3, P4, P5
         ## Neck: SPP
         'neck': 'sppf',
@@ -86,14 +85,13 @@ yolo_free_v2_cfg = {
     'yolo_free_v2_small': {
         # ---------------- Model config ----------------
         ## Backbone
-        'backbone': 'elan_cspnet',
+        'backbone': 'elannet',
         'pretrained': True,
         'bk_act': 'silu',
         'bk_norm': 'BN',
         'bk_dpw': False,
         'width': 0.50,
         'depth': 0.34,
-        'ratio': 2.0,
         'stride': [8, 16, 32],  # P3, P4, P5
         ## Neck: SPP
         'neck': 'sppf',
@@ -122,8 +120,8 @@ yolo_free_v2_cfg = {
         'multi_scale': [0.5, 1.5],
         'trans_config': {# Basic Augment
                           'degrees': 0.0,
-                          'translate': 0.2,
-                          'scale': 0.9,
+                          'translate': 0.1,
+                          'scale': 0.5,
                           'shear': 0.0,
                           'perspective': 0.0,
                           'hsv_h': 0.015,
@@ -132,7 +130,7 @@ yolo_free_v2_cfg = {
                           # Mosaic & Mixup
                           'mosaic_prob': 1.0,
                           'mosaic_9x_prob': 0.0,
-                          'mixup_prob': 0.05,
+                          'mixup_prob': 0.0,
                           },
         # ---------------- Assignment config ----------------
         'matcher': {'topk': 10,
@@ -166,14 +164,13 @@ yolo_free_v2_cfg = {
     'yolo_free_v2_medium': {
         # ---------------- Model config ----------------
         ## Backbone
-        'backbone': 'elan_cspnet',
+        'backbone': 'elannet',
         'pretrained': True,
         'bk_act': 'silu',
         'bk_norm': 'BN',
         'bk_dpw': False,
         'width': 0.75,
         'depth': 0.67,
-        'ratio': 1.5,
         'stride': [8, 16, 32],  # P3, P4, P5
         ## Neck: SPP
         'neck': 'sppf',
@@ -246,14 +243,13 @@ yolo_free_v2_cfg = {
     'yolo_free_v2_large': {
         # ---------------- Model config ----------------
         ## Backbone
-        'backbone': 'elan_cspnet',
+        'backbone': 'elannet',
         'pretrained': True,
         'bk_act': 'silu',
         'bk_norm': 'BN',
         'bk_dpw': False,
         'width': 1.0,
         'depth': 1.0,
-        'ratio': 1.0,
         'stride': [8, 16, 32],  # P3, P4, P5
         ## Neck: SPP
         'neck': 'sppf',
@@ -326,14 +322,13 @@ yolo_free_v2_cfg = {
     'yolo_free_v2_huge': {
         # ---------------- Model config ----------------
         ## Backbone
-        'backbone': 'elan_cspnet',
+        'backbone': 'elannet',
         'pretrained': True,
         'bk_act': 'silu',
         'bk_norm': 'BN',
         'bk_dpw': False,
         'width': 1.25,
-        'depth': 1.0,
-        'ratio': 1.0,
+        'depth': 1.34,
         'stride': [8, 16, 32],  # P3, P4, P5
         ## Neck: SPP
         'neck': 'sppf',
