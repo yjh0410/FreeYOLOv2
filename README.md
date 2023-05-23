@@ -1,8 +1,6 @@
 # FreeYOLOv2
 English | [简体中文](https://github.com/yjh0410/FreeYOLOv2/blob/main/README_CN.md)
 
-![image](/img_files/overview_yolofreev2.png)
-
 ## Requirements
 - We recommend you to use Anaconda to create a conda environment:
 ```Shell
@@ -72,7 +70,7 @@ python train.py --cuda -d coco -v yolo_free_v2_nano -bs 16 --max_epoch 300 --wp_
 
 | Model             | Scale | FPS<sup>3090<br>FP32-bs1 | AP<sup>val<br>0.5:0.95 | FLOPs<br><sup>(G) | Params<br><sup>(M) | Weight |
 |-------------------|-------|--------------------------|------------------------|-------------------|--------------------|--------|
-| FreeYOLOv2-Nano   |  640  |                          |                        |       8.3         |       2.8          |  |
+| FreeYOLOv2-Nano   |  640  |           100            |          35.3          |       8.3         |       2.8          |  |
 | FreeYOLOv2-Small  |  640  |                          |                        |                   |                    |  |
 | FreeYOLOv2-Medium |  640  |                          |                        |                   |                    |  |
 | FreeYOLOv2-Large  |  640  |                          |                        |                   |                    |  |
