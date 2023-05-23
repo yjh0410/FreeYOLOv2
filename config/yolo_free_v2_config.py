@@ -208,7 +208,7 @@ yolo_free_v2_cfg = {
                           'hsv_v': 0.4,
                           # Mosaic & Mixup
                           'mosaic_prob': 1.0,
-                          'mosaic_9x_prob': 0.0,
+                          'mosaic_9x_prob': 0.2,
                           'mixup_prob': 0.1,
                           },
         # ---------------- Assignment config ----------------
@@ -287,7 +287,7 @@ yolo_free_v2_cfg = {
                           'hsv_v': 0.4,
                           # Mosaic & Mixup
                           'mosaic_prob': 1.0,
-                          'mosaic_9x_prob': 0.0,
+                          'mosaic_9x_prob': 0.2,
                           'mixup_prob': 0.15,
                           },
         # ---------------- Assignment config ----------------
@@ -365,7 +365,7 @@ yolo_free_v2_cfg = {
                           'hsv_v': 0.4,
                           # Mosaic & Mixup
                           'mosaic_prob': 1.0,
-                          'mosaic_9x_prob': 0.0,
+                          'mosaic_9x_prob': 0.2,
                           'mixup_prob': 0.2,
                           },
         # ---------------- Assignment config ----------------
