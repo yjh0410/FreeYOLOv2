@@ -72,8 +72,12 @@ python train.py --cuda -d coco -v yolo_free_v2_tiny -bs 16 --max_epoch 300 --wp_
 | FreeYOLOv2-Small  |  640  |                          |                        |                   |                    |  |
 | FreeYOLOv2-Medium |  640  |                          |                        |                   |                    |  |
 | FreeYOLOv2-Large  |  640  |                          |                        |                   |                    |  |
-| FreeYOLOv2-Huge   |  640  |                          |                        |                   |                    |  |
 
+*所有模型的FLOPs都是用640x640的图像尺寸来测试的，而推理速度则包含模型前向推理以及包括NMS在内的后处理。*
+
+*更大的batch size如128（我只能设置为16）也许能进一步提升FreeYOLOv2-Medium和FreeYOLOv2-Large的性能。*
+
+*受限于我的计算资源，我无法训练FreeYOLOv2-Huge。*
 
 ### WiderFace
 - 下载 [WiderFace](http://shuoyang1213.me/WIDERFACE/).
@@ -122,7 +126,6 @@ Main results on WiderFace-val:
 | FreeYOLOv2-Small  |  640    |      |        |  |
 | FreeYOLOv2-Medium |  640    |      |        |  |
 | FreeYOLOv2-Large  |  640    |      |        |  |
-| FreeYOLOv2-Huge   |  640    |      |        |  |
 
 ### CrowdHuman
 - 下载 [CrowdHuman](https://www.crowdhuman.org/).
@@ -180,7 +183,6 @@ Main results on CrowdHuman-val:
 | FreeYOLOv2-Small  |  640    |      |        |  |
 | FreeYOLOv2-Medium |  640    |      |        |  |
 | FreeYOLOv2-Large  |  640    |      |        |  |
-| FreeYOLOv2-Huge   |  640    |      |        |  |
 
 ## 训练
 ### 使用单个GPU来训练
