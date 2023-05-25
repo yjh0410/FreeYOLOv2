@@ -78,7 +78,7 @@ class CrowdHumanEvaluator():
             gt_bboxes, gt_labels = self.dataset.pull_anno(index)
             gt_bboxes = np.array(gt_bboxes)[..., :4]  # [N, 4]
             gt_tag = np.zeros([gt_bboxes.shape[0], 1], dtype=gt_bboxes.dtype)
-            gt_bboxes = np.concatenate([gt_bboxes, gt_tag], axis=-1).astype(np.float64)
+            gt_bboxes = np.concatenate([gt_bboxes, gt_tag], axis=-1)
 
             # preprocess
             x, _, deltas = self.transform(img)
@@ -109,8 +109,8 @@ class CrowdHumanEvaluator():
                 ID=img_id,
                 height=int(orig_h),
                 width=int(orig_w),
-                dtboxes=self.boxes_dump(pd_bboxes),
-                gtboxes=self.boxes_dump(gt_bboxes)
+                dtboxes=self.boxes_dump(pd_bboxes.astype(np.float64)),
+                gtboxes=self.boxes_dump(gt_bboxes.astype(np.float64))
                 )
             all_result_dicts.append(result_dict)
 
@@ -131,7 +131,6 @@ class CrowdHumanEvaluator():
         fpath = os.path.join(evalDir, 'dump-{}.json'.format('yolo_free'))
         with open(fpath,'w') as fid:
             for db in all_results:
-                print(db)
                 line = json.dumps(db)+'\n'
                 fid.write(line)
 
