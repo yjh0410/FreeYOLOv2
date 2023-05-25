@@ -402,6 +402,71 @@ cd <FreeYOLOv2_HOME>
 python eval.py --root path/to/OurDataset/ -d ourdataset -v yolo_free_v2_tiny --weight path/to/checkpoint
 ```
 
+## 目标跟踪
+该项目也支持**多目标跟踪**任务。我们使用本项目的YOLO检测器作为“tracking-by-detection”的检测器，并使用简单高效的**ByteTrack**作为跟踪器。
+
+* images tracking
+```Shell
+python track.py --mode image \
+                --path_to_img path/to/images/ \
+                --cuda \
+                -size 640 \
+                -dt yolo_free_v2_nano \
+                -tk byte_tracker \
+                --weight path/to/coco_pretrained/ \
+                --show \
+                --gif
+```
+
+* video tracking
+
+```Shell
+python track.py --mode video \
+                --path_to_img path/to/video/ \
+                --cuda \
+                -size 640 \
+                -dt yolo_free_v2_nano \
+                -tk byte_tracker \
+                --weight path/to/coco_pretrained/ \
+                --show \
+                --gif
+```
+
+* camera tracking
+
+```Shell
+python track.py --mode camera \
+                --cuda \
+                -size 640 \
+                -dt yolo_free_v2_nano \
+                -tk byte_tracker \
+                --weight path/to/coco_pretrained/ \
+                --show \
+                --gif
+```
+
+### 多目标跟踪的例子
+* Detector: FreeYOLOv2-Nano
+* Tracker: ByteTracker
+
+运行命令如下：
+
+```Shell
+python track.py --mode video \
+                --path_to_img ./dataset/demo/videos/000006.mp4 \
+                --cuda \
+                -size 640 \
+                -dt yolo_free_v2_nano \
+                -tk byte_tracker \
+                --weight path/to/coco_pretrained/ \
+                --show \
+                --gif
+```
+
+结果如下：
+
+![image](./img_files/video_tracking_demo.gif)
+
 ## 部署
 1. [ONNX export and an ONNXRuntime](./deployment/ONNXRuntime/)
 2. [OpenVINO in C++ and Python](./deployment/OpenVINO)

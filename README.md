@@ -433,7 +433,7 @@ python track.py --mode camera \
 ```
 
 ### Tracking visualization
-* Detector: YOLOv2
+* Detector: FreeYOLOv2-Nano
 * Tracker: ByteTracker
 
 Command：
