@@ -105,8 +105,13 @@ class CrowdHumanEvaluator():
             pd_bboxes[:, 2:4] -= pd_bboxes[:, :2]
             gt_bboxes[:, 2:4] -= gt_bboxes[:, :2]
 
-            result_dict = dict(ID=img_id, height=orig_h, width=orig_w,
-                dtboxes=self.boxes_dump(pd_bboxes), gtboxes=self.boxes_dump(gt_bboxes))
+            result_dict = dict(
+                ID=img_id,
+                height=int(orig_h),
+                width=int(orig_w),
+                dtboxes=self.boxes_dump(pd_bboxes),
+                gtboxes=self.boxes_dump(gt_bboxes)
+                )
             all_result_dicts.append(result_dict)
 
 
