@@ -168,10 +168,14 @@ class OurDataset(Dataset):
 
 
     def pull_anno(self, index):
-        id_ = self.ids[index]
-
-        anno_ids = self.coco.getAnnIds(imgIds=[int(id_)], iscrowd=None)
+        img_id = self.ids[index]
+        im_ann = self.coco.loadImgs(img_id)[0]
+        anno_ids = self.coco.getAnnIds(imgIds=[int(img_id)], iscrowd=0)
         annotations = self.coco.loadAnns(anno_ids)
+        
+        # image infor
+        width = im_ann['width']
+        height = im_ann['height']
         
         #load a target
         bboxes = []
@@ -181,9 +185,9 @@ class OurDataset(Dataset):
                 # bbox
                 x1 = np.max((0, anno['bbox'][0]))
                 y1 = np.max((0, anno['bbox'][1]))
-                x2 = x1 + anno['bbox'][2]
-                y2 = y1 + anno['bbox'][3]
-                if x2 < x1 or y2 < y1:
+                x2 = np.min((width - 1, x1 + np.max((0, anno['bbox'][2] - 1))))
+                y2 = np.min((height - 1, y1 + np.max((0, anno['bbox'][3] - 1))))
+                if x2 <= x1 or y2 <= y1:
                     continue
                 # class label
                 cls_id = self.class_ids.index(anno['category_id'])

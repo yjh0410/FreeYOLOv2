@@ -167,10 +167,14 @@ class CrowdHumanDataset(Dataset):
 
 
     def pull_anno(self, index):
-        id_ = self.ids[index]
-
-        anno_ids = self.coco.getAnnIds(imgIds=[int(id_)], iscrowd=None)
+        img_id = self.ids[index]
+        im_ann = self.coco.loadImgs(img_id)[0]
+        anno_ids = self.coco.getAnnIds(imgIds=[int(img_id)], iscrowd=0)
         annotations = self.coco.loadAnns(anno_ids)
+        
+        # image infor
+        width = im_ann['width']
+        height = im_ann['height']
         
         #load a target
         bboxes = []
@@ -180,9 +184,9 @@ class CrowdHumanDataset(Dataset):
                 # bbox
                 x1 = np.max((0, anno['bbox'][0]))
                 y1 = np.max((0, anno['bbox'][1]))
-                x2 = x1 + anno['bbox'][2]
-                y2 = y1 + anno['bbox'][3]
-                if x2 < x1 or y2 < y1:
+                x2 = np.min((width - 1, x1 + np.max((0, anno['bbox'][2] - 1))))
+                y2 = np.min((height - 1, y1 + np.max((0, anno['bbox'][3] - 1))))
+                if x2 <= x1 or y2 <= y1:
                     continue
                 # class label
                 cls_id = self.class_ids.index(anno['category_id'])
@@ -204,13 +208,13 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='FreeYOLO')
 
     # opt
-    parser.add_argument('--root', default='D:\\python_work\\object-detection\\dataset\\COCO',
+    parser.add_argument('--root', default='D:\\python_work\\object-detection\\dataset\\CrowdHuman',
                         help='data root')
 
     args = parser.parse_args()
     
     img_size = 640
-    is_train = True
+    is_train = False
     trans_config = {
         # Basic Augment
         'degrees': 0.0,
@@ -222,9 +226,9 @@ if __name__ == "__main__":
         'hsv_s': 0.7,
         'hsv_v': 0.4,
         # Mosaic & Mixup
-        'mosaic_prob': 1.0,
+        'mosaic_prob': 0.0,
         'mosaic_9x_prob': 0.2,
-        'mixup_prob': 0.15,
+        'mixup_prob': 0.0,
         'mosaic_type': 'yolov5_mosaic',
         'mixup_type': 'yolov5_mixup',
         'mixup_scale': [0.5, 1.5]
@@ -236,8 +240,6 @@ if __name__ == "__main__":
         data_dir=args.root,
         image_set='val',
         transform=transform,
-        mosaic_prob=trans_config['mosaic_prob'],
-        mixup_prob=trans_config['mixup_prob'],
         trans_config=trans_config,
         )
     

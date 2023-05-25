@@ -103,6 +103,7 @@ class COCODataset(Dataset):
 
         # load a target
         bboxes, labels = self.pull_anno(index)
+        
         target = {
             "boxes": bboxes,
             "labels": labels,
