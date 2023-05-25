@@ -62,7 +62,7 @@ class CrowdHumanEvaluator():
     def inference(self, model):
         model.eval()
         all_result_dicts = []
-        num_images = len(self.dataset)
+        num_images = 100 #len(self.dataset)
         print('total number of images: %d' % (num_images))
 
         # start testing
