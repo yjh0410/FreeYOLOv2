@@ -67,7 +67,7 @@ def parse_args():
     # detector
     parser.add_argument('-dt', '--model', default='yolo_free_v2_nano', type=str,
                         help='build FreeYOLOv2')
-    parser.add_argument('-ns', '--num_classes', type=int, default=80,
+    parser.add_argument('-nc', '--num_classes', type=int, default=80,
                         help='number of object classes.')
     parser.add_argument('--weight', default=None,
                         type=str, help='Trained state_dict file path to open')
