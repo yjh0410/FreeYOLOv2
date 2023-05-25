@@ -27,22 +27,17 @@ class CrowdHumanEvaluator():
             nmsthre (float):
                 IoU threshold of non-max supression ranging from 0 to 1.
         """
-        self.dataset = CrowdHumanDataset(
-            data_dir=data_dir,
-            image_set=image_set,
-            transform=None,
-            trans_config=None,
-            is_train=False
-            )
+        # ----------------- Basic parameters -----------------
+        self.eval_source = os.path.join(data_dir, 'annotation_val.odgt')
         self.image_set = image_set
         self.transform = transform
         self.device = device
-
-        self.eval_source = os.path.join(data_dir, 'annotation_val.odgt')
-
-        self.ap = 0.
+        # ----------------- Metrics -----------------
+        self.map = 0.
         self.mr = 0.
         self.ji = 0.
+        # ----------------- Dataset -----------------
+        self.dataset = CrowdHumanDataset(data_dir=data_dir, image_set=image_set)
 
 
     def boxes_dump(self, boxes):
@@ -145,6 +140,6 @@ class CrowdHumanEvaluator():
         eval_fid.write(line+'\n')
         eval_fid.close()
 
-        self.ap = AP
+        self.map = AP
         self.mr = MR
         self.ji = JI
