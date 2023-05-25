@@ -126,6 +126,7 @@ class CrowdHumanEvaluator():
         fpath = os.path.join(evalDir, 'dump-{}.json'.format('yolo_free'))
         with open(fpath,'w') as fid:
             for db in all_results:
+                print(db)
                 line = json.dumps(db)+'\n'
                 fid.write(line)
 
