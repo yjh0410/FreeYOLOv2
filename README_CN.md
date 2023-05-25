@@ -177,12 +177,12 @@ python train.py --cuda -d crowdhuman -v yolo_free_v2_tiny -bs 16 --max_epoch 100
 
 Main results on CrowdHuman-val:
 
-| Model             |  Scale  |    AP    |    AP50    |  Weight  |
-|-------------------|---------|----------|------------|----------|
-| FreeYOLOv2-Nano   |  640    |      |        |  |
-| FreeYOLOv2-Small  |  640    |      |        |  |
-| FreeYOLOv2-Medium |  640    |      |        |  |
-| FreeYOLOv2-Large  |  640    |      |        |  |
+| Model             |  Scale  |    AP    |    MR    |   JI   |  Weight  |
+|-------------------|---------|----------|----------|--------|----------|
+| FreeYOLOv2-Nano   |  640    |          |          |        |          |
+| FreeYOLOv2-Small  |  640    |          |          |        |          |
+| FreeYOLOv2-Medium |  640    |          |          |        |          |
+| FreeYOLOv2-Large  |  640    |          |          |        |          |
 
 ## 训练
 ### 使用单个GPU来训练
