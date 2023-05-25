@@ -117,6 +117,7 @@ class CrowdHumanEvaluator():
     def evaluate(self, model):
         # prepare
         evalDir = os.path.join('det_results', 'eval', 'CrowdHuman')
+        os.makedirs(evalDir, exist_ok=True)
         
         # inference
         all_results = self.inference(model)
