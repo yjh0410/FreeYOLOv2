@@ -78,7 +78,7 @@ class CrowdHumanEvaluator():
             gt_bboxes, gt_labels = self.dataset.pull_anno(index)
             gt_bboxes = np.array(gt_bboxes)[..., :4]  # [N, 4]
             gt_tag = np.zeros([gt_bboxes.shape[0], 1], dtype=gt_bboxes.dtype)
-            gt_bboxes = np.concatenate([gt_bboxes, gt_tag], axis=-1)
+            gt_bboxes = np.concatenate([gt_bboxes, gt_tag], axis=-1).astype(np.float64)
 
             # preprocess
             x, _, deltas = self.transform(img)
