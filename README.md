@@ -435,13 +435,13 @@ python track.py --mode camera \
 ### Tracking visualization
 * Detector: FreeYOLOv2-Nano
 * Tracker: ByteTracker
+* Device: i5-12500H CPU
 
 Command：
 
 ```Shell
 python track.py --mode video \
                 --path_to_img ./dataset/demo/videos/000006.mp4 \
-                --cuda \
                 -size 640 \
                 -dt yolo_free_v2_nano \
                 -tk byte_tracker \
