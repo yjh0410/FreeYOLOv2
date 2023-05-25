@@ -19,7 +19,7 @@ from utils.misc import load_weight
 from utils.misc import compute_flops
 
 from config import build_config
-from models import build_model
+from models.detectors import build_model
 
 
 def parse_args():

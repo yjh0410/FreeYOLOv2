@@ -390,7 +390,69 @@ python eval.py --root path/to/OurDataset/ -d ourdataset -v yolo_free_v2_nano --w
 ```
 
 ## Tracking
-Coming soon ...
+Our project also supports **multi-object tracking** tasks. We use the YOLO of this project as the detector, following the "tracking-by-detection" framework, and use the simple and efficient **ByteTrack** as the tracker.
+
+* images tracking
+```Shell
+python track.py --mode image \
+                --path_to_img path/to/images/ \
+                --cuda \
+                -size 640 \
+                -dt yolo_free_v2_nano \
+                -tk byte_tracker \
+                --weight path/to/coco_pretrained/ \
+                --show \
+                --gif
+```
+
+* video tracking
+
+```Shell
+python track.py --mode video \
+                --path_to_img path/to/video/ \
+                --cuda \
+                -size 640 \
+                -dt yolo_free_v2_nano \
+                -tk byte_tracker \
+                --weight path/to/coco_pretrained/ \
+                --show \
+                --gif
+```
+
+* camera tracking
+
+```Shell
+python track.py --mode camera \
+                --cuda \
+                -size 640 \
+                -dt yolo_free_v2_nano \
+                -tk byte_tracker \
+                --weight path/to/coco_pretrained/ \
+                --show \
+                --gif
+```
+
+### Tracking visualization
+* Detector: YOLOv2
+* Tracker: ByteTracker
+
+Command：
+
+```Shell
+python track.py --mode video \
+                --path_to_img ./dataset/demo/videos/000006.mp4 \
+                --cuda \
+                -size 640 \
+                -dt yolo_free_v2_nano \
+                -tk byte_tracker \
+                --weight path/to/coco_pretrained/ \
+                --show \
+                --gif
+```
+
+Results:
+
+![image](./img_files/video_tracking_demo.gif)
 
 ## Deployment
 1. [ONNX export and an ONNXRuntime](./deployment/ONNXRuntime/)
