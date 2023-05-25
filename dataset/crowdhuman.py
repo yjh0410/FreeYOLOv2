@@ -158,12 +158,13 @@ class CrowdHumanDataset(Dataset):
 
     def pull_image(self, index):
         id_ = self.ids[index]
-        im_ann = self.coco.loadImgs(id_)[0] 
+        im_ann = self.coco.loadImgs(id_)[0]
+        img_id = im_ann["file_name"][:-4]
         img_file = os.path.join(
                 self.data_dir, 'CrowdHuman_{}'.format(self.image_set), 'Images', im_ann["file_name"])
         image = cv2.imread(img_file)
 
-        return image, id_
+        return image, img_id
 
 
     def pull_anno(self, index):
