@@ -44,11 +44,11 @@ dataset_cfg = {
         'class_names': ('person',),
     },
 
-    'generaldataset':{
-        'data_name': 'GeneralDataset',
-        'num_classes': 1,
+    'ourdataset':{
+        'data_name': 'AnimalDataset',
+        'num_classes': 4,
         'class_indexs': None,
-        'class_names': ('cat',),
+        'class_names': ('butterfly', 'cat', 'dog', 'person'),
     },
 
 }

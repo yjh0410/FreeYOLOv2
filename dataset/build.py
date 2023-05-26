@@ -1,13 +1,21 @@
 import os
 
-from dataset.voc import VOCDetection
-from dataset.coco import COCODataset
-from dataset.widerface import WiderFaceDataset
-from dataset.crowdhuman import CrowdHumanDataset
-from dataset.ourdataset import OurDataset
-
-from dataset.transforms import TrainTransforms, ValTransforms
-
+try:
+    from .voc import VOCDetection
+    from .coco import COCODataset
+    from .widerface import WiderFaceDataset
+    from .crowdhuman import CrowdHumanDataset
+    from .ourdataset import OurDataset
+    from .transforms import TrainTransforms, ValTransforms
+except:
+    import sys
+    sys.path.append('.')
+    from voc import VOCDetection
+    from coco import COCODataset
+    from widerface import WiderFaceDataset
+    from crowdhuman import CrowdHumanDataset
+    from ourdataset import OurDataset
+    from transforms import TrainTransforms, ValTransforms
 
 # ------------------------------ Dataset ------------------------------
 def build_dataset(args, data_cfg, trans_config, transform, is_train=False):

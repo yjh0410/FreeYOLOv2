@@ -68,6 +68,7 @@ def convert(xml_files, json_file):
     else:
         categories = get_categories(xml_files)
     bnd_id = START_BOUNDING_BOX_ID
+    image_cnt = 0
     for i, xml_file in enumerate(xml_files):
         if i % 100 == 0:
             print('[{}] / [{}]'.format(i, len(xml_files)))
@@ -81,7 +82,8 @@ def convert(xml_files, json_file):
         else:
             raise ValueError("%d paths found in %s" % (len(path), xml_file))
         ## The filename must be a number
-        image_id = get_filename_as_int(filename)
+        image_cnt += 1
+        # image_id = get_filename_as_int(filename)
         size = get_and_check(root, "size", 1)
         width = int(get_and_check(size, "width", 1).text)
         height = int(get_and_check(size, "height", 1).text)
@@ -89,7 +91,7 @@ def convert(xml_files, json_file):
             "file_name": filename,
             "height": height,
             "width": width,
-            "id": image_id,
+            "id": image_cnt,
         }
         json_dict["images"].append(image)
         ## Currently we do not support segmentation.
@@ -113,7 +115,7 @@ def convert(xml_files, json_file):
             ann = {
                 "area": o_width * o_height,
                 "iscrowd": 0,
-                "image_id": image_id,
+                "image_id": image_cnt,
                 "bbox": [xmin, ymin, o_width, o_height],
                 "category_id": category_id,
                 "id": bnd_id,

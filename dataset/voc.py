@@ -246,18 +246,28 @@ class VOCDetection(data.Dataset):
 
 if __name__ == "__main__":
     import argparse
-    from transforms import build_transform
+    from build import build_transform
     
-    parser = argparse.ArgumentParser(description='FreeYOLO')
+    parser = argparse.ArgumentParser(description='FreeYOLOv2')
 
     # opt
     parser.add_argument('--root', default='D:\\python_work\\object-detection\\dataset\\VOCdevkit',
                         help='data root')
-    
-    args = parser.parse_args()
+    parser.add_argument('--split', default='train',
+                        help='data split')
+    parser.add_argument('-size', '--img_size', default=640, type=int, 
+                        help='input image size')
+    parser.add_argument('--min_box_size', default=8.0, type=float,
+                        help='min size of target bounding box.')
+    parser.add_argument('--mosaic', default=None, type=float,
+                        help='mosaic augmentation.')
+    parser.add_argument('--mixup', default=None, type=float,
+                        help='mixup augmentation.')
 
+    args = parser.parse_args()
+    
     img_size = 640
-    is_train = False
+    is_train = True
     trans_config = {
         # Basic Augment
         'degrees': 0.0,
@@ -271,10 +281,12 @@ if __name__ == "__main__":
         # Mosaic & Mixup
         'mosaic_prob': 1.0,
         'mosaic_9x_prob': 0.2,
-        'mixup_prob': 1.0,
+        'mixup_prob': 0.15,
+        'mosaic_type': 'yolov5_mosaic',
+        'mixup_type': 'yolov5_mixup',
         'mixup_scale': [0.5, 1.5]
     }
-    transform = build_transform(img_size, trans_config, max_stride=32, is_train=is_train)
+    transform, trans_config = build_transform(args, trans_config, max_stride=32, is_train=is_train)
 
     dataset = VOCDetection(
         img_size=img_size,
