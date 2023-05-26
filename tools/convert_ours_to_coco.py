@@ -140,7 +140,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Convert VOC-style annotation labele by LabelImg to COCO format."
     )
-    parser.add_argument("--root", help="Directory path to dataset.", type=str)
+    parser.add_argument("--root", default='AnimalDataset', help="Directory path to dataset.", type=str)
     parser.add_argument("--split", default='train', 
                         help="split of dataset.", type=str)
     parser.add_argument("-anno", "--annotations", default='annotations', 

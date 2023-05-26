@@ -1,0 +1,26 @@
+<annotation>
+	<folder>images</folder>
+	<filename>169.jpg</filename>
+	<path>D:\python_work\object-detection\FreeYOLOv2\AnimalDataset\train\images\169.jpg</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>797</width>
+		<height>873</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>cat</name>
+		<pose>Unspecified</pose>
+		<truncated>1</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>103</xmin>
+			<ymin>39</ymin>
+			<xmax>797</xmax>
+			<ymax>873</ymax>
+		</bndbox>
+	</object>
+</annotation>
