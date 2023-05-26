@@ -149,7 +149,6 @@ def train():
     
     # Dataset
     dataset, dataset_info = build_dataset(args, data_cfg, trans_config, train_transform, is_train=True)
-    num_classes = dataset_info['num_classes']
 
     # Dataloader
     dataloader = build_dataloader(args, dataset, per_gpu_batch, CollateFunc())
@@ -162,7 +161,7 @@ def train():
         args=args, 
         cfg=model_cfg,
         device=device,
-        num_classes=num_classes,
+        num_classes=dataset_info['num_classes'],
         trainable=True,
         )
     model = model.to(device).train()
