@@ -28,6 +28,7 @@ class COCOAPIEvaluator():
         self.image_set = 'test2017' if testset else 'val2017'
         self.transform = transform
         self.device = device
+        self.testset = testset
         # ----------------- Metrics -----------------
         self.map = 0.
         self.ap50_95 = 0.
