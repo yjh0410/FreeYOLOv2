@@ -115,7 +115,7 @@ def test(args,
          model, 
          device, 
          dataset,
-         transforms=None,
+         transform=None,
          class_colors=None, 
          class_names=None, 
          class_indexs=None):
@@ -130,7 +130,7 @@ def test(args,
         orig_h, orig_w, _ = image.shape
 
         # prepare
-        x, _, deltas = transforms(image)
+        x, _, deltas = transform(image)
         x = x.unsqueeze(0).to(device) / 255.
 
         t0 = time.time()
@@ -222,7 +222,7 @@ if __name__ == '__main__':
          model=model, 
          device=device, 
          dataset=dataset,
-         transforms=transform,
+         transform=transform,
          class_colors=class_colors,
          class_names=class_names,
          class_indexs=class_indexs

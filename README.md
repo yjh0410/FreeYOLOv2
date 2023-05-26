@@ -433,7 +433,7 @@ python track.py --mode camera \
 ```
 
 ### Tracking visualization
-* Detector: FreeYOLOv2-Nano
+* Detector: FreeYOLOv2-Nano (pretrained on COCO)
 * Tracker: ByteTracker
 * Device: i5-12500H CPU
 
@@ -449,6 +449,8 @@ python track.py --mode video \
                 --show \
                 --gif
 ```
+
+If GPU can be used, please include the `--cuda` parameter in the above command to use GPU for detection.
 
 Results:
 

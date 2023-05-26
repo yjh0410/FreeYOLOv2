@@ -4,9 +4,13 @@ import time
 import os
 import torch
 
-from dataset.transforms import ValTransforms
+# load transform
+from dataset.transforms import build_transform
+
+# load dataset
 from dataset.coco import COCODataset, coco_class_index, coco_class_labels
 
+# load some utils
 from utils.misc import compute_flops
 from utils.misc import load_weight
 
@@ -66,18 +70,24 @@ def test(net, device, img_size, testset, transform):
             orig_h, orig_w, _ = image.shape
 
             # prepare
-            x = transform(image)[0]
+            x, _, deltas = transform(image)
             x = x.unsqueeze(0).to(device) / 255.
 
             # star time
             torch.cuda.synchronize()
             start_time = time.perf_counter()    
 
-            # inference
-            bboxes, scores, cls_inds = net(x)
+            # inference + post-process
+            bboxes, scores, labels = model(x)
             
             # rescale
-            bboxes *= max(orig_h, orig_w)
+            img_h, img_w = x.shape[-2:]
+            bboxes[..., [0, 2]] = bboxes[..., [0, 2]] / (img_w - deltas[0]) * orig_w
+            bboxes[..., [1, 3]] = bboxes[..., [1, 3]] / (img_h - deltas[1]) * orig_h
+
+            # clip bbox
+            bboxes[..., [0, 2]] = np.clip(bboxes[..., [0, 2]], a_min=0., a_max=orig_w)
+            bboxes[..., [1, 3]] = np.clip(bboxes[..., [1, 3]], a_min=0., a_max=orig_h)
 
             # end time
             torch.cuda.synchronize()
@@ -126,9 +136,10 @@ if __name__ == '__main__':
     model = load_weight(model, args.weight, args.fuse_conv_bn, args.fuse_repconv)
 
     # transform
-    transform = ValTransforms(img_size=args.img_size)
+    transform = build_transform(args.img_size, max_stride=max(cfg['stride']), is_train=False)
 
     # run
+    print("================= DETECT =================")
     test(net=model, 
         img_size=args.img_size,
         device=device, 

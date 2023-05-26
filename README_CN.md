@@ -446,15 +446,15 @@ python track.py --mode camera \
 ```
 
 ### 多目标跟踪的例子
-* Detector: FreeYOLOv2-Nano
+* Detector: FreeYOLOv2-Nano (使用COCO数据集预训练)
 * Tracker: ByteTracker
+* Device: i5-12500H CPU
 
 运行命令如下：
 
 ```Shell
 python track.py --mode video \
                 --path_to_img ./dataset/demo/videos/000006.mp4 \
-                --cuda \
                 -size 640 \
                 -dt yolo_free_v2_nano \
                 -tk byte_tracker \
@@ -462,6 +462,8 @@ python track.py --mode video \
                 --show \
                 --gif
 ```
+
+如果可以使用GPU，请在上述的命令中加入`--cuda`参数，以便使用GPU来做检测。
 
 结果如下：
 
