@@ -454,19 +454,3 @@ class ValTransforms(object):
 
 
         return pad_image, target, [dw, dh]
-
-
-def build_transform(img_size, trans_config=None, max_stride=32, is_train=False):
-    if is_train:
-        transform = TrainTransforms(
-            img_size=img_size,
-            trans_config=trans_config,
-            min_box_size=8
-            )
-    else:
-        transform = ValTransforms(
-            img_size=img_size,
-            max_stride=max_stride
-            )
-
-    return transform

@@ -7,13 +7,12 @@ from copy import deepcopy
 import torch
 
 # load transform
-from dataset.transforms import build_transform
+from dataset.build import build_dataset, build_transform
 
 # load some utils
-from utils.misc import build_dataset, load_weight
-from utils.misc import compute_flops
+from utils.misc import load_weight, compute_flops
 
-from config import build_config
+from config import build_dataset_config, build_model_config
 from models.detectors import build_model
 
 
@@ -180,12 +179,17 @@ if __name__ == '__main__':
     else:
         device = torch.device("cpu")
 
-    # config
-    cfg = build_config(args)
+    # Dataset & Model Config
+    data_cfg = build_dataset_config(args)
+    model_cfg = build_model_config(args)
 
-    # dataset
-    dataset, dataset_info, _ = build_dataset(cfg, args, device, is_train=False)
-    num_classes, class_names, class_indexs = dataset_info
+    # Transform
+    val_transform, trans_config = build_transform(
+        args=args, trans_config=model_cfg['trans_config'], max_stride=model_cfg['max_stride'], is_train=False)
+
+    # Dataset
+    dataset, dataset_info = build_dataset(args, data_cfg, trans_config, val_transform, is_train=False)
+    num_classes = dataset_info['num_classes']
 
     np.random.seed(0)
     class_colors = [(np.random.randint(255),
@@ -194,7 +198,7 @@ if __name__ == '__main__':
 
     # build model
     model = build_model(args=args, 
-                        cfg=cfg,
+                        cfg=model_cfg,
                         device=device, 
                         num_classes=num_classes, 
                         trainable=False)
@@ -213,17 +217,14 @@ if __name__ == '__main__':
         device=device)
     del model_copy
 
-    # transform
-    transform = build_transform(args.img_size, max_stride=max(cfg['stride']), is_train=False)
-
     # run
     print("================= DETECT =================")
     test(args=args,
          model=model, 
          device=device, 
          dataset=dataset,
-         transform=transform,
+         transform=val_transform,
          class_colors=class_colors,
-         class_names=class_names,
-         class_indexs=class_indexs
+         class_names=dataset_info['class_names'],
+         class_indexs=dataset_info['class_indexs'],
          )

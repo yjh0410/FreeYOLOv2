@@ -8,15 +8,14 @@ import imageio
 import torch
 
 # load transform
-from dataset.transforms import build_transform
+from dataset.build import build_transform
 
 # load some utils
 from utils.misc import load_weight
 from utils.vis_tools import visualize
 
-from config import build_config
+from config import build_model_config
 from models.detectors import build_model
-
 
 
 def parse_args():
@@ -51,6 +50,8 @@ def parse_args():
                         help='confidence threshold')
     parser.add_argument('-nt', '--nms_thresh', default=0.45, type=float,
                         help='NMS threshold')
+    parser.add_argument('-nc', '--num_classes', default=80, type=int,
+                        help='number of classes.')
     parser.add_argument('--topk', default=100, type=int,
                         help='topk candidates for testing')
     parser.add_argument("--deploy", action="store_true", default=False,
@@ -268,14 +269,14 @@ def run():
 
     np.random.seed(0)
 
-    # config
-    cfg = build_config(args)
+    # Dataset & Model Config
+    model_cfg = build_model_config(args)
 
     # build model
     model = build_model(args=args, 
-                        cfg=cfg,
+                        cfg=model_cfg,
                         device=device, 
-                        num_classes=80, 
+                        num_classes=args.num_classes, 
                         trainable=False)
 
     # load trained weight
@@ -283,14 +284,18 @@ def run():
     model.to(device).eval()
 
     # transform
-    transform = build_transform(args.img_size, max_stride=max(cfg['stride']), is_train=False)
+    val_transform, _ = build_transform(
+        args=args,
+        max_stride=model_cfg['max_stride'],
+        is_train=False
+        )
 
     print("================= DETECT =================")
     # run
     detect(args=args,
            model=model, 
             device=device,
-            transform=transform,
+            transform=val_transform,
             mode=args.mode,
             vis_thresh=args.vis_thresh)
 

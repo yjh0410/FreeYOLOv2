@@ -4,17 +4,15 @@ import time
 import os
 import torch
 
-# load transform
-from dataset.transforms import build_transform
-
 # load dataset
+from dataset.build import build_transform
 from dataset.coco import COCODataset, coco_class_index, coco_class_labels
 
 # load some utils
 from utils.misc import compute_flops
 from utils.misc import load_weight
 
-from config import build_config
+from config import build_dataset_config, build_model_config
 from models.detectors import build_model
 
 
@@ -112,7 +110,6 @@ if __name__ == '__main__':
         device = torch.device("cpu")
 
     # dataset
-    print('test on coco-val ...')
     data_dir = os.path.join(args.root, 'COCO')
     class_names = coco_class_labels
     class_indexs = coco_class_index
@@ -122,12 +119,13 @@ if __name__ == '__main__':
                 image_set='val2017',
                 img_size=args.img_size)
 
-    # config
-    cfg = build_config(args)
+    # Dataset & Model Config
+    data_cfg = build_dataset_config(args)
+    model_cfg = build_model_config(args)
 
     # build model
     model = build_model(args=args, 
-                        cfg=cfg,
+                        cfg=model_cfg,
                         device=device, 
                         num_classes=num_classes, 
                         trainable=False)
@@ -136,7 +134,11 @@ if __name__ == '__main__':
     model = load_weight(model, args.weight, args.fuse_conv_bn, args.fuse_repconv)
 
     # transform
-    transform = build_transform(args.img_size, max_stride=max(cfg['stride']), is_train=False)
+    val_transform, _ = build_transform(
+        args=args,
+        max_stride=model_cfg['max_stride'],
+        is_train=False
+        )
 
     # run
     print("================= DETECT =================")
@@ -144,5 +146,5 @@ if __name__ == '__main__':
         img_size=args.img_size,
         device=device, 
         testset=dataset,
-        transform=transform
+        transform=val_transform
         )

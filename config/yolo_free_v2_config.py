@@ -14,6 +14,7 @@ yolo_free_v2_cfg = {
         'width': 0.25,
         'depth': 0.34,
         'stride': [8, 16, 32],  # P3, P4, P5
+        'max_stride': 32,
         ## Neck: SPP
         'neck': 'sppf',
         'neck_expand_ratio': 0.5,
@@ -93,6 +94,7 @@ yolo_free_v2_cfg = {
         'width': 0.50,
         'depth': 0.34,
         'stride': [8, 16, 32],  # P3, P4, P5
+        'max_stride': 32,
         ## Neck: SPP
         'neck': 'sppf',
         'neck_expand_ratio': 0.5,
@@ -172,6 +174,7 @@ yolo_free_v2_cfg = {
         'width': 0.75,
         'depth': 0.67,
         'stride': [8, 16, 32],  # P3, P4, P5
+        'max_stride': 32,
         ## Neck: SPP
         'neck': 'sppf',
         'neck_expand_ratio': 0.5,
@@ -251,6 +254,7 @@ yolo_free_v2_cfg = {
         'width': 1.0,
         'depth': 1.0,
         'stride': [8, 16, 32],  # P3, P4, P5
+        'max_stride': 32,
         ## Neck: SPP
         'neck': 'sppf',
         'neck_expand_ratio': 0.5,
@@ -330,6 +334,7 @@ yolo_free_v2_cfg = {
         'width': 1.25,
         'depth': 1.34,
         'stride': [8, 16, 32],  # P3, P4, P5
+        'max_stride': 32,
         ## Neck: SPP
         'neck': 'sppf',
         'neck_expand_ratio': 0.5,

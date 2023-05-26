@@ -9,4 +9,4 @@ __pycache__
 det_results
 .vscode
 deployment/OpenVINO/cpp/build
-AnimalDataset
+GeneralDataset

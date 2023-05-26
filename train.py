@@ -1,24 +1,36 @@
 from __future__ import division
 
 import os
-import math
 import argparse
 from copy import deepcopy
 
+# ----------------- Torch Components -----------------
 import torch
 import torch.distributed as dist
 from torch.nn.parallel import DistributedDataParallel as DDP
 
-from utils import distributed_utils
-from utils.misc import ModelEMA, CollateFunc, build_dataset, build_dataloader
-from utils.misc import compute_flops
+# ----------------- Config Components -----------------
+from config import build_dataset_config, build_model_config
+
+# ----------------- Dataset Components -----------------
+from dataset.build import build_dataset, build_transform
+
+# ----------------- Evaluator Components -----------------
+from evaluator.build import build_evluator
+
+# ----------------- Optimizer & LrScheduler Components -----------------
 from utils.solver.optimizer import build_optimizer
 from utils.solver.lr_scheduler import build_lr_scheduler
 
-from engine import train_one_epoch, val_one_epoch
+# ----------------- Extra Components -----------------
+from utils import distributed_utils
+from utils.misc import ModelEMA, CollateFunc, build_dataloader
+from utils.misc import compute_flops
 
-from config import build_config
-from models import build_model
+# ----------------- Model Components -----------------
+from models.detectors import build_model
+
+from engine import train_one_epoch, val_one_epoch
 
 
 def parse_args():
@@ -105,7 +117,7 @@ def train():
     print("Setting Arguments.. : ", args)
     print("----------------------------------------------------------")
 
-    # dist
+    # Dist
     world_size = distributed_utils.get_world_size()
     per_gpu_batch = args.batch_size // world_size
     print('World size: {}'.format(world_size))
@@ -125,20 +137,30 @@ def train():
     else:
         device = torch.device("cpu")
 
-    # config
-    cfg = build_config(args)
+    # Dataset & Model Config
+    data_cfg = build_dataset_config(args)
+    model_cfg = build_model_config(args)
 
-    # dataset and evaluator
-    dataset, dataset_info, evaluator = build_dataset(cfg, args, device, is_train=True)
-    num_classes = dataset_info[0]
+    # Transform
+    train_transform, trans_config = build_transform(
+        args=args, trans_config=model_cfg['trans_config'], max_stride=model_cfg['max_stride'], is_train=True)
+    val_transform, _ = build_transform(
+        args=args, max_stride=model_cfg['max_stride'], is_train=False)
+    
+    # Dataset
+    dataset, dataset_info = build_dataset(args, data_cfg, trans_config, train_transform, is_train=True)
+    num_classes = dataset_info['num_classes']
 
-    # dataloader
+    # Dataloader
     dataloader = build_dataloader(args, dataset, per_gpu_batch, CollateFunc())
 
-    # build model
+    # Evaluator
+    evaluator = build_evluator(args, data_cfg, val_transform, device)
+
+    # Build model
     model, criterion = build_model(
         args=args, 
-        cfg=cfg,
+        cfg=model_cfg,
         device=device,
         num_classes=num_classes,
         trainable=True,
@@ -177,13 +199,13 @@ def train():
     accumulate = max(1, round(64 / total_bs))
     print('Grad_Accumulate: ', accumulate)
 
-    # optimizer
-    cfg['weight_decay'] *= total_bs * accumulate / 64
-    optimizer, start_epoch = build_optimizer(cfg, model_without_ddp, cfg['lr0'], args.resume)
+    # Optimizer
+    model_cfg['weight_decay'] *= total_bs * accumulate / 64
+    optimizer, start_epoch = build_optimizer(model_cfg, model_without_ddp, model_cfg['lr0'], args.resume)
 
     # Scheduler
     total_epochs = args.max_epoch
-    scheduler, lf = build_lr_scheduler(cfg, optimizer, total_epochs)
+    scheduler, lf = build_lr_scheduler(model_cfg, optimizer, total_epochs)
     scheduler.last_epoch = start_epoch - 1  # do not move
     if args.resume:
         scheduler.step()
@@ -191,7 +213,7 @@ def train():
     # Model EMA
     if args.ema and distributed_utils.get_rank() in [-1, 0]:
         print('Build ModelEMA ...')
-        ema = ModelEMA(model, cfg['ema_decay'], cfg['ema_tau'], start_epoch * len(dataloader))
+        ema = ModelEMA(model, model_cfg['ema_decay'], model_cfg['ema_tau'], start_epoch * len(dataloader))
     else:
         ema = None
 
@@ -215,7 +237,7 @@ def train():
             dataloader.batch_sampler.sampler.set_epoch(epoch)
 
         # check second stage
-        if epoch >= (total_epochs - cfg['no_aug_epoch'] - 1):
+        if epoch >= (total_epochs - model_cfg['no_aug_epoch'] - 1):
             # close mosaic augmentation
             if dataloader.dataset.mosaic_prob > 0.:
                 print('close Mosaic Augmentation ...')
@@ -232,7 +254,7 @@ def train():
             epoch=epoch,
             total_epochs=total_epochs,
             args=args, 
-            cfg=cfg, 
+            cfg=model_cfg, 
             device=device,
             ema=ema, 
             model=model,
