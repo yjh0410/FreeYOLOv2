@@ -321,7 +321,7 @@ OurDataset
 |  ...
 ```
 
-本项目在 `dataset/OurDataset/` 中提供了一个本地数据集的例子，以供使用者参考。
+本项目在 `GeneralDataset` 中提供了一个本地数据集的例子，以供使用者参考。
 
 - 步骤2：将本地数据集转换为 COCO 格式。
 
@@ -329,14 +329,14 @@ OurDataset
 cd <FreeYOLOv2_HOME>
 cd tools
 # 转换训练集
-python convert_ours_to_coco.py --root path/to/OurDataset/ --split train
+python convert_ours_to_coco.py --root path/to/GeneralDataset/ --split train
 # 转换验证集
-python convert_ours_to_coco.py --root path/to/OurDataset/ --split val
+python convert_ours_to_coco.py --root path/to/GeneralDataset/ --split val
 ```
 
 然后，我们就会得到相应的 `train.json` 和 `val.json` 两个文件，如下所示：
 ```
-OurDataset
+GeneralDataset
 |_ train
 |  |_ images     
 |     |_ 0.jpg
@@ -370,9 +370,9 @@ OurDataset
 cd <FreeYOLOv2_HOME>
 cd dataset
 # 检查训练集
-python ourdataset.py --root path/to/OurDataset/ --split train
+python ourdataset.py --root path/to/GeneralDataset/ --split train
 # 检查验证集
-python ourdataset.py --root path/to/OurDataset/ --split val
+python ourdataset.py --root path/to/GeneralDataset/ --split val
 ```
 
 - 步骤5：**训练**
@@ -381,7 +381,7 @@ python ourdataset.py --root path/to/OurDataset/ --split val
 
 ```Shell
 cd <FreeYOLOv2_HOME>
-python train.py --root path/to/OurDataset/ -d ourdataset -v yolo_free_v2_tiny -bs 16 --max_epoch 100 --wp_epoch 1 --eval_epoch 5 -p path/to/yolo_free_tiny_coco.pth
+python train.py --root path/to/GeneralDataset/ -d ourdataset -v yolo_free_v2_tiny -bs 16 --max_epoch 100 --wp_epoch 1 --eval_epoch 5 -p path/to/yolo_free_tiny_coco.pth
 ```
 
 - Step-6 **测试**
@@ -390,7 +390,7 @@ python train.py --root path/to/OurDataset/ -d ourdataset -v yolo_free_v2_tiny -b
 
 ```Shell
 cd <FreeYOLOv2_HOME>
-python test.py --root path/to/OurDataset/ -d ourdataset -v yolo_free_v2_tiny --weight path/to/checkpoint --show
+python test.py --root path/to/GeneralDataset/ -d ourdataset -v yolo_free_v2_tiny --weight path/to/checkpoint --show
 ```
 
 - Step-7 **验证**

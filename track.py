@@ -7,11 +7,11 @@ import numpy as np
 
 import torch
 
-from dataset.transforms import build_transform
+from dataset.build import build_transform
 from utils.vis_tools import plot_tracking
 from utils.misc import load_weight
 
-from config import build_config
+from config import build_model_config
 
 from models.detectors import build_model
 from models.trackers import build_tracker
@@ -417,13 +417,17 @@ if __name__ == '__main__':
     np.random.seed(0)
 
     # config
-    cfg = build_config(args)
+    model_cfg = build_model_config(args)
 
     # transform
-    transform = build_transform(args.img_size, max_stride=max(cfg['stride']), is_train=False)
+    val_transform, _ = build_transform(
+        args=args,
+        max_stride=model_cfg['max_stride'],
+        is_train=False
+        )
 
     # ---------------------- General Object Detector ----------------------
-    detector = build_model(args, cfg, device, args.num_classes, False)
+    detector = build_model(args, model_cfg, device, args.num_classes, False)
 
     ## load trained weight
     detector = load_weight(detector, args.weight, args.fuse_conv_bn)
@@ -437,4 +441,4 @@ if __name__ == '__main__':
         tracker=tracker,
         detector=detector, 
         device=device,
-        transform=transform)
+        transform=val_transform)

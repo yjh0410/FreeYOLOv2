@@ -309,7 +309,7 @@ OurDataset
 |     |_ ...
 |  ...
 ```
-You can refer the format of `AnimalDataset/` which has been provided in this project.
+You can refer the format of `GeneralDataset/` which has been provided in this project.
 
 - Step-2: Convert ourdataset to COCO format.
 
@@ -317,13 +317,13 @@ You can refer the format of `AnimalDataset/` which has been provided in this pro
 cd <FreeYOLOv2_HOME>
 cd tools
 # convert train split
-python convert_ours_to_coco.py --root path/to/AnimalDataset/ --split train
+python convert_ours_to_coco.py --root path/to/GeneralDataset/ --split train
 # convert val split
-python convert_ours_to_coco.py --root path/to/AnimalDataset/ --split val
+python convert_ours_to_coco.py --root path/to/GeneralDataset/ --split val
 ```
 Then, we can get a `train.json` file and a `val.json` file, as shown below.
 ```
-AnimalDataset
+GeneralDataset
 |_ train
 |  |_ images     
 |     |_ 0.jpg
@@ -357,9 +357,9 @@ Please open `dataset/ourdataset.py` file and change `our_class_labels = ('cat',)
 cd <FreeYOLOv2_HOME>
 cd dataset
 # convert train split
-python ourdataset.py --root path/to/AnimalDataset/ --split train
+python ourdataset.py --root path/to/GeneralDataset/ --split train
 # convert val split
-python ourdataset.py --root path/to/AnimalDataset/ --split val
+python ourdataset.py --root path/to/GeneralDataset/ --split val
 ```
 
 - Step-5 **Train**
@@ -368,7 +368,7 @@ For example:
 
 ```Shell
 cd <FreeYOLOv2_HOME>
-python train.py --root path/to/OurDataset/ -d ourdataset -v yolo_free_v2_nano -bs 16 --max_epoch 100 --wp_epoch 1 --eval_epoch 5 -p path/to/yolo_free_tiny_coco.pth
+python train.py --root path/to/GeneralDataset/ -d ourdataset -v yolo_free_v2_nano -bs 16 --max_epoch 100 --wp_epoch 1 --eval_epoch 5 -p path/to/yolo_free_tiny_coco.pth
 ```
 
 - Step-6 **Test**
@@ -377,7 +377,7 @@ For example:
 
 ```Shell
 cd <FreeYOLOv2_HOME>
-python test.py --root path/to/OurDataset/ -d ourdataset -v yolo_free_v2_nano --weight path/to/checkpoint --show
+python test.py --root path/to/GeneralDataset/ -d ourdataset -v yolo_free_v2_nano --weight path/to/checkpoint --show
 ```
 
 - Step-7 **Eval**
@@ -386,7 +386,7 @@ For example:
 
 ```Shell
 cd <FreeYOLOv2_HOME>
-python eval.py --root path/to/OurDataset/ -d ourdataset -v yolo_free_v2_nano --weight path/to/checkpoint
+python eval.py --root path/to/GeneralDataset/ -d ourdataset -v yolo_free_v2_nano --weight path/to/checkpoint
 ```
 
 ## Tracking
