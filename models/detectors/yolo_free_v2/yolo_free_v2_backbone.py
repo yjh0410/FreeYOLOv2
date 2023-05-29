@@ -8,6 +8,7 @@ except:
 
 
 model_urls = {
+    'elannet_pico': "https://github.com/yjh0410/image_classification_pytorch/releases/download/weight/elannet_pico.pth",
     'elannet_nano': "https://github.com/yjh0410/image_classification_pytorch/releases/download/weight/elannet_nano.pth",
     'elannet_small': "https://github.com/yjh0410/image_classification_pytorch/releases/download/weight/elannet_small.pth",
     'elannet_medium': "https://github.com/yjh0410/image_classification_pytorch/releases/download/weight/elannet_medium.pth",
@@ -109,7 +110,9 @@ def build_backbone(cfg, pretrained=False):
         )
     # check whether to load imagenet pretrained weight
     if pretrained:
-        if cfg['width'] == 0.25 and cfg['depth'] == 0.34:
+        if cfg['width'] == 0.25 and cfg['depth'] == 0.34 and cfg['bk_dpw']:
+            backbone = load_weight(backbone, model_name='elannet_pico')
+        elif cfg['width'] == 0.25 and cfg['depth'] == 0.34:
             backbone = load_weight(backbone, model_name='elannet_nano')
         elif cfg['width'] == 0.5 and cfg['depth'] == 0.34:
             backbone = load_weight(backbone, model_name='elannet_small')
@@ -128,12 +131,12 @@ if __name__ == '__main__':
     import time
     from thop import profile
     cfg = {
-        'pretrained': False,
-        'bk_act': 'lrelu',
+        'pretrained': True,
+        'bk_act': 'silu',
         'bk_norm': 'BN',
-        'bk_dpw': False,
-        'width': 1.0,
-        'depth': 1.0,
+        'bk_dpw': True,
+        'width': 0.25,
+        'depth': 0.34,
     }
     model, feats = build_backbone(cfg)
     x = torch.randn(1, 3, 640, 640)

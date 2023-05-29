@@ -68,16 +68,19 @@ python train.py --cuda -d coco -v yolo_free_v2_nano -bs 16 --max_epoch 300 --wp_
 
 - FreeYOLOv2
 
-| Model             | Scale | FPS<sup>3090<br>FP32-bs1 | AP<sup>val<br>0.5:0.95 | FLOPs<br><sup>(G) | Params<br><sup>(M) | Weight |
-|-------------------|-------|--------------------------|------------------------|-------------------|--------------------|--------|
-| FreeYOLOv2-Nano   |  640  |           100            |          35.3          |       9.0         |       2.8          | [ckpt](https://github.com/yjh0410/FreeYOLOv2/releases/download/yolo_free_v2_ckpt/yolo_free_v2_nano_coco.pth) |
-| FreeYOLOv2-Small  |  640  |                          |          43.3          |      33.3         |       8.8          |  |
-| FreeYOLOv2-Medium |  640  |                          |                        |                   |                    |  |
-| FreeYOLOv2-Large  |  640  |                          |                        |                   |                    |  |
+| Model             | Scale | Epoch | FPS<sup>3090<br>FP32-bs1 | AP<sup>val<br>0.5:0.95 | FLOPs<br><sup>(G) | Params<br><sup>(M) | Weight |
+|-------------------|-------|-------|--------------------------|------------------------|-------------------|--------------------|--------|
+| FreeYOLOv2-Pico   |  640  |  300  |                          |                        |       4.5         |       1.4          |  |
+| FreeYOLOv2-Nano   |  640  |  300  |           100            |          35.3          |       9.0         |       2.8          | [ckpt](https://github.com/yjh0410/FreeYOLOv2/releases/download/yolo_free_v2_ckpt/yolo_free_v2_nano_coco.pth) |
+| FreeYOLOv2-Small  |  640  |  300  |                          |          43.3          |      33.3         |       8.8          | [ckpt](https://github.com/yjh0410/FreeYOLOv2/releases/download/yolo_free_v2_ckpt/yolo_free_v2_small_coco.pth) |
+| FreeYOLOv2-Medium |  640  |  300  |                          |                        |      86.7         |      23.0          |  |
+| FreeYOLOv2-Large  |  640  |  300  |                          |                        |                   |                    |  |
 
 *All FLOPs are measured with a 640x640 image size on COCO val2017. The FPS is measured with batch size 1 on 3090 GPU from the model inference to the NMS operation.*
 
 *A large batch size such as 128（I have to set it as 16.） may further improve the performance of FreeYOLOv2-Medium and FreeYOLOv2-Large.*
+
+*Increasing Epoch to 500 may further improve the performance of FreeYOLOv2.*
 
 *Due to my performance limitations, I am unable to train the FreeYOLOv2-Huge model.*
 
