@@ -76,13 +76,13 @@ python train.py --cuda -d coco -v yolo_free_v2_nano -bs 16 --max_epoch 300 --wp_
 | FreeYOLOv2-Medium |  640  |  300  |                          |                        |      86.7         |      23.0          |  |
 | FreeYOLOv2-Large  |  640  |  300  |                          |                        |                   |                    |  |
 
-*All FLOPs are measured with a 640x640 image size on COCO val2017. The FPS is measured with batch size 1 on 3090 GPU from the model inference to the NMS operation.*
+- *All FLOPs are measured with a 640x640 image size on COCO val2017. The FPS is measured with batch size 1 on 3090 GPU from the model inference to the NMS operation.*
 
-*A large batch size such as 128（I have to set it as 16.） may further improve the performance of FreeYOLOv2-Medium and FreeYOLOv2-Large.*
+- *A large batch size such as 128（I have to set it as 16.） may further improve the performance of **FreeYOLOv2-Medium** and **FreeYOLOv2-Large**.*
 
-*Increasing Epoch to 500 may further improve the performance of FreeYOLOv2.*
+- *Increasing Epoch to 500 may further improve the performance of FreeYOLOv2.*
 
-*Due to my performance limitations, I am unable to train the FreeYOLOv2-Huge model.*
+- *Due to my performance limitations, I am unable to train the FreeYOLOv2-Huge model.*
 
 
 ### WiderFace

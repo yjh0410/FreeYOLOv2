@@ -74,11 +74,13 @@ python train.py --cuda -d coco -v yolo_free_v2_tiny -bs 16 --max_epoch 300 --wp_
 | FreeYOLOv2-Medium |  640  |  300  |                          |                        |      86.7         |      23.0          |  |
 | FreeYOLOv2-Large  |  640  |  300  |                          |                        |                   |                    |  |
 
-*所有模型的FLOPs都是用640x640的图像尺寸来测试的，而推理速度则包含模型前向推理以及包括NMS在内的后处理。*
+- *所有模型的FLOPs都是用640x640的图像尺寸来测试的，而推理速度则包含模型前向推理以及包括NMS在内的后处理；*
 
-*更大的batch size如128（我只能设置为16）也许能进一步提升FreeYOLOv2-Medium和FreeYOLOv2-Large的性能。*
+- *更大的batch size如128（我只能设置为16）也许能进一步提升**FreeYOLOv2-Medium**和**FreeYOLOv2-Large**的性能；*
 
-*受限于我的计算资源，我无法训练FreeYOLOv2-Huge。*
+- *将训练时长增加到500 epoch也许能进一步提升FreeYOLOv2的性能；*
+
+- *受限于我的计算资源，我无法训练**FreeYOLOv2-Huge**。*
 
 ### WiderFace
 - 下载 [WiderFace](http://shuoyang1213.me/WIDERFACE/).

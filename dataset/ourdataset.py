@@ -17,7 +17,7 @@ except:
     from transforms import yolov5_mosaic_augment, yolov5_mosaic_augment_9x, yolov5_mixup_augment
 
 # please define our class labels
-our_class_labels = ('butterfly', 'cat', 'dog', 'person')
+our_class_labels = ('butterfly', 'cat', 'dog', 'lion', 'person', 'tiger', )
 
 
 
@@ -277,7 +277,7 @@ if __name__ == "__main__":
             color = class_colors[cls_id]
             # class name
             label = our_class_labels[cls_id]
-            image = cv2.rectangle(image, (int(x1), int(y1)), (int(x2), int(y2)), (0,0,255), 2)
+            image = cv2.rectangle(image, (int(x1), int(y1)), (int(x2), int(y2)), color, 2)
             # put the test on the bbox
             cv2.putText(image, label, (int(x1), int(y1 - 5)), 0, 0.5, color, 1, lineType=cv2.LINE_AA)
         cv2.imshow('gt', image)
