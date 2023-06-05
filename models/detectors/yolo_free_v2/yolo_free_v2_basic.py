@@ -81,7 +81,7 @@ class Conv(nn.Module):
         return self.convs(x)
 
 
-# ---------------------------- YOLOv8's Modules ----------------------------
+# ---------------------------- Modified YOLOv7's Modules ----------------------------
 ## ELANBlock
 class ELANBlock(nn.Module):
     def __init__(self, in_dim, out_dim, expand_ratio=0.5, depth=1.0, act_type='silu', norm_type='BN', depthwise=False):

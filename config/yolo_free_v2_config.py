@@ -1,4 +1,4 @@
-# yolo-free config
+# FreeYOLOv2 config
 
 
 yolo_free_v2_cfg = {
