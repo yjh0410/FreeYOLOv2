@@ -19,7 +19,7 @@ from models.detectors import build_model
 def parse_args():
     parser = argparse.ArgumentParser(description='FreeYOLOv2')
     # Model
-    parser.add_argument('-v', '--version', default='yolo_free_v2_large', type=str,
+    parser.add_argument('-m', '--model', default='yolo_free_v2_large', type=str,
                         help='build yolo_free_v2')
     parser.add_argument('-ct', '--conf_thresh', default=0.1, type=float,
                         help='confidence threshold')
