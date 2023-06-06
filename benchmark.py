@@ -37,6 +37,9 @@ def parse_args():
     # data root
     parser.add_argument('--root', default='/mnt/share/ssd2/dataset',
                         help='data root')
+    parser.add_argument('-d', '--dataset', default='coco',
+                        help='coco, voc.')
+
     # basic
     parser.add_argument('-size', '--img_size', default=640, type=int,
                         help='the min size of input image')
