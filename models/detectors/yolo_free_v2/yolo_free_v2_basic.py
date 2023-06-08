@@ -53,6 +53,7 @@ class Conv(nn.Module):
         super(Conv, self).__init__()
         convs = []
         add_bias = False if norm_type else True
+        p = p if d == 1 else d
         if depthwise:
             convs.append(get_conv2d(c1, c1, k=k, p=p, s=s, d=d, g=c1, bias=add_bias))
             # depthwise conv

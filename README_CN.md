@@ -72,7 +72,7 @@ python train.py --cuda -d coco -v yolo_free_v2_tiny -bs 16 --max_epoch 300 --wp_
 | FreeYOLOv2-Nano   |  640  |  300  |           100            |          35.3          |       9.0         |       2.8          | [ckpt](https://github.com/yjh0410/FreeYOLOv2/releases/download/yolo_free_v2_ckpt/yolo_free_v2_nano_coco.pth) |
 | FreeYOLOv2-Small  |  640  |  300  |           86             |          43.3          |      33.3         |       8.8          | [ckpt](https://github.com/yjh0410/FreeYOLOv2/releases/download/yolo_free_v2_ckpt/yolo_free_v2_small_coco.pth) |
 | FreeYOLOv2-Medium |  640  |  300  |           71             |          47.5          |      86.7         |      23.0          | [ckpt](https://github.com/yjh0410/FreeYOLOv2/releases/download/yolo_free_v2_ckpt/yolo_free_v2_medium_coco.pth) |
-| FreeYOLOv2-Large  |  640  |  300  |                          |                        |                   |                    |  |
+| FreeYOLOv2-Large  |  640  |  300  |                          |                        |     175.4         |      46.5          |  |
 
 - *所有模型的FLOPs都是用640x640的图像尺寸来测试的，而推理速度则包含模型前向推理以及包括NMS在内的后处理；*
 
