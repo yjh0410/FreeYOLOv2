@@ -18,7 +18,7 @@ from utils.vis_tools import visualize
 
 def make_parser():
     parser = argparse.ArgumentParser("onnxruntime inference sample")
-    parser.add_argument("--model", type=str, default="../../weights/onnx/11/yolo_free_large.onnx",
+    parser.add_argument("-m", "--model", type=str, default="../../weights/onnx/11/yolo_free_v2_nano.onnx",
                         help="Input your onnx model.")
     parser.add_argument("-i", "--image_path", type=str, default='../test_image.jpg',
                         help="Path to your input image.")
@@ -44,9 +44,7 @@ if __name__ == '__main__':
     prepocess = PreProcessor(img_size=args.img_size)
 
     # postprocessor
-    postprocess = PostProcessor(
-        img_size=args.img_size, strides=[8, 16, 32],
-        num_classes=80, conf_thresh=args.score_thr, nms_thresh=0.5)
+    postprocess = PostProcessor(num_classes=80, conf_thresh=args.score_thr, nms_thresh=0.5)
 
     # read an image
     input_shape = tuple([args.img_size, args.img_size])
