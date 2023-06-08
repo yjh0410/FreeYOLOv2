@@ -1,15 +1,4 @@
-## FreeYOLO ONNXRuntime
-
-### Download FreeYOLO ONNX file
-Main results on COCO-val:
-
-| Model          |  Scale  |    AP    |    AP50    |  ONNX(opset=11)  |  ONNX(opset=10)  |
-|----------------|---------|----------|------------|------------------|------------------|
-| FreeYOLO-Nano  |  640    |   30.5   |   50.3     | [github](https://github.com/yjh0410/FreeYOLO/releases/download/weight/yolo_free_nano_opset_11.onnx) | [github](https://github.com/yjh0410/FreeYOLO/releases/download/weight/yolo_free_nano_opset_10.onnx) |
-| FreeYOLO-Tiny  |  640    |   34.4   |   53.9     | [github](https://github.com/yjh0410/FreeYOLO/releases/download/weight/yolo_free_tiny_opset_11.onnx) | [github](https://github.com/yjh0410/FreeYOLO/releases/download/weight/yolo_free_tiny_opset_10.onnx) |
-| FreeYOLO-Large |  640    |   48.3   |   68.5     | [github](https://github.com/yjh0410/FreeYOLO/releases/download/weight/yolo_free_large_opset_11.onnx) | [github](https://github.com/yjh0410/FreeYOLO/releases/download/weight/yolo_free_large_opset_10.onnx) |
-| FreeYOLO-Huge  |  640    |   50.0   |   69.5     | [github](https://github.com/yjh0410/FreeYOLO/releases/download/weight/yolo_free_huge_opset_11.onnx) | [github](https://github.com/yjh0410/FreeYOLO/releases/download/weight/yolo_free_huge_opset_10.onnx) |
-
+## FreeYOLOv2 ONNXRuntime
 
 ### Convert Your Model to ONNX
 
@@ -22,7 +11,7 @@ Then, you can:
 
 1. Convert a standard FreeYOLO model by:
 ```shell
-python3 export_onnx.py --output-name yolo_free_large.onnx -v yolo_free_large --weight ../weight/coco/yolo_free_large/yolo_free_large.pth --no_decode -nc 80 --img_size 640
+python3 export_onnx.py -m yolo_free_v2_nano --weight ../weight/coco/yolov1/yolo_free_v2_nano_coco.pth -nc 80 --img_size 640
 ```
 
 Notes:
@@ -45,10 +34,10 @@ cd <YOLOX_HOME>/deployment/ONNXRuntime
 
 Step2. 
 ```shell
-python3 onnx_inference.py --weight ../../weights/onnx/11/yolo_free_large.onnx -i ../test_image.jpg -s 0.3 --img_size 640
+python3 onnx_inference.py --model ../../weights/onnx/11/yolo_free_v2_nano.onnx -i ../test_image.jpg -s 0.3 --img_size 640
 ```
 Notes:
-* --weight: your converted onnx model
+* --model: your converted onnx model
 * -i: input_image
 * -s: score threshold for visualization.
 * --img_size: should be consistent with the shape you used for onnx convertion.
