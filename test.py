@@ -197,11 +197,7 @@ if __name__ == '__main__':
                      np.random.randint(255)) for _ in range(num_classes)]
 
     # build model
-    model = build_model(args=args, 
-                        cfg=model_cfg,
-                        device=device, 
-                        num_classes=num_classes, 
-                        trainable=False)
+    model = build_model(args, model_cfg, device, num_classes, False)
 
     # load trained weight
     model = load_weight(model, args.weight, args.fuse_conv_bn, args.fuse_repconv)

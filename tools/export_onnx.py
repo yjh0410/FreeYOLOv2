@@ -82,12 +82,12 @@ def main():
                         trainable=False,
                         deploy=True)
 
-    # replace nn.SiLU with SiLU
-    model = replace_module(model, nn.SiLU, SiLU)
-
     # load trained weight
     model = load_weight(model, args.weight, args.fuse_conv_bn)
     model = model.to(device).eval()
+
+    # replace nn.SiLU with SiLU
+    model = replace_module(model, nn.SiLU, SiLU)
 
     logger.info("loading checkpoint done.")
     dummy_input = torch.randn(args.batch_size, 3, args.img_size, args.img_size)
