@@ -18,7 +18,6 @@ class Trainer(object):
         self.cfg = cfg
         self.device = device
         self.epoch = 0
-        self.total_epochs = args.max_epoch
         self.best_map = -1.
         # ------------------- core modules -------------------
         self.model_ema = model_ema
@@ -113,7 +112,7 @@ class Trainer(object):
                 t1 = time.time()
                 cur_lr = [param_group['lr']  for param_group in self.optimizer.param_groups]
                 # basic infor
-                log =  '[Epoch: {}/{}]'.format(self.epoch+1, self.total_epochs)
+                log =  '[Epoch: {}/{}]'.format(self.epoch+1, self.args.max_epochs)
                 log += '[Iter: {}/{}]'.format(iter_i, epoch_size)
                 log += '[lr: {:.6f}]'.format(cur_lr[2])
                 # loss infor
