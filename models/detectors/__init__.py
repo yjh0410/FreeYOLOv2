@@ -10,12 +10,13 @@ def build_model(args,
                 cfg,
                 device, 
                 num_classes=80, 
-                trainable=False):
+                trainable=False,
+                deploy=False):
     # FreeYOLOv2
     if args.model in ['yolo_free_v2_pico', 'yolo_free_v2_nano', 'yolo_free_v2_small',
                       'yolo_free_v2_medium', 'yolo_free_v2_large', 'yolo_free_v2_huge']:
         model, criterion = build_yolo_free_v2(
-            args, cfg, device, num_classes, trainable)
+            args, cfg, device, num_classes, trainable, deploy)
 
     if trainable:
         # Load pretrained weight

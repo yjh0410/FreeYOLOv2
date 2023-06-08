@@ -89,9 +89,7 @@ def main():
     prepocess = PreProcessor(img_size=args.img_size)
 
     # postprocessor
-    postprocess = PostProcessor(
-        img_size=args.img_size, strides=[8, 16, 32],
-        num_classes=80, conf_thresh=args.score_thr, nms_thresh=0.5)
+    postprocess = PostProcessor(num_classes=80, conf_thresh=args.score_thr, nms_thresh=0.5)
 
     # ---------------------------Step 6. Prepare input---------------------------------------------------------------------
     input_shape = tuple([args.img_size, args.img_size])

@@ -404,6 +404,14 @@ class RepConv(nn.Module):
             del self.rbr_dense
             self.rbr_dense = None
 
+## SiLU
+class SiLU(nn.Module):
+    """export-friendly version of nn.SiLU()"""
+
+    @staticmethod
+    def forward(x):
+        return x * torch.sigmoid(x)
+
 
 # ---------------------------- NMS ----------------------------
 ## basic NMS
@@ -509,19 +517,17 @@ class PreProcessor(object):
         
         # [H, W, C] -> [C, H, W]
         padded_img = padded_img.transpose(swap)
-        padded_img = np.ascontiguousarray(padded_img, dtype=np.float32)
+        padded_img = np.ascontiguousarray(padded_img, dtype=np.float32) / 255.
 
 
         return padded_img, r
 
 ## Post-processer
 class PostProcessor(object):
-    def __init__(self, img_size, strides, num_classes, conf_thresh=0.15, nms_thresh=0.5):
-        self.img_size = img_size
+    def __init__(self, num_classes, conf_thresh=0.15, nms_thresh=0.5):
         self.num_classes = num_classes
         self.conf_thresh = conf_thresh
         self.nms_thresh = nms_thresh
-        self.strides = strides
 
     def __call__(self, predictions):
         """
