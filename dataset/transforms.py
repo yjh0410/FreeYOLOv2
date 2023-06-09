@@ -6,7 +6,7 @@ import torch
 
 
 def random_perspective(image,
-                       targets=(),
+                       bboxes=(),
                        degrees=10,
                        translate=.1,
                        scale=.1,
@@ -56,27 +56,25 @@ def random_perspective(image,
             image = cv2.warpAffine(image, M[:2], dsize=(width, height), borderValue=(114, 114, 114))
 
     # Transform label coordinates
-    n = len(targets)
+    n = len(bboxes)
     if n:
-        new = np.zeros((n, 4))
+        new_bboxes = np.zeros((n, 4))
         # warp boxes
         xy = np.ones((n * 4, 3))
-        xy[:, :2] = targets[:, [1, 2, 3, 4, 1, 4, 3, 2]].reshape(n * 4, 2)  # x1y1, x2y2, x1y2, x2y1
+        xy[:, :2] = bboxes[:, [0, 1, 2, 3, 0, 3, 2, 1]].reshape(n * 4, 2)  # x1y1, x2y2, x1y2, x2y1
         xy = xy @ M.T  # transform
         xy = (xy[:, :2] / xy[:, 2:3] if perspective else xy[:, :2]).reshape(n, 8)  # perspective rescale or affine
 
         # create new boxes
         x = xy[:, [0, 2, 4, 6]]
         y = xy[:, [1, 3, 5, 7]]
-        new = np.concatenate((x.min(1), y.min(1), x.max(1), y.max(1))).reshape(4, n).T
+        new_bboxes = np.concatenate((x.min(1), y.min(1), x.max(1), y.max(1))).reshape(4, n).T
 
         # clip
-        new[:, [0, 2]] = new[:, [0, 2]].clip(0, width)
-        new[:, [1, 3]] = new[:, [1, 3]].clip(0, height)
+        new_bboxes[:, [0, 2]] = new_bboxes[:, [0, 2]].clip(0, width)
+        new_bboxes[:, [1, 3]] = new_bboxes[:, [1, 3]].clip(0, height)
 
-        targets[:, 1:5] = new
-
-    return image, targets
+    return image, new_bboxes
 
 
 def augment_hsv(img, hgain=0.5, sgain=0.5, vgain=0.5):
@@ -163,10 +161,9 @@ def yolov5_mosaic_augment(image_list, target_list, img_size, affine_params=None)
     mosaic_bboxes = mosaic_bboxes.clip(0, img_size * 2)
 
     # random perspective
-    mosaic_targets = np.concatenate([mosaic_labels[..., None], mosaic_bboxes], axis=-1)
-    mosaic_img, mosaic_targets = random_perspective(
+    mosaic_img, mosaic_bboxes = random_perspective(
         mosaic_img,
-        mosaic_targets,
+        mosaic_bboxes,
         affine_params['degrees'],
         translate=affine_params['translate'],
         scale=affine_params['scale'],
@@ -177,8 +174,8 @@ def yolov5_mosaic_augment(image_list, target_list, img_size, affine_params=None)
 
     # target
     mosaic_target = {
-        "boxes": mosaic_targets[..., 1:],
-        "labels": mosaic_targets[..., 0],
+        "boxes": mosaic_bboxes,
+        "labels": mosaic_labels,
         "orig_size": [img_size, img_size]
     }
 
@@ -269,22 +266,21 @@ def yolov5_mosaic_augment_9x(image_list, target_list, img_size, affine_params=No
     mosaic_bboxes = mosaic_bboxes.clip(0, img_size * 2)
 
     # random perspective
-    mosaic_targets = np.concatenate([mosaic_labels[..., None], mosaic_bboxes], axis=-1)
-    mosaic_img, mosaic_targets = random_perspective(
+    mosaic_img, mosaic_bboxes = random_perspective(
         mosaic_img,
-        mosaic_targets,
+        mosaic_bboxes,
         affine_params['degrees'],
         translate=affine_params['translate'],
         scale=affine_params['scale'],
         shear=affine_params['shear'],
         perspective=affine_params['perspective'],
-        border=mosaic_border
+        border=[-img_size//2, -img_size//2]
         )
 
     # target
     mosaic_target = {
-        "boxes": mosaic_targets[..., 1:],
-        "labels": mosaic_targets[..., 0],
+        "boxes": mosaic_bboxes,
+        "labels": mosaic_labels,
         "orig_size": [img_size, img_size]
     }
 
@@ -365,21 +361,17 @@ class TrainTransforms(object):
             boxes_ = target["boxes"].copy()
             boxes_[:, [0, 2]] = boxes_[:, [0, 2]] / img_w0 * img_w
             boxes_[:, [1, 3]] = boxes_[:, [1, 3]] / img_h0 * img_h
-            target["boxes"] = boxes_
 
             # spatial augment
-            target_ = np.concatenate(
-                (target['labels'][..., None], target['boxes']), axis=-1)
-            img, target_ = random_perspective(
-                img, target_,
+            img, boxes_ = random_perspective(
+                img, boxes_,
                 degrees=self.trans_config['degrees'],
                 translate=self.trans_config['translate'],
                 scale=self.trans_config['scale'],
                 shear=self.trans_config['shear'],
                 perspective=self.trans_config['perspective']
                 )
-            target['boxes'] = target_[..., 1:]
-            target['labels'] = target_[..., 0]
+            target['boxes'] = boxes_
         
         # random flip
         if random.random() < 0.5:
