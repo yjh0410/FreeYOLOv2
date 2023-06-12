@@ -282,9 +282,6 @@ if __name__ == "__main__":
         'mosaic_prob': 1.0,
         'mosaic_9x_prob': 0.2,
         'mixup_prob': 0.15,
-        'mosaic_type': 'yolov5_mosaic',
-        'mixup_type': 'yolov5_mixup',
-        'mixup_scale': [0.5, 1.5]
     }
     transform, trans_config = build_transform(args, trans_config, max_stride=32, is_train=is_train)
 

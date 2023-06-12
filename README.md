@@ -74,7 +74,7 @@ python train.py --cuda -d coco -v yolo_free_v2_nano -bs 16 --max_epoch 300 --wp_
 | FreeYOLOv2-Nano   |  640  |  300  |           100            |          35.3          |       9.0         |       2.8          | [ckpt](https://github.com/yjh0410/FreeYOLOv2/releases/download/yolo_free_v2_ckpt/yolo_free_v2_nano_coco.pth) |
 | FreeYOLOv2-Small  |  640  |  300  |           86             |          43.3          |      33.3         |       8.8          | [ckpt](https://github.com/yjh0410/FreeYOLOv2/releases/download/yolo_free_v2_ckpt/yolo_free_v2_small_coco.pth) |
 | FreeYOLOv2-Medium |  640  |  300  |           71             |          47.5          |      86.7         |      23.0          | [ckpt](https://github.com/yjh0410/FreeYOLOv2/releases/download/yolo_free_v2_ckpt/yolo_free_v2_medium_coco.pth) |
-| FreeYOLOv2-Large  |  640  |  300  |                          |                        |     175.4         |      46.5          |  |
+| FreeYOLOv2-Large  |  640  |  300  |           66             |                        |     175.4         |      46.5          |  |
 
 - *All FLOPs are measured with a 640x640 image size on COCO val2017. The FPS is measured with batch size 1 on 3090 GPU from the model inference to the NMS operation.*
 
