@@ -74,7 +74,9 @@ def random_perspective(image,
         new_bboxes[:, [0, 2]] = new_bboxes[:, [0, 2]].clip(0, width)
         new_bboxes[:, [1, 3]] = new_bboxes[:, [1, 3]].clip(0, height)
 
-    return image, new_bboxes
+        bboxes = new_bboxes
+
+    return image, bboxes
 
 
 def augment_hsv(img, hgain=0.5, sgain=0.5, vgain=0.5):
