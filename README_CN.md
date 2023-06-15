@@ -68,15 +68,15 @@ python train.py --cuda -d coco -v yolo_free_v2_tiny -bs 16 --max_epoch 300 --wp_
 
 | Model             | Scale | Epoch | FPS<sup>3090<br>FP32-bs1 | AP<sup>val<br>0.5:0.95 | FLOPs<br><sup>(G) | Params<br><sup>(M) | Weight |
 |-------------------|-------|-------|--------------------------|------------------------|-------------------|--------------------|--------|
-| FreeYOLOv2-Pico   |  640  |  300  |                          |                        |       4.5         |       1.4          |  |
+| FreeYOLOv2-Pico   |  640  |  300  |            -             |                        |       4.5         |       1.4          |  |
 | FreeYOLOv2-Nano   |  640  |  300  |           100            |          35.3          |       9.0         |       2.8          | [ckpt](https://github.com/yjh0410/FreeYOLOv2/releases/download/yolo_free_v2_ckpt/yolo_free_v2_nano_coco.pth) |
 | FreeYOLOv2-Small  |  640  |  300  |           86             |          43.3          |      33.3         |       8.8          | [ckpt](https://github.com/yjh0410/FreeYOLOv2/releases/download/yolo_free_v2_ckpt/yolo_free_v2_small_coco.pth) |
 | FreeYOLOv2-Medium |  640  |  300  |           71             |          47.5          |      86.7         |      23.0          | [ckpt](https://github.com/yjh0410/FreeYOLOv2/releases/download/yolo_free_v2_ckpt/yolo_free_v2_medium_coco.pth) |
-| FreeYOLOv2-Large  |  640  |  300  |                          |                        |     175.4         |      46.5          |  |
+| FreeYOLOv2-Large  |  640  |  300  |           66             |          49.4          |     175.4         |      46.5          | [ckpt](https://github.com/yjh0410/FreeYOLOv2/releases/download/yolo_free_v2_ckpt/yolo_free_v2_large_coco.pth) |
 
 - *所有模型的FLOPs都是用640x640的图像尺寸来测试的，而推理速度则包含模型前向推理以及包括NMS在内的后处理；*
 
-- *更大的batch size如128（我只能设置为16）也许能进一步提升**FreeYOLOv2-Medium**和**FreeYOLOv2-Large**的性能；*
+- *更大的batch size如128或者256（我只能设置为16）也许能进一步提升**FreeYOLOv2-Medium**和**FreeYOLOv2-Large**的性能；*
 
 - *将训练时长增加到500 epoch也许能进一步提升FreeYOLOv2的性能；*
 
