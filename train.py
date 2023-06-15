@@ -237,7 +237,7 @@ def train():
         if heavy_eval:
             trainer.eval_one_epoch(model_without_ddp, evaluator)
         else:
-            if (epoch % args.eval_epoch) == 0 or (epoch == args.total_epochs - 1):
+            if (epoch % args.eval_epoch) == 0 or (epoch == args.max_epoch - 1):
                 trainer.eval_one_epoch(model_without_ddp, evaluator)
         
     # Empty cache after train loop
