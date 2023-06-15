@@ -163,13 +163,6 @@ def train():
         model = DDP(model, device_ids=[args.gpu])
         model_without_ddp = model.module
 
-    # ---------------------------- Build Model-EMA ----------------------------
-    if args.ema and distributed_utils.get_rank() in [-1, 0]:
-        print('Build ModelEMA ...')
-        model_ema = ModelEMA(model, model_cfg['ema_decay'], model_cfg['ema_tau'], start_epoch * len(train_loader))
-    else:
-        model_ema = None
-
     # ---------------------------- Calcute Params & GFLOPs ----------------------------
     if distributed_utils.is_main_process:
         model_copy = deepcopy(model_without_ddp)
@@ -197,6 +190,13 @@ def train():
     lr_scheduler.last_epoch = start_epoch - 1  # do not move
     if args.resume:
         lr_scheduler.step()
+
+    # ---------------------------- Build Model-EMA ----------------------------
+    if args.ema and distributed_utils.get_rank() in [-1, 0]:
+        print('Build ModelEMA ...')
+        model_ema = ModelEMA(model, model_cfg['ema_decay'], model_cfg['ema_tau'], start_epoch * len(train_loader))
+    else:
+        model_ema = None
 
     # ---------------------------- Build Trainer ----------------------------
     trainer = Trainer(args, device, model_cfg, model_ema, optimizer, lf, lr_scheduler, criterion, scaler)
