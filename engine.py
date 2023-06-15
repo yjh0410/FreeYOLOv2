@@ -137,9 +137,9 @@ class Trainer(object):
         
 
     @torch.no_grad()
-    def eval_one_epoch(self, model_eval, evaluator):
+    def eval_one_epoch(self, model, evaluator):
         # chech model
-        model_eval = model_eval if self.model_ema is None else self.model_ema.ema
+        model_eval = model if self.model_ema is None else self.model_ema.ema
 
         # path to save model
         path_to_save = os.path.join(self.args.save_folder, self.args.dataset, self.args.model)
