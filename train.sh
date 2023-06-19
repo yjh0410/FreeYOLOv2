@@ -32,6 +32,7 @@ python train.py \
         --multi_scale \
         --mosaic 0.5 \
         --mixup 0.0 \
+        --min_box_size 1 \
         --pretrained weights/coco/yolo_free_v2_large/yolo_free_v2_large_coco.pth \
         # --resume weights/coco/yolo_free_v2_large/yolo_free_v2_large_epoch_41_43.06.pth \
         # --eval_first
