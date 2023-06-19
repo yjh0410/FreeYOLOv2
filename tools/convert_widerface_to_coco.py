@@ -144,7 +144,7 @@ def convert_wider_annots(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Convert dataset')
     parser.add_argument(
-        '-d', '--datadir', help="dir to widerface", default='data/widerface', type=str)
+        '--root', '--datadir', help="dir to widerface", default='data/widerface', type=str)
 
     parser.add_argument(
         '-s', '--subset', help="which subset to convert", default='all', choices=['all', 'train', 'val'], type=str)
