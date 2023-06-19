@@ -35,3 +35,21 @@ python train.py \
         --pretrained weights/coco/yolo_free_v2_large/yolo_free_v2_large_coco.pth \
         # --resume weights/coco/yolo_free_v2_large/yolo_free_v2_large_epoch_41_43.06.pth \
         # --eval_first
+
+# # Train FreeYOLO on CrowdHuman
+# python train.py \
+#         --cuda \
+#         -d crowdhuman \
+#         --root /mnt/share/ssd2/dataset/ \
+#         -m yolo_free_v2_large \
+#         -bs 16 \
+#         -size 640 \
+#         --wp_epoch 1 \
+#         --max_epoch 100 \
+#         --eval_epoch 10 \
+#         --ema \
+#         --fp16 \
+#         --multi_scale \
+#         --pretrained weights/coco/yolo_free_v2_large/yolo_free_v2_large_coco.pth \
+#         # --resume weights/coco/yolo_free_v2_large/yolo_free_v2_large_epoch_41_43.06.pth \
+#         # --eval_first
