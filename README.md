@@ -127,7 +127,7 @@ Main results on WiderFace-val:
 |-------------------|---------|----------|------------|----------|
 | FreeYOLOv2-Pico   |  640    |      |        |  |
 | FreeYOLOv2-Nano   |  640    |      |        |  |
-| FreeYOLOv2-Small  |  640    |   33.5   |    60.1    |  |
+| FreeYOLOv2-Small  |  640    |   33.5   |    60.1    | [ckpt](https://github.com/yjh0410/FreeYOLOv2/releases/download/yolo_free_v2_ckpt/yolo_free_v2_small_widerface.pth) |
 | FreeYOLOv2-Medium |  640    |   34.8   |    61.7    | [ckpt](https://github.com/yjh0410/FreeYOLOv2/releases/download/yolo_free_v2_ckpt/yolo_free_v2_medium_widerface.pth) |
 | FreeYOLOv2-Large  |  640    |   35.5   |    62.6    | [ckpt](https://github.com/yjh0410/FreeYOLOv2/releases/download/yolo_free_v2_ckpt/yolo_free_v2_large_widerface.pth) |
 
