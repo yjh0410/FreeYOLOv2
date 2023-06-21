@@ -186,7 +186,7 @@ Main results on CrowdHuman-val:
 | FreeYOLOv2-Nano   |  640    |          |          |        |          |
 | FreeYOLOv2-Small  |  640    |          |          |        |          |
 | FreeYOLOv2-Medium |  640    |          |          |        |          |
-| FreeYOLOv2-Large  |  640    |          |          |        |          |
+| FreeYOLOv2-Large  |  640    |   88.2   |   42.1   |  76.8  | [ckpt](https://github.com/yjh0410/FreeYOLOv2/releases/download/yolo_free_v2_ckpt/yolo_free_v2_large_crowdhuman.pth) |
 
 
 ## Train
