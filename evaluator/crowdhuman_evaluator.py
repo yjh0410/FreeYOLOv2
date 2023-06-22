@@ -1,5 +1,6 @@
 import os
 import json
+import time
 import numpy as np
 
 import torch
@@ -112,7 +113,7 @@ class CrowdHumanEvaluator():
     @torch.no_grad()
     def evaluate(self, model):
         # prepare
-        evalDir = os.path.join('det_results', 'eval', 'CrowdHuman')
+        evalDir = os.path.join('det_results', 'eval', 'CrowdHuman', time.strftime("%Y%S"))
         os.makedirs(evalDir, exist_ok=True)
         
         # inference
