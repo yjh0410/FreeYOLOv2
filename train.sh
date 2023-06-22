@@ -42,7 +42,7 @@ python train.py \
         --cuda \
         -d crowdhuman \
         --root /mnt/share/ssd2/dataset/ \
-        -m yolo_free_v2_nano \
+        -m yolo_free_v2_pico \
         -bs 16 \
         -size 640 \
         --wp_epoch 1 \
@@ -51,6 +51,6 @@ python train.py \
         --ema \
         --fp16 \
         --multi_scale \
-        --pretrained weights/coco/yolo_free_v2_nano/yolo_free_v2_nano_coco.pth \
+        --pretrained weights/coco/yolo_free_v2_pico/yolo_free_v2_pico_coco.pth \
         # --resume weights/coco/yolo_free_v2_large/yolo_free_v2_large_epoch_41_43.06.pth \
         # --eval_first
