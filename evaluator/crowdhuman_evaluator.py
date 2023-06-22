@@ -24,6 +24,8 @@ class CrowdHumanEvaluator():
         self.image_set = image_set
         self.transform = transform
         self.device = device
+        self.evalDir = os.path.join('det_results', 'eval', 'CrowdHuman', time.strftime("%Y%S"))
+        os.makedirs(self.evalDir, exist_ok=True)
         # ----------------- Metrics -----------------
         self.map = 0.
         self.mr = 0.
@@ -112,22 +114,18 @@ class CrowdHumanEvaluator():
 
     @torch.no_grad()
     def evaluate(self, model):
-        # prepare
-        evalDir = os.path.join('det_results', 'eval', 'CrowdHuman', time.strftime("%Y%S"))
-        os.makedirs(evalDir, exist_ok=True)
-        
         # inference
         all_results = self.inference(model)
 
         # save json lines
-        fpath = os.path.join(evalDir, 'dump-{}.json'.format('yolo_free'))
+        fpath = os.path.join(self.evalDir, 'dump-{}.json'.format('yolo_free'))
         with open(fpath,'w') as fid:
             for db in all_results:
                 line = json.dumps(db)+'\n'
                 fid.write(line)
 
         # evaluation
-        eval_path = os.path.join(evalDir, 'eval-{}.json'.format('yolo_free'))
+        eval_path = os.path.join(self.evalDir, 'eval-{}.json'.format('yolo_free'))
         eval_fid = open(eval_path,'w')
         res_line, JI = compute_JI.evaluation_all(fpath, 'box')
         for line in res_line:
