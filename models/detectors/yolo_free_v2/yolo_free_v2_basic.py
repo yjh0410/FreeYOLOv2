@@ -164,7 +164,7 @@ class DownSample(nn.Module):
 # ---------------------------- FPN Modules ----------------------------
 ## build fpn's core block
 def build_fpn_block(cfg, in_dim, out_dim):
-    if cfg['fpn_core_block'] == 'ELANBlock':
+    if cfg['fpn_core_block'] == 'elanblock':
         layer = ELANBlock(in_dim=in_dim,
                           out_dim=out_dim,
                           expand_ratio=[0.5, 0.5],
