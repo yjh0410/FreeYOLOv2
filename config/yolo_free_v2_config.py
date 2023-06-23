@@ -61,9 +61,17 @@ yolo_free_v2_cfg = {
         # ---------------- Loss config ----------------
         ## loss weight
         'cls_loss': 'bce', # vfl (optional)
-        'loss_cls_weight': 0.5,
-        'loss_iou_weight': 7.5,
-        'loss_dfl_weight': 1.5,
+        'loss_weights': {'bce':{
+                            'loss_cls_weight': 0.5,
+                            'loss_iou_weight': 7.5,
+                            'loss_dfl_weight': 1.5
+                            },
+                         'vfl':{
+                            'loss_cls_weight': 1.0,
+                            'loss_iou_weight': 2.0,
+                            'loss_dfl_weight': 1.0
+                            },
+                         },
         # ---------------- Train config ----------------
         ## close strong augmentation
         'no_aug_epoch': 20,
@@ -140,10 +148,18 @@ yolo_free_v2_cfg = {
                     'beta': 6.0},
         # ---------------- Loss config ----------------
         ## loss weight
-        'cls_loss': 'bce', # vfl (optional)
-        'loss_cls_weight': 0.5,
-        'loss_iou_weight': 7.5,
-        'loss_dfl_weight': 1.5,
+        'cls_loss': 'vfl', # vfl (optional)
+        'loss_weights': {'bce':{
+                            'loss_cls_weight': 0.5,
+                            'loss_iou_weight': 7.5,
+                            'loss_dfl_weight': 1.5
+                            },
+                         'vfl':{
+                            'loss_cls_weight': 1.0,
+                            'loss_iou_weight': 2.0,
+                            'loss_dfl_weight': 1.0
+                            },
+                         },
         # ---------------- Train config ----------------
         ## close strong augmentation
         'no_aug_epoch': 20,
@@ -221,9 +237,17 @@ yolo_free_v2_cfg = {
         # ---------------- Loss config ----------------
         ## loss weight
         'cls_loss': 'bce', # vfl (optional)
-        'loss_cls_weight': 0.5,
-        'loss_iou_weight': 7.5,
-        'loss_dfl_weight': 1.5,
+        'loss_weights': {'bce':{
+                            'loss_cls_weight': 0.5,
+                            'loss_iou_weight': 7.5,
+                            'loss_dfl_weight': 1.5
+                            },
+                         'vfl':{
+                            'loss_cls_weight': 1.0,
+                            'loss_iou_weight': 2.0,
+                            'loss_dfl_weight': 1.0
+                            },
+                         },
         # ---------------- Train config ----------------
         ## close strong augmentation
         'no_aug_epoch': 20,
@@ -301,9 +325,17 @@ yolo_free_v2_cfg = {
         # ---------------- Loss config ----------------
         ## loss weight
         'cls_loss': 'bce', # vfl (optional)
-        'loss_cls_weight': 0.5,
-        'loss_iou_weight': 7.5,
-        'loss_dfl_weight': 1.5,
+        'loss_weights': {'bce':{
+                            'loss_cls_weight': 0.5,
+                            'loss_iou_weight': 7.5,
+                            'loss_dfl_weight': 1.5
+                            },
+                         'vfl':{
+                            'loss_cls_weight': 1.0,
+                            'loss_iou_weight': 2.0,
+                            'loss_dfl_weight': 1.0
+                            },
+                         },
         # ---------------- Train config ----------------
         ## close strong augmentation
         'no_aug_epoch': 20,
@@ -381,9 +413,17 @@ yolo_free_v2_cfg = {
         # ---------------- Loss config ----------------
         ## loss weight
         'cls_loss': 'bce', # vfl (optional)
-        'loss_cls_weight': 0.5,
-        'loss_iou_weight': 7.5,
-        'loss_dfl_weight': 1.5,
+        'loss_weights': {'bce':{
+                            'loss_cls_weight': 0.5,
+                            'loss_iou_weight': 7.5,
+                            'loss_dfl_weight': 1.5
+                            },
+                         'vfl':{
+                            'loss_cls_weight': 1.0,
+                            'loss_iou_weight': 2.0,
+                            'loss_dfl_weight': 1.0
+                            },
+                         },
         # ---------------- Train config ----------------
         ## close strong augmentation
         'no_aug_epoch': 20,
@@ -460,9 +500,17 @@ yolo_free_v2_cfg = {
         # ---------------- Loss config ----------------
         ## loss weight
         'cls_loss': 'bce', # vfl (optional)
-        'loss_cls_weight': 0.5,
-        'loss_iou_weight': 7.5,
-        'loss_dfl_weight': 1.5,
+        'loss_weights': {'bce':{
+                            'loss_cls_weight': 0.5,
+                            'loss_iou_weight': 7.5,
+                            'loss_dfl_weight': 1.5
+                            },
+                         'vfl':{
+                            'loss_cls_weight': 1.0,
+                            'loss_iou_weight': 2.0,
+                            'loss_dfl_weight': 1.0
+                            },
+                         },
         # ---------------- Train config ----------------
         ## close strong augmentation
         'no_aug_epoch': 20,

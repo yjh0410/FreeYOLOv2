@@ -20,9 +20,10 @@ class Criterion(object):
         self.cls_lossf = ClassificationLoss(cfg, reduction='none')
         self.reg_lossf = RegressionLoss(num_classes, cfg['reg_max'] - 1, self.use_dfl)
         # loss weight
-        self.loss_cls_weight = cfg['loss_cls_weight']
-        self.loss_iou_weight = cfg['loss_iou_weight']
-        self.loss_dfl_weight = cfg['loss_dfl_weight']
+        loss_cfg = cfg['loss_weights'][cfg['cls_loss']]
+        self.loss_cls_weight = loss_cfg['loss_cls_weight']
+        self.loss_iou_weight = loss_cfg['loss_iou_weight']
+        self.loss_dfl_weight = loss_cfg['loss_dfl_weight']
         # matcher
         matcher_config = cfg['matcher']
         self.matcher = TaskAlignedAssigner(
@@ -58,6 +59,7 @@ class Criterion(object):
         box_preds = torch.cat(outputs['pred_box'], dim=1)
         
         # label assignment
+        gt_label_targets = []
         gt_score_targets = []
         gt_bbox_targets = []
         fg_masks = []
@@ -70,13 +72,14 @@ class Criterion(object):
             if len(tgt_labels) == 0 or tgt_boxs.max().item() == 0.:
                 # There is no valid gt
                 fg_mask = cls_preds.new_zeros(1, num_anchors).bool()               #[1, M,]
+                gt_label = cls_preds.new_zeros((1, num_anchors,))                  #[1, M,]
                 gt_score = cls_preds.new_zeros((1, num_anchors, self.num_classes)) #[1, M, C]
                 gt_box = cls_preds.new_zeros((1, num_anchors, 4))                  #[1, M, 4]
             else:
                 tgt_labels = tgt_labels[None, :, None]      # [1, Mp, 1]
                 tgt_boxs = tgt_boxs[None]                   # [1, Mp, 4]
                 (
-                    _,
+                    gt_label,   #[1, M]
                     gt_box,     #[1, M, 4]
                     gt_score,   #[1, M, C]
                     fg_mask,    #[1, M,]
@@ -88,18 +91,26 @@ class Criterion(object):
                     gt_labels = tgt_labels,
                     gt_bboxes = tgt_boxs
                     )
+            gt_label_targets.append(gt_label)
             gt_score_targets.append(gt_score)
             gt_bbox_targets.append(gt_box)
             fg_masks.append(fg_mask)
 
         # List[B, 1, M, C] -> Tensor[B, M, C] -> Tensor[BM, C]
         fg_masks = torch.cat(fg_masks, 0).view(-1)                                    # [BM,]
+        gt_label_targets = torch.cat(gt_label_targets, 0).view(-1)                    # [BM,]
         gt_score_targets = torch.cat(gt_score_targets, 0).view(-1, self.num_classes)  # [BM, C]
         gt_bbox_targets = torch.cat(gt_bbox_targets, 0).view(-1, 4)                   # [BM, 4]
         
         # cls loss
         cls_preds = cls_preds.view(-1, self.num_classes)
-        loss_cls = self.cls_lossf(cls_preds, gt_score_targets)
+        gt_label_targets = torch.where(
+            fg_masks > 0,
+            gt_label_targets,
+            torch.full_like(gt_label_targets, self.num_classes)
+            )
+        gt_labels_one_hot = F.one_hot(gt_label_targets.long(), self.num_classes + 1)[..., :-1]
+        loss_cls = self.cls_lossf(cls_preds, gt_score_targets, gt_labels_one_hot)
 
         # reg loss
         anchors = anchors[None].repeat(bs, 1, 1).view(-1, 2)                           # [BM, 2]
@@ -153,6 +164,19 @@ class ClassificationLoss(nn.Module):
         self.alpha = 0.75
         self.gamma = 2.0
 
+    def varifocalloss(self, pred_logits, gt_score, gt_label, alpha=0.75, gamma=2.0):
+        focal_weight = alpha * pred_logits.sigmoid().pow(gamma) * (1 - gt_label) + gt_score * gt_label
+        with torch.cuda.amp.autocast(enabled=False):
+            bce_loss = F.binary_cross_entropy_with_logits(
+                pred_logits.float(), gt_score.float(), reduction='none')
+            loss = bce_loss * focal_weight
+
+            if self.reduction == 'sum':
+                loss = loss.sum()
+            elif self.reduction == 'mean':
+                loss = loss.mean()
+
+        return loss
 
     def binary_cross_entropy(self, pred_logits, gt_score):
         loss = F.binary_cross_entropy_with_logits(
@@ -166,9 +190,11 @@ class ClassificationLoss(nn.Module):
         return loss
 
 
-    def forward(self, pred_logits, gt_score):
+    def forward(self, pred_logits, gt_score, gt_label):
         if self.cfg['cls_loss'] == 'bce':
             return self.binary_cross_entropy(pred_logits, gt_score)
+        elif self.cfg['cls_loss'] == 'vfl':
+            return self.varifocalloss(pred_logits, gt_score, gt_label, self.alpha, self.gamma)
 
 
 class RegressionLoss(nn.Module):

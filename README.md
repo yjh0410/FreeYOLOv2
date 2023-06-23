@@ -182,9 +182,9 @@ Main results on CrowdHuman-val:
 
 | Model             |  Scale  |    AP    |    MR    |   JI   |  Weight  |
 |-------------------|---------|----------|----------|--------|----------|
-| FreeYOLOv2-Pico   |  640    |          |          |        |          |
-| FreeYOLOv2-Nano   |  640    |          |          |        |          |
-| FreeYOLOv2-Small  |  640    |          |          |        |          |
+| FreeYOLOv2-Pico   |  640    |   82.4   |   53.1   |  69.8  |          |
+| FreeYOLOv2-Nano   |  640    |   84.1   |   50.3   |  71.8  |          |
+| FreeYOLOv2-Small  |  640    |   86.5   |   45.6   |  75.0  |          |
 | FreeYOLOv2-Medium |  640    |   87.5   |   43.4   |  76.2  |          |
 | FreeYOLOv2-Large  |  640    |   88.2   |   42.1   |  76.8  | [ckpt](https://github.com/yjh0410/FreeYOLOv2/releases/download/yolo_free_v2_ckpt/yolo_free_v2_large_crowdhuman.pth) |
 
