@@ -148,7 +148,7 @@ yolo_free_v2_cfg = {
                     'beta': 6.0},
         # ---------------- Loss config ----------------
         ## loss weight
-        'cls_loss': 'vfl', # vfl (optional)
+        'cls_loss': 'bce', # vfl (optional)
         'loss_weights': {'bce':{
                             'loss_cls_weight': 0.5,
                             'loss_iou_weight': 7.5,
