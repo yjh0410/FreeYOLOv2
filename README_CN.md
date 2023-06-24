@@ -61,7 +61,7 @@ python dataset/coco.py
 
 For example:
 ```Shell
-python train.py --cuda -d coco -v yolo_free_v2_tiny -bs 16 --max_epoch 300 --wp_epoch 3 --eval_epoch 10 --fp16 --ema --root path/to/COCO
+python train.py --cuda -d coco -v yolo_free_v2_nano -bs 16 --max_epoch 300 --wp_epoch 3 --eval_epoch 10 --fp16 --ema --root path/to/COCO
 ```
 
 **P5-Model on COCO:**
@@ -118,7 +118,7 @@ python dataset/widerface.py
 
 例如:
 ```Shell
-python train.py --cuda -d widerface --root path/to/WiderFace -v yolo_free_v2_tiny -bs 16 --max_epoch 100 --wp_epoch 1 --eval_epoch 10 --fp16 --ema --pretrained path/to/coco/yolo_free_v2_tiny_coco.pth --mosaic 0.5 --mixup 0.0 --min_box_size 1
+python train.py --cuda -d widerface --root path/to/WiderFace -v yolo_free_v2_nano -bs 16 --max_epoch 100 --wp_epoch 1 --eval_epoch 10 --fp16 --ema --pretrained path/to/coco/yolo_free_v2_nano_coco.pth --mosaic 0.5 --mixup 0.0 --min_box_size 1
 ```
 
 Main results on WiderFace-val:
@@ -176,7 +176,7 @@ python dataset/crowdhuman.py
 
 例如:
 ```Shell
-python train.py --cuda -d crowdhuman -v yolo_free_v2_tiny -bs 16 --max_epoch 100 --wp_epoch 1 --eval_epoch 10 --fp16 --ema --root path/to/CrowdHuman --pretrained path/to/coco/yolo_free_v2_tiny.pth
+python train.py --cuda -d crowdhuman -v yolo_free_v2_nano -bs 16 --max_epoch 100 --wp_epoch 1 --eval_epoch 10 --fp16 --ema --root path/to/CrowdHuman --pretrained path/to/coco/yolo_free_v2_nano.pth
 ```
 
 Main results on CrowdHuman-val:
@@ -304,7 +304,7 @@ python demo.py --mode camera \
 - 步骤1：使用`labelimg`工具来标注已准备好的图片（JPG/JPEG/PNG ...），并得到相应的`.xml`格式的标签文件。请使用者按照如下的格式来准备自己的数据集。
 
 ```
-OurDataset
+Dataset
 |_ train
 |  |_ images     
 |     |_ 0.jpg
@@ -326,22 +326,20 @@ OurDataset
 |  ...
 ```
 
-本项目在 `GeneralDataset` 中提供了一个本地数据集的例子，以供使用者参考。
-
 - 步骤2：将本地数据集转换为 COCO 格式。
 
 ```Shell
 cd <FreeYOLOv2_HOME>
 cd tools
 # 转换训练集
-python convert_ours_to_coco.py --root path/to/GeneralDataset/ --split train
+python convert_ours_to_coco.py --root path/to/Dataset/ --split train
 # 转换验证集
-python convert_ours_to_coco.py --root path/to/GeneralDataset/ --split val
+python convert_ours_to_coco.py --root path/to/Dataset/ --split val
 ```
 
 然后，我们就会得到相应的 `train.json` 和 `val.json` 两个文件，如下所示：
 ```
-GeneralDataset
+Dataset
 |_ train
 |  |_ images     
 |     |_ 0.jpg
@@ -375,9 +373,9 @@ GeneralDataset
 cd <FreeYOLOv2_HOME>
 cd dataset
 # 检查训练集
-python ourdataset.py --root path/to/GeneralDataset/ --split train
+python ourdataset.py --root path/to/Dataset/ --split train
 # 检查验证集
-python ourdataset.py --root path/to/GeneralDataset/ --split val
+python ourdataset.py --root path/to/Dataset/ --split val
 ```
 
 - 步骤5：**训练**
@@ -386,7 +384,7 @@ python ourdataset.py --root path/to/GeneralDataset/ --split val
 
 ```Shell
 cd <FreeYOLOv2_HOME>
-python train.py --root path/to/GeneralDataset/ -d ourdataset -v yolo_free_v2_tiny -bs 16 --max_epoch 100 --wp_epoch 1 --eval_epoch 5 -p path/to/yolo_free_tiny_coco.pth
+python train.py --root path/to/Dataset/ -d ourdataset -v yolo_free_v2_nano -bs 16 --max_epoch 100 --wp_epoch 1 --eval_epoch 5 -p path/to/yolo_free_v2_nano_coco.pth
 ```
 
 - Step-6 **测试**
@@ -395,7 +393,7 @@ python train.py --root path/to/GeneralDataset/ -d ourdataset -v yolo_free_v2_tin
 
 ```Shell
 cd <FreeYOLOv2_HOME>
-python test.py --root path/to/GeneralDataset/ -d ourdataset -v yolo_free_v2_tiny --weight path/to/checkpoint --show
+python test.py --root path/to/Dataset/ -d ourdataset -v yolo_free_v2_nano --weight path/to/checkpoint --show
 ```
 
 - Step-7 **验证**
@@ -404,7 +402,7 @@ python test.py --root path/to/GeneralDataset/ -d ourdataset -v yolo_free_v2_tiny
 
 ```Shell
 cd <FreeYOLOv2_HOME>
-python eval.py --root path/to/OurDataset/ -d ourdataset -v yolo_free_v2_tiny --weight path/to/checkpoint
+python eval.py --root path/to/Dataset/ -d ourdataset -v yolo_free_v2_nano --weight path/to/checkpoint
 ```
 
 ## 目标跟踪
