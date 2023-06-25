@@ -2,7 +2,6 @@
 
 
 yolo_free_v2_cfg = {
-    # ----------------------- P5 Model -----------------------
     'yolo_free_v2_pico': {
         # ---------------- Model config ----------------
         ## Backbone
