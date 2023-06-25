@@ -61,7 +61,7 @@ python dataset/coco.py
 
 For example:
 ```Shell
-python train.py --cuda -d coco -v yolo_free_v2_nano -bs 16 --max_epoch 300 --wp_epoch 3 --eval_epoch 10 --fp16 --ema --root path/to/COCO
+python train.py --cuda -d coco -m yolo_free_v2_nano -bs 16 --max_epoch 300 --wp_epoch 3 --eval_epoch 10 --fp16 --ema --root path/to/COCO
 ```
 
 **P5-Model on COCO:**
@@ -118,7 +118,7 @@ python dataset/widerface.py
 
 例如:
 ```Shell
-python train.py --cuda -d widerface --root path/to/WiderFace -v yolo_free_v2_nano -bs 16 --max_epoch 100 --wp_epoch 1 --eval_epoch 10 --fp16 --ema --pretrained path/to/coco/yolo_free_v2_nano_coco.pth --mosaic 0.5 --mixup 0.0 --min_box_size 1
+python train.py --cuda -d widerface --root path/to/WiderFace -m yolo_free_v2_nano -bs 16 --max_epoch 100 --wp_epoch 1 --eval_epoch 10 --fp16 --ema --pretrained path/to/coco/yolo_free_v2_nano_coco.pth --mosaic 0.5 --mixup 0.0 --min_box_size 1
 ```
 
 Main results on WiderFace-val:
@@ -176,7 +176,7 @@ python dataset/crowdhuman.py
 
 例如:
 ```Shell
-python train.py --cuda -d crowdhuman -v yolo_free_v2_nano -bs 16 --max_epoch 100 --wp_epoch 1 --eval_epoch 10 --fp16 --ema --root path/to/CrowdHuman --pretrained path/to/coco/yolo_free_v2_nano.pth
+python train.py --cuda -d crowdhuman -m yolo_free_v2_nano -bs 16 --max_epoch 100 --wp_epoch 1 --eval_epoch 10 --fp16 --ema --root path/to/CrowdHuman --pretrained path/to/coco/yolo_free_v2_nano.pth
 ```
 
 Main results on CrowdHuman-val:
@@ -199,7 +199,7 @@ sh train.sh
 
 如果使用者想查看训练时所使用的数据，可以在训练命令中输入`--vsi_tgt`参数，例如：
 ```Shell
-python train.py --cuda -d coco --root path/to/coco -v yolo_free_v2_large --vis_tgt
+python train.py --cuda -d coco --root path/to/coco -m yolo_free_v2_large --vis_tgt
 ```
 
 下面展示了四张训练数据的可视化图像：
@@ -222,7 +222,7 @@ sh train_ddp.sh
 python train.py \
         --cuda \
         -d coco \
-        -v yolo_free_v2_large \
+        -m yolo_free_v2_large \
         -bs 16 \
         --max_epoch 300 \
         --wp_epoch 3 \
@@ -238,7 +238,7 @@ python train.py \
 ```Shell
 python test.py -d coco \
                --cuda \
-               -v yolo_free_v2_large \
+               -m yolo_free_v2_large \
                --img_size 640 \
                --weight path/to/weight \
                --root path/to/dataset/ \
@@ -251,7 +251,7 @@ python test.py -d coco \
 ```Shell
 python eval.py -d coco-val \
                --cuda \
-               -v yolo_free_v2_large \
+               -m yolo_free_v2_large \
                --img_size 640 \
                --weight path/to/weight \
                --root path/to/dataset/ \
@@ -271,7 +271,7 @@ python eval.py -d coco-val \
 ```Shell
 python demo.py --mode image \
                --path_to_img data/demo/images/ \
-               -v yolo_free_v2_large \
+               -m yolo_free_v2_large \
                --img_size 640 \
                --cuda \
                --weight path/to/weight
@@ -282,7 +282,7 @@ python demo.py --mode image \
 ```Shell
 python demo.py --mode video \
                --path_to_img data/demo/videos/your_video \
-               -v yolo_free_v2_large \
+               -m yolo_free_v2_large \
                --img_size 640 \
                --cuda \
                --weight path/to/weight
@@ -292,7 +292,7 @@ python demo.py --mode video \
 
 ```Shell
 python demo.py --mode camera \
-               -v yolo_free_v2_large \
+               -m yolo_free_v2_large \
                --img_size 640 \
                --cuda \
                --weight path/to/weight
@@ -384,7 +384,7 @@ python ourdataset.py --root path/to/Dataset/ --split val
 
 ```Shell
 cd <FreeYOLOv2_HOME>
-python train.py --root path/to/Dataset/ -d ourdataset -v yolo_free_v2_nano -bs 16 --max_epoch 100 --wp_epoch 1 --eval_epoch 5 -p path/to/yolo_free_v2_nano_coco.pth
+python train.py --root path/to/Dataset/ -d ourdataset -m yolo_free_v2_nano -bs 16 --max_epoch 100 --wp_epoch 1 --eval_epoch 5 -p path/to/yolo_free_v2_nano_coco.pth
 ```
 
 - Step-6 **测试**
@@ -393,7 +393,7 @@ python train.py --root path/to/Dataset/ -d ourdataset -v yolo_free_v2_nano -bs 1
 
 ```Shell
 cd <FreeYOLOv2_HOME>
-python test.py --root path/to/Dataset/ -d ourdataset -v yolo_free_v2_nano --weight path/to/checkpoint --show
+python test.py --root path/to/Dataset/ -d ourdataset -m yolo_free_v2_nano --weight path/to/checkpoint --show
 ```
 
 - Step-7 **验证**
@@ -402,7 +402,7 @@ python test.py --root path/to/Dataset/ -d ourdataset -v yolo_free_v2_nano --weig
 
 ```Shell
 cd <FreeYOLOv2_HOME>
-python eval.py --root path/to/Dataset/ -d ourdataset -v yolo_free_v2_nano --weight path/to/checkpoint
+python eval.py --root path/to/Dataset/ -d ourdataset -m yolo_free_v2_nano --weight path/to/checkpoint
 ```
 
 ## 目标跟踪

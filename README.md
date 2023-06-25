@@ -61,7 +61,7 @@ python dataset/coco.py
 
 For example:
 ```Shell
-python train.py --cuda -d coco -v yolo_free_v2_nano -bs 16 --max_epoch 300 --wp_epoch 3 --eval_epoch 10 --fp16 --ema --root path/to/COCO
+python train.py --cuda -d coco -m yolo_free_v2_nano -bs 16 --max_epoch 300 --wp_epoch 3 --eval_epoch 10 --fp16 --ema --root path/to/COCO
 ```
 
 **P5-Model on COCO:**
@@ -118,7 +118,7 @@ python dataset/widerface.py
 - Train on WiderFace
 For example:
 ```Shell
-python train.py --cuda -d widerface --root path/to/WiderFace -v yolo_free_v2_nano -bs 16 --max_epoch 100 --wp_epoch 1 --eval_epoch 10 --fp16 --ema --pretrained path/to/coco/yolo_free_v2_nano_coco.pth --mosaic 0.5 --mixup 0.0 --min_box_size 1
+python train.py --cuda -d widerface --root path/to/WiderFace -m yolo_free_v2_nano -bs 16 --max_epoch 100 --wp_epoch 1 --eval_epoch 10 --fp16 --ema --pretrained path/to/coco/yolo_free_v2_nano_coco.pth --mosaic 0.5 --mixup 0.0 --min_box_size 1
 ```
 
 Main results on WiderFace-val:
@@ -175,7 +175,7 @@ python dataset/crowdhuman.py
 
 For example:
 ```Shell
-python train.py --cuda -d crowdhuman -v yolo_free_v2_nano -bs 16 --max_epoch 100 --wp_epoch 1 --eval_epoch 10 --fp16 --ema --root path/to/CrowdHuman --pretrained path/to/coco/yolo_free_v2_nano.pth
+python train.py --cuda -d crowdhuman -m yolo_free_v2_nano -bs 16 --max_epoch 100 --wp_epoch 1 --eval_epoch 10 --fp16 --ema --root path/to/CrowdHuman --pretrained path/to/coco/yolo_free_v2_nano.pth
 ```
 
 Main results on CrowdHuman-val:
@@ -199,7 +199,7 @@ You can change the configurations of `train.sh`, according to your own situation
 
 You also can add `--vis_tgt`  to check the images and targets during the training stage. For example:
 ```Shell
-python train.py --cuda -d coco --root path/to/coco -v yolo_free_v2_large --vis_tgt
+python train.py --cuda -d coco --root path/to/coco -m yolo_free_v2_large --vis_tgt
 ```
 
 ![image](./img_files/tgt_data_0.png)
@@ -221,7 +221,7 @@ weight path (`None` by default) to resume training. For example:
 python train.py \
         --cuda \
         -d coco \
-        -v yolo_free_v2_large \
+        -m yolo_free_v2_large \
         -bs 16 \
         --max_epoch 300 \
         --wp_epoch 3 \
@@ -237,7 +237,7 @@ Then, training will continue from 151 epoch.
 ```Shell
 python test.py -d coco \
                --cuda \
-               -v yolo_free_v2_large \
+               -m yolo_free_v2_large \
                --img_size 640 \
                --weight path/to/weight \
                --root path/to/dataset/ \
@@ -248,7 +248,7 @@ python test.py -d coco \
 ```Shell
 python eval.py -d coco-val \
                --cuda \
-               -v yolo_free_v2_large \
+               -m yolo_free_v2_large \
                --img_size 640 \
                --weight path/to/weight \
                --root path/to/dataset/ \
@@ -261,7 +261,7 @@ I have provide some images in `data/demo/images/`, so you can run following comm
 ```Shell
 python demo.py --mode image \
                --path_to_img data/demo/images/ \
-               -v yolo_free_v2_large \
+               -m yolo_free_v2_large \
                --img_size 640 \
                --cuda \
                --weight path/to/weight
@@ -272,7 +272,7 @@ If you want run a demo of streaming video detection, you need to set `--mode` to
 ```Shell
 python demo.py --mode video \
                --path_to_img data/demo/videos/your_video \
-               -v yolo_free_v2_large \
+               -m yolo_free_v2_large \
                --img_size 640 \
                --cuda \
                --weight path/to/weight
@@ -282,7 +282,7 @@ If you want run video detection with your camera, you need to set `--mode` to `c
 
 ```Shell
 python demo.py --mode camera \
-               -v yolo_free_v2_large \
+               -m yolo_free_v2_large \
                --img_size 640 \
                --cuda \
                --weight path/to/weight
@@ -372,7 +372,7 @@ For example:
 
 ```Shell
 cd <FreeYOLOv2_HOME>
-python train.py --root path/to/Dataset/ -d ourdataset -v yolo_free_v2_nano -bs 16 --max_epoch 100 --wp_epoch 1 --eval_epoch 5 -p path/to/yolo_free_tiny_coco.pth
+python train.py --root path/to/Dataset/ -d ourdataset -m yolo_free_v2_nano -bs 16 --max_epoch 100 --wp_epoch 1 --eval_epoch 5 -p path/to/yolo_free_tiny_coco.pth
 ```
 
 - Step-6 **Test**
@@ -381,7 +381,7 @@ For example:
 
 ```Shell
 cd <FreeYOLOv2_HOME>
-python test.py --root path/to/Dataset/ -d ourdataset -v yolo_free_v2_nano --weight path/to/checkpoint --show
+python test.py --root path/to/Dataset/ -d ourdataset -m yolo_free_v2_nano --weight path/to/checkpoint --show
 ```
 
 - Step-7 **Eval**
@@ -390,7 +390,7 @@ For example:
 
 ```Shell
 cd <FreeYOLOv2_HOME>
-python eval.py --root path/to/Dataset/ -d ourdataset -v yolo_free_v2_nano --weight path/to/checkpoint
+python eval.py --root path/to/Dataset/ -d ourdataset -m yolo_free_v2_nano --weight path/to/checkpoint
 ```
 
 ## Tracking
