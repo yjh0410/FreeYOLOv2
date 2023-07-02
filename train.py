@@ -199,7 +199,7 @@ def train():
         model_ema = None
 
     # ---------------------------- Build Trainer ----------------------------
-    trainer = Trainer(args, device, model_cfg, model_ema, optimizer, lf, lr_scheduler, criterion, scaler)
+    trainer = Trainer(args, device, model_cfg, model_ema, optimizer, lf, lr_scheduler, criterion, scaler, start_epoch)
 
     # start training loop
     heavy_eval = False

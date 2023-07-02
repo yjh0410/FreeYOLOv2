@@ -12,12 +12,12 @@ from utils.vis_tools import vis_data
 
 
 class Trainer(object):
-    def __init__(self, args, device, cfg, model_ema, optimizer, lf, lr_scheduler, criterion, scaler):
+    def __init__(self, args, device, cfg, model_ema, optimizer, lf, lr_scheduler, criterion, scaler, start_epoch):
         # ------------------- basic parameters -------------------
         self.args = args
         self.cfg = cfg
         self.device = device
-        self.epoch = 0
+        self.epoch = start_epoch
         self.best_map = -1.
         # ------------------- core modules -------------------
         self.model_ema = model_ema
@@ -57,7 +57,7 @@ class Trainer(object):
             # multi scale
             if self.args.multi_scale:
                 images, targets, img_size = self.rescale_image_targets(
-                    images, targets, model.stride, self.args.min_box_size, self.cfg['multi_scale'])
+                    images, targets, self.cfg['stride'], self.args.min_box_size, self.cfg['multi_scale'])
             else:
                 targets = self.refine_targets(targets, self.args.min_box_size)
                 
