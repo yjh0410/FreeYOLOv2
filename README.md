@@ -263,6 +263,7 @@ python demo.py --mode image \
                --path_to_img data/demo/images/ \
                -m yolo_free_v2_large \
                --img_size 640 \
+               -nc 80 \  # number of classes
                --cuda \
                --weight path/to/weight
 ```
@@ -274,6 +275,7 @@ python demo.py --mode video \
                --path_to_img data/demo/videos/your_video \
                -m yolo_free_v2_large \
                --img_size 640 \
+               -nc 80 \  # number of classes
                --cuda \
                --weight path/to/weight
 ```
@@ -284,6 +286,7 @@ If you want run video detection with your camera, you need to set `--mode` to `c
 python demo.py --mode camera \
                -m yolo_free_v2_large \
                --img_size 640 \
+               -nc 80 \  # number of classes
                --cuda \
                --weight path/to/weight
 ```
