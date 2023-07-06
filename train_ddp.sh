@@ -5,7 +5,7 @@ python -m torch.distributed.run --nproc_per_node=8 train.py \
                                                     -d coco \
                                                     --root /data/datasets/ \
                                                     -m yolo_free_v2_medium \
-                                                    -bs 8 \
+                                                    -bs 128 \
                                                     -size 640 \
                                                     --wp_epoch 3 \
                                                     --max_epoch 300 \
