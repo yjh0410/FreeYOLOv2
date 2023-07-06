@@ -171,7 +171,7 @@ class YoloTrainer(object):
                     # unscale gradients
                     self.scaler.unscale_(self.optimizer)
                     # clip gradients
-                    torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=self.cfg['clip_grad'])
+                    torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=self.clip_grad)
                 # optimizer.step
                 self.scaler.step(self.optimizer)
                 self.scaler.update()
