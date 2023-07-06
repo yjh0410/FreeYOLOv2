@@ -2,10 +2,10 @@ import torch
 import torch.nn as nn
 
 
-def build_optimizer(cfg, model, base_lr=0.01, resume=None):
+def build_optimizer(cfg, model, resume=None):
     print('==============================')
     print('Optimizer: {}'.format(cfg['optimizer']))
-    print('--base lr: {}'.format(base_lr))
+    print('--base lr: {}'.format(cfg['lr0']))
     print('--momentum: {}'.format(cfg['momentum']))
     print('--weight_decay: {}'.format(cfg['weight_decay']))
 
@@ -20,9 +20,9 @@ def build_optimizer(cfg, model, base_lr=0.01, resume=None):
             g[0].append(v.weight)
 
     if cfg['optimizer'] == 'AdamW':
-        optimizer = torch.optim.AdamW(g[2], lr=base_lr, weight_decay=0.0)
+        optimizer = torch.optim.AdamW(g[2], lr=cfg['lr0'], weight_decay=0.0)
     elif cfg['optimizer'] == 'SGD':
-        optimizer = torch.optim.SGD(g[2], lr=base_lr, momentum=cfg['momentum'], nesterov=True)
+        optimizer = torch.optim.SGD(g[2], lr=cfg['lr0'], momentum=cfg['momentum'], nesterov=True)
     else:
         raise NotImplementedError('Optimizer {} not implemented.'.format(cfg['optimizer']))
 

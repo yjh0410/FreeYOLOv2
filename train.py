@@ -11,26 +11,15 @@ from torch.nn.parallel import DistributedDataParallel as DDP
 # ----------------- Config Components -----------------
 from config import build_dataset_config, build_model_config
 
-# ----------------- Dataset Components -----------------
-from dataset.build import build_dataset, build_transform
-
-# ----------------- Evaluator Components -----------------
-from evaluator.build import build_evluator
-
-# ----------------- Optimizer & LrScheduler Components -----------------
-from utils.solver.optimizer import build_optimizer
-from utils.solver.lr_scheduler import build_lr_scheduler
-
 # ----------------- Extra Components -----------------
 from utils import distributed_utils
-from utils.misc import ModelEMA, CollateFunc, build_dataloader
 from utils.misc import compute_flops
 
 # ----------------- Model Components -----------------
 from models.detectors import build_model
 
 # ----------------- Train Components -----------------
-from engine import Trainer
+from engine import build_trainer
 
 
 def parse_args():
@@ -121,11 +110,10 @@ def train():
     if args.distributed:
         distributed_utils.init_distributed_mode(args)
         print("git:\n  {}\n".format(distributed_utils.get_sha()))
-    world_size = distributed_utils.get_world_size()
-    per_gpu_batch = args.batch_size // world_size
-    print('World size: {}'.format(world_size))
+    print('World size: {}'.format(distributed_utils.get_world_size()))
 
     # ---------------------------- Build CUDA ----------------------------
+    # Build CUDA
     if args.cuda:
         print('use cuda')
         # cudnn.benchmark = True
@@ -133,37 +121,22 @@ def train():
     else:
         device = torch.device("cpu")
 
-    # ---------------------------- Build Dataset & Model Config ----------------------------
+    # Build Dataset & Model & Trans. Config
     data_cfg = build_dataset_config(args)
     model_cfg = build_model_config(args)
 
-    # ---------------------------- Build Transform ----------------------------
-    train_transform, trans_config = build_transform(
-        args=args, trans_config=model_cfg['trans_config'], max_stride=model_cfg['max_stride'], is_train=True)
-    val_transform, _ = build_transform(
-        args=args, max_stride=model_cfg['max_stride'], is_train=False)
-    
-    # ---------------------------- Build Dataset & Dataloader ----------------------------
-    dataset, dataset_info = build_dataset(args, data_cfg, trans_config, train_transform, is_train=True)
-    train_loader = build_dataloader(args, dataset, per_gpu_batch, CollateFunc())
-
-    # ---------------------------- Build Evaluator ----------------------------
-    evaluator = build_evluator(args, data_cfg, val_transform, device)
-
-    # ---------------------------- Build Model ----------------------------
-    model, criterion = build_model(args, model_cfg, device, dataset_info['num_classes'], True)
+    # Build Model
+    model, criterion = build_model(args, model_cfg, device, data_cfg['num_classes'], True)
     model = model.to(device).train()
+    model_without_ddp = model
     if args.sybn and args.distributed:
         print('use SyncBatchNorm ...')
         model = torch.nn.SyncBatchNorm.convert_sync_batchnorm(model)
-
-    # ---------------------------- Build DDP Model ----------------------------
-    model_without_ddp = model
     if args.distributed:
-        model = DDP(model, device_ids=[args.gpu])
+        model = DDP(model, device_ids=[args.gpu], find_unused_parameters=True)
         model_without_ddp = model.module
 
-    # ---------------------------- Calcute Params & GFLOPs ----------------------------
+    # Calcute Params & GFLOPs
     if distributed_utils.is_main_process:
         model_copy = deepcopy(model_without_ddp)
         model_copy.trainable = False
@@ -173,73 +146,22 @@ def train():
                       device=device)
         del model_copy
     if args.distributed:
-        # wait for all processes to synchronize
         dist.barrier()
 
-    # ---------------------------- Build Grad. Scaler ----------------------------
-    scaler = torch.cuda.amp.GradScaler(enabled=args.fp16)
+    # Build Trainer
+    trainer = build_trainer(args, data_cfg, model_cfg, device, model_without_ddp, criterion)
 
-    # ---------------------------- Build Optimizer ----------------------------
-    accumulate = max(1, round(64 / args.batch_size))
-    print('Grad_Accumulate: ', accumulate)
-    model_cfg['weight_decay'] *= args.batch_size * accumulate / 64
-    optimizer, start_epoch = build_optimizer(model_cfg, model_without_ddp, model_cfg['lr0'], args.resume)
-
-    # ---------------------------- Build LR Scheduler ----------------------------
-    lr_scheduler, lf = build_lr_scheduler(model_cfg, optimizer, args.max_epoch)
-    lr_scheduler.last_epoch = start_epoch - 1  # do not move
-    if args.resume:
-        lr_scheduler.step()
-
-    # ---------------------------- Build Model-EMA ----------------------------
-    if args.ema and distributed_utils.get_rank() in [-1, 0]:
-        print('Build ModelEMA ...')
-        model_ema = ModelEMA(model, model_cfg['ema_decay'], model_cfg['ema_tau'], start_epoch * len(train_loader))
-    else:
-        model_ema = None
-
-    # ---------------------------- Build Trainer ----------------------------
-    trainer = Trainer(args, device, model_cfg, model_ema, optimizer, lf, lr_scheduler, criterion, scaler, start_epoch)
-
-    # start training loop
-    heavy_eval = False
-    optimizer.zero_grad()
-    
-    # --------------------------------- Main process for training ---------------------------------
+    # --------------------------------- Train: Start ---------------------------------
     ## Eval before training
     if args.eval_first and distributed_utils.is_main_process():
         # to check whether the evaluator can work
         model_eval = model_without_ddp
-        trainer.eval_one_epoch(model_eval, evaluator)
+        trainer.eval(model_eval)
 
     ## Satrt Training
-    for epoch in range(start_epoch, args.max_epoch):
-        if args.distributed:
-            train_loader.batch_sampler.sampler.set_epoch(epoch)
+    trainer.train(model)
+    # --------------------------------- Train: End ---------------------------------
 
-        # check second stage
-        if epoch >= (args.max_epoch - model_cfg['no_aug_epoch'] - 1):
-            # close mosaic augmentation
-            if train_loader.dataset.mosaic_prob > 0.:
-                print('close Mosaic Augmentation ...')
-                train_loader.dataset.mosaic_prob = 0.
-                heavy_eval = True
-            # close mixup augmentation
-            if train_loader.dataset.mixup_prob > 0.:
-                print('close Mixup Augmentation ...')
-                train_loader.dataset.mixup_prob = 0.
-                heavy_eval = True
-
-        # train one epoch
-        trainer.train_one_epoch(model, train_loader)
-
-        # eval one epoch
-        if heavy_eval:
-            trainer.eval_one_epoch(model_without_ddp, evaluator)
-        else:
-            if (epoch % args.eval_epoch) == 0 or (epoch == args.max_epoch - 1):
-                trainer.eval_one_epoch(model_without_ddp, evaluator)
-        
     # Empty cache after train loop
     del trainer
     if args.cuda:
