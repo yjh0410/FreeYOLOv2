@@ -79,6 +79,7 @@ class Trainer(object):
                 if self.args.distributed:
                     # gradient averaged between devices in DDP mode
                     losses *= distributed_utils.get_world_size()
+                    print(distributed_utils.get_world_size())
 
             # check loss
             try:
