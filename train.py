@@ -133,7 +133,7 @@ def train():
         print('use SyncBatchNorm ...')
         model = torch.nn.SyncBatchNorm.convert_sync_batchnorm(model)
     if args.distributed:
-        model = DDP(model, device_ids=[args.gpu], find_unused_parameters=True)
+        model = DDP(model, device_ids=[args.gpu])
         model_without_ddp = model.module
 
     # Calcute Params & GFLOPs

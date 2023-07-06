@@ -190,7 +190,7 @@ class ModelEMA(object):
         # Create EMA
         self.ema = deepcopy(self.de_parallel(model)).eval()  # FP32 EMA
         self.updates = updates  # number of EMA updates
-        self.decay = lambda x: cfg['decay'] * (1 - math.exp(-x / cfg['tau']))  # decay exponential ramp (to help early epochs)
+        self.decay = lambda x: cfg['ema_decay'] * (1 - math.exp(-x / cfg['ema_tau']))  # decay exponential ramp (to help early epochs)
         for p in self.ema.parameters():
             p.requires_grad_(False)
 
