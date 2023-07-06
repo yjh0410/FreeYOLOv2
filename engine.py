@@ -261,63 +261,6 @@ class YoloTrainer(object):
         self.lr_scheduler.step()
         
 
-    @torch.no_grad()
-    def eval_one_epoch(self, model, evaluator):
-        # chech model
-        model_eval = model if self.model_ema is None else self.model_ema.ema
-
-        # path to save model
-        path_to_save = os.path.join(self.args.save_folder, self.args.dataset, self.args.model)
-        os.makedirs(path_to_save, exist_ok=True)
-
-        if distributed_utils.is_main_process():
-            # check evaluator
-            if evaluator is None:
-                print('No evaluator ... save model and go on training.')
-                print('Saving state, epoch: {}'.format(self.epoch + 1))
-                weight_name = '{}_no_eval.pth'.format(self.args.model)
-                checkpoint_path = os.path.join(path_to_save, weight_name)
-                torch.save({'model': model_eval.state_dict(),
-                            'mAP': -1.,
-                            'optimizer': self.optimizer.state_dict(),
-                            'epoch': self.epoch,
-                            'args': self.args}, 
-                            checkpoint_path)                      
-                
-            else:
-                print('eval ...')
-                # set eval mode
-                model_eval.trainable = False
-                model_eval.eval()
-
-                # evaluate
-                evaluator.evaluate(model_eval)
-
-                # save model
-                cur_map = evaluator.map
-                if cur_map > self.best_map:
-                    # update best-map
-                    self.best_map = cur_map
-                    # save model
-                    print('Saving state, epoch:', self.epoch + 1)
-                    weight_name = '{}_best.pth'.format(self.args.model)
-                    checkpoint_path = os.path.join(path_to_save, weight_name)
-                    torch.save({'model': model_eval.state_dict(),
-                                'mAP': round(self.best_map*100, 1),
-                                'optimizer': self.optimizer.state_dict(),
-                                'epoch': self.epoch,
-                                'args': self.args}, 
-                                checkpoint_path)                      
-
-                # set train mode.
-                model_eval.trainable = True
-                model_eval.train()
-
-        if self.args.distributed:
-            # wait for all processes to synchronize
-            dist.barrier()
-
-
     def refine_targets(self, targets, min_box_size):
         # rescale targets
         for tgt in targets:
