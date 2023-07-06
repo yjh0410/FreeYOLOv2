@@ -2,7 +2,7 @@
 python train.py \
         --cuda \
         -d coco \
-        --root /data/dataset/ \
+        --root /data/datasets/ \
         -m yolo_free_v2_medium\
         -bs 16 \
         -size 640 \
