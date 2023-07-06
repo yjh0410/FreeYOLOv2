@@ -2,7 +2,7 @@
 python -m torch.distributed.run --nproc_per_node=8 train.py \
                                                     --cuda \
                                                     -dist \
-                                                    -d coco \
+                                                    -d voc \
                                                     --root /data/datasets/ \
                                                     -m yolo_free_v2_medium \
                                                     -bs 128 \
